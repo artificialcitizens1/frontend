@@ -1,0 +1,6 @@
+{
+  "name": "PoliSim 3D World - Phase 6",
+  "description": "Phase 6: Interactive Population Control. Features detailed low-poly building clusters, a road network, and dynamic population. Users can now input target coordinates for two people via a UI to simulate real-time position updates.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
