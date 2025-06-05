@@ -1,6 +1,9 @@
 /* package imports */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+/* styles import */
+import "./styles/fonts.css";
+
 /* page/component imports */
 import Welcome from "./pages/Welcome";
 
