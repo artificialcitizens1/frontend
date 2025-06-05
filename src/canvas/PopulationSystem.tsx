@@ -1,19 +1,18 @@
-
-import React from 'react';
-import * as THREE from 'three';
-import PersonCapsule from './PersonCapsule';
+import React from "react";
+import * as THREE from "three";
+import PersonCapsule from "./PersonCapsule";
 
 // Static configuration for people (ID, color, speed)
 // Initial positions are now managed by App.tsx
 const peopleConfig = [
   {
-    id: 'person1',
-    color: '#FF4500', // OrangeRed
+    id: "person1",
+    color: "#FF4500", // OrangeRed
     speed: 2,
   },
   {
-    id: 'person2',
-    color: '#1E90FF', // DodgerBlue
+    id: "person2",
+    color: "#1E90FF", // DodgerBlue
     speed: 1.8,
   },
 ];
@@ -39,15 +38,15 @@ const PopulationSystem: React.FC<PopulationSystemProps> = ({
         let initialPos: THREE.Vector3;
         let targetPos: THREE.Vector3 | null;
 
-        if (personData.id === 'person1') {
+        if (personData.id === "person1") {
           initialPos = person1InitialPosition;
           targetPos = person1TargetPosition;
-        } else if (personData.id === 'person2') {
+        } else if (personData.id === "person2") {
           initialPos = person2InitialPosition;
           targetPos = person2TargetPosition;
         } else {
           // Should not happen with current config
-          initialPos = new THREE.Vector3(); 
+          initialPos = new THREE.Vector3();
           targetPos = null;
         }
 
@@ -69,4 +68,3 @@ const PopulationSystem: React.FC<PopulationSystemProps> = ({
 };
 
 export default PopulationSystem;
-    

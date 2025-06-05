@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React from "react";
 
 interface WorldTerrainProps {
   size: number;
@@ -11,7 +10,7 @@ const WorldTerrain: React.FC<WorldTerrainProps> = ({ size, divisions }) => {
     <>
       {/* Ground plane mesh that receives shadows */}
       <mesh
-        receiveShadow 
+        receiveShadow
         rotation={[-Math.PI / 2, 0, 0]} // Rotate plane to be horizontal
         position={[0, -0.01, 0]} // Slightly below grid lines to prevent z-fighting
       >
@@ -22,10 +21,10 @@ const WorldTerrain: React.FC<WorldTerrainProps> = ({ size, divisions }) => {
           flatShading={true} // Enable flat shading
         />
       </mesh>
-      
+
       {/* Grid helper for visual reference of the 100x100 unit grid */}
       <gridHelper
-        args={[size, divisions, '#666666', '#888888']} // Grid size, divisions, center line color, grid line color
+        args={[size, divisions, "#666666", "#888888"]} // Grid size, divisions, center line color, grid line color
         position={[0, 0, 0]} // Ensure grid is at Y=0
       />
     </>

@@ -1,12 +1,11 @@
-
-import React from 'react';
+import React from "react";
 
 const LightingSystem: React.FC = () => {
   return (
     <>
       {/* Ambient light for overall scene illumination */}
       <ambientLight intensity={0.7} color="#ffffff" />
-      
+
       {/* Directional light simulating sunlight, casting shadows */}
       <directionalLight
         castShadow

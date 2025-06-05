@@ -1,7 +1,6 @@
-
-import React, { useRef, useState, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import React, { useRef, useState, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 
 interface PersonCapsuleProps {
   id: string;
@@ -18,7 +17,7 @@ const PersonCapsule: React.FC<PersonCapsuleProps> = ({
   initialPosition,
   targetPosition,
   speed = 1.5,
-  color = '#FF0000',
+  color = "#FF0000",
   capsuleArgs = [0.4, 0.8, 4, 8],
   onTargetReached,
 }) => {
@@ -52,9 +51,10 @@ const PersonCapsule: React.FC<PersonCapsuleProps> = ({
         // Consider it "reached". This handles cases where target is set to current location.
         // Only call onTargetReached if we weren't already "not moving" or if the external target command is new.
         // This ensures we don't spam onTargetReached if target prop is repeatedly set to current location.
-         if (activeMovementTarget !== null || (targetPosition && !activeMovementTarget) ) { // if we were moving, or if we get a new target that is current pos
-            onTargetReached(id, meshRef.current.position.clone());
-         }
+        if (activeMovementTarget !== null || (targetPosition && !activeMovementTarget)) {
+          // if we were moving, or if we get a new target that is current pos
+          onTargetReached(id, meshRef.current.position.clone());
+        }
         setActiveMovementTarget(null); // Stop any theoretical movement.
       }
     } else {
@@ -77,7 +77,8 @@ const PersonCapsule: React.FC<PersonCapsuleProps> = ({
     const currentPos = meshRef.current.position;
     const distanceToTarget = currentPos.distanceTo(activeMovementTarget);
 
-    if (distanceToTarget < 0.1) { // Threshold for reaching the target
+    if (distanceToTarget < 0.1) {
+      // Threshold for reaching the target
       meshRef.current.position.copy(activeMovementTarget); // Snap to exact target
       onTargetReached(id, activeMovementTarget.clone());
       setActiveMovementTarget(null); // Stop movement
@@ -85,7 +86,9 @@ const PersonCapsule: React.FC<PersonCapsuleProps> = ({
       // Move towards activeMovementTarget
       const direction = activeMovementTarget.clone().sub(currentPos).normalize();
       const moveDistance = speed * delta;
-      meshRef.current.position.add(direction.multiplyScalar(Math.min(moveDistance, distanceToTarget)));
+      meshRef.current.position.add(
+        direction.multiplyScalar(Math.min(moveDistance, distanceToTarget))
+      );
 
       // Orient the capsule to look where it's going (Y-axis fixed)
       const lookAtPosition = currentPos.clone().add(direction);
@@ -102,4 +105,3 @@ const PersonCapsule: React.FC<PersonCapsuleProps> = ({
 };
 
 export default PersonCapsule;
-    
