@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 /* page/component imports */
 import Welcome from "./pages/Welcome";
+import SimulationApp from "./pages/SimulationApp";
 
 // Example page components
 const About = () => (
@@ -25,6 +26,7 @@ const App: React.FC = () => {
       {/* Routes */}
       <Routes>
         <Route path="/" element={<Welcome />} />
+        <Route path="/simulation" element={<SimulationApp />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>
