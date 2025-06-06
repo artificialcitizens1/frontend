@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+
 const Welcome = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative w-full min-h-screen bg-black overflow-hidden">
       {/* Main container */}
@@ -35,7 +39,10 @@ const Welcome = () => {
           {/* Navigation Buttons */}
           <div className="flex flex-col space-y-6 w-[555px]">
             {/* Create Simulation Button */}
-            <button className="w-full h-[104px] bg-white border border-white/30 hover:bg-white/90 transition-colors">
+            <button 
+              className="w-full h-[104px] bg-white border border-white/30 hover:bg-white/90 transition-colors"
+              onClick={() => navigate('/create-simulation')}
+            >
               <span 
                 className="flex items-center justify-center h-full text-[28px] leading-[37px] text-black"
                 style={{ fontFamily: 'Roboto Mono' }}
