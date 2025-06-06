@@ -1,0 +1,18 @@
+/* Import Roboto Mono from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap');
+
+/* Import Arcade Interlaced font */
+@font-face {
+  font-family: 'Arcade Interlaced';
+  src: url('/fonts/arcade-interlaced.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Global styles */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+} 

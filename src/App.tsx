@@ -1,8 +1,14 @@
 /* package imports */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+/* styles import */
+import "./styles/fonts.css";
+
 /* page/component imports */
 import Welcome from "./pages/Welcome";
+import CreateSimulation from "./pages/CreateSimulation";
+import SimulationDescription from "./pages/SimulationDescription";
+import CandidateSettings from "./pages/CandidateSettings";
 
 // Example page components
 const About = () => (
@@ -27,6 +33,9 @@ const App: React.FC = () => {
         <Route path="/" element={<Welcome />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/create-simulation" element={<CreateSimulation />} />
+        <Route path="/simulation-description" element={<SimulationDescription />} />
+        <Route path="/candidate-settings" element={<CandidateSettings />} />
       </Routes>
     </Router>
   );
