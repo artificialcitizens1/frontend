@@ -29,6 +29,7 @@ const CandidateSettings = () => {
   ]);
   const navigate = useNavigate();
   const { setCandidates: setStoreCandidates, getAllData } = useSimulationStore();
+  const [error, setError] = useState<string | null>(null);
 
   // Update store with candidates whenever they change
   useEffect(() => {
@@ -49,6 +50,10 @@ const CandidateSettings = () => {
       }
       
       newCandidates[index] = updatedCandidate;
+      
+      // Clear error when fields are updated
+      setError(null);
+      
       return newCandidates;
     });
   };
@@ -63,6 +68,40 @@ const CandidateSettings = () => {
     updateCandidate(index, {
       parameters: { ...candidates[index].parameters, mediaInteractions: media }
     });
+  };
+
+  const validateCandidates = () => {
+    for (let i = 0; i < candidates.length; i++) {
+      const candidate = candidates[i];
+      if (!candidate.name.trim()) {
+        setError(`Candidate ${i + 1} name is required`);
+        return false;
+      }
+      if (!candidate.description.trim()) {
+        setError(`Candidate ${i + 1} description is required`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Check if both candidates have filled required fields
+  const isFormValid = () => {
+    return candidates.every(candidate => 
+      candidate.name.trim() !== '' && 
+      candidate.description.trim() !== ''
+    );
+  };
+
+  const handleContinue = () => {
+    if (!validateCandidates()) {
+      return;
+    }
+    
+    // Get all form data from store and console.log it
+    const allData = getAllData();
+    console.log('Form Data:', allData);
+    navigate('/simulation-settings');
   };
 
   return (
@@ -104,14 +143,17 @@ const CandidateSettings = () => {
                 </p>
               </div>
             </div>
+            {error && (
+              <div className="text-red-500 mr-4 self-center">
+                {error}
+              </div>
+            )}
             <button 
-              className="px-[88px] py-5 bg-white hover:bg-white/90 transition-colors text-black text-2xl font-['Roboto Mono']"
-              onClick={() => {
-                // Get all form data from store and console.log it
-                const allData = getAllData();
-                console.log('Form Data:', allData);
-                navigate('/simulation-settings');
-              }}
+              className={`px-[88px] py-5 bg-white transition-colors text-black text-2xl font-['Roboto Mono'] ${
+                !isFormValid() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/90'
+              }`}
+              onClick={handleContinue}
+              disabled={!isFormValid()}
             >
               Continue
             </button>

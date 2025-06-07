@@ -8,6 +8,7 @@ import type {
   MediaOutlet 
 } from '../types/simulation';
 import { PoliticalStandingGraph } from '../components/simulation/PoliticalStandingGraph';
+import { useSimulationStore } from '../store/simulationStore';
 
 const defaultMediaOutlets: MediaOutlet[] = [
   { name: 'NNC', bias: 'Left Leaning', isSelected: true },
@@ -41,7 +42,9 @@ export const SimulationSettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<SimulationSettings>(defaultSettings);
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [newTopic, setNewTopic] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { setSimulationSettings, getAllData } = useSimulationStore();
 
   const handleAddTopic = () => {
     setShowTopicModal(true);
@@ -58,6 +61,7 @@ export const SimulationSettingsPage: React.FC = () => {
       }));
       setNewTopic('');
       setShowTopicModal(false);
+      setError(null);
     }
   };
 
@@ -172,6 +176,39 @@ export const SimulationSettingsPage: React.FC = () => {
     }));
   };
 
+  const validateSettings = () => {
+    // Check if at least one topic is selected
+    if (settings.electionSettings.topics.length === 0) {
+      setError("At least one election topic is required");
+      return false;
+    }
+    
+    // Check if at least one media outlet is selected
+    const hasSelectedOutlet = settings.mediaSettings.outlets.some(outlet => outlet.isSelected);
+    if (!hasSelectedOutlet) {
+      setError("At least one media outlet must be selected");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleContinue = () => {
+    if (!validateSettings()) {
+      return;
+    }
+    
+    // Store settings in simulation store
+    setSimulationSettings(settings);
+    
+    // Get all form data and log it
+    const allData = getAllData();
+    console.log('All Form Data:', allData);
+    
+    // Navigate to loading page
+    navigate('/simulation-loading');
+  };
+
   return (
     <div className="min-h-screen w-full relative">
       {/* Fixed Background */}
@@ -211,14 +248,14 @@ export const SimulationSettingsPage: React.FC = () => {
                 </p>
               </div>
             </div>
+            {error && (
+              <div className="text-red-500 mr-4 self-center">
+                {error}
+              </div>
+            )}
             <button 
               className="px-[88px] py-5 bg-white hover:bg-white/90 transition-colors text-black text-2xl font-['Roboto Mono']"
-              onClick={() => {
-                // Store settings in state/context if needed
-                console.log('Settings:', settings);
-                // Navigate to loading page
-                navigate('/simulation-loading');
-              }}
+              onClick={handleContinue}
             >
               Continue
             </button>

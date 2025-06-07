@@ -1,16 +1,31 @@
 import { useNavigate } from 'react-router-dom';
 import { useSimulationStore } from '../store';
+import { useState } from 'react';
 
 const SimulationDescription = () => {
   const navigate = useNavigate();
   const { description, setDescription } = useSimulationStore();
   const maxChars = 100;
+  const [error, setError] = useState<string | null>(null);
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     if (text.length <= maxChars) {
       setDescription(text);
+      if (error) setError(null);
     }
+  };
+
+  const handleContinue = () => {
+    if (!description.trim()) {
+      setError("Description is required");
+      return;
+    }
+    
+    // Log the description using the store
+    console.log('Description:', description);
+    // Navigate to candidate settings
+    navigate('/candidate-settings');
   };
 
   return (
@@ -53,20 +68,19 @@ const SimulationDescription = () => {
             {description.length}/{maxChars} characters
           </div>
         </div>
+        
+        {error && (
+          <div className="text-red-500 mt-10">
+            {error}
+          </div>
+        )}
 
         {/* Continue Button */}
         <button 
           className={`mt-16 w-[400px] h-[104px] bg-white hover:bg-white/90 transition-all ${
             !description.trim() ? 'opacity-50 cursor-not-allowed' : ''
           }`}
-          onClick={() => {
-            if (description.trim()) {
-              // Log the description using the store
-              console.log('Description:', description);
-              // Navigate to candidate settings
-              navigate('/candidate-settings');
-            }
-          }}
+          onClick={handleContinue}
           disabled={!description.trim()}
         >
           <span 
