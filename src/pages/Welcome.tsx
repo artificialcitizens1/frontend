@@ -70,17 +70,8 @@ const Welcome = () => {
                 Settings
               </span>
             </button>
-
-            {/* Exit Button */}
-            <button className="w-full h-[104px] mt-[355px] bg-transparent border border-white/30 hover:bg-white/10 transition-colors">
-              <span 
-                className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
-                style={{ fontFamily: 'Roboto Mono' }}
-              >
-                Exit
-              </span>
-            </button>
-          </div>
+          </div> 
+          
         </div>
       </div>
     </div>
