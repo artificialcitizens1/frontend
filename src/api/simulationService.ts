@@ -135,3 +135,13 @@ export const getSimulationLore = async (simId: string): Promise<LoreResponse> =>
     content: paragraphs
   };
 }; 
+
+export const getSimulationStatus = async (tick=0, simId: string): Promise<SimulationResponse> => {
+  try {
+      const response = await baseInstance.post(`/api/simulations/data`, {tick: tick, simId: simId});
+      return response.data;
+  } catch (error) {
+    console.error('Error fetching simulation status:', error);
+    throw error;
+  }
+};

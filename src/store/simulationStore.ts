@@ -7,13 +7,14 @@ interface SimulationState {
   description: string;
   candidates: [Candidate, Candidate] | null;
   simulationSettings: SimulationSettings | null;
+  simulationId: string | null;
 
   // Actions
   setSimulationName: (name: string) => void;
   setDescription: (desc: string) => void;
   setCandidates: (candidates: [Candidate, Candidate]) => void;
   setSimulationSettings: (settings: SimulationSettings) => void;
-
+  setSimulationId: (id: string) => void;
   // Reset function
   reset: () => void;
 
@@ -31,12 +32,12 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   description: "",
   candidates: null,
   simulationSettings: null,
-
+  simulationId: null,
   setSimulationName: (name) => set({ simulationName: name }),
   setDescription: (desc) => set({ description: desc }),
   setCandidates: (candidates) => set({ candidates }),
   setSimulationSettings: (settings) => set({ simulationSettings: settings }),
-
+  setSimulationId: (id) => set({ simulationId: id }),
   reset: () =>
     set({
       simulationName: "",

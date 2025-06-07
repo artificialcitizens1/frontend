@@ -6,7 +6,7 @@ import { startSimulationFlow } from '../api/simulationService';
 const SimulationCreation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { candidates } = useSimulationStore();
+  const { candidates, setSimulationId } = useSimulationStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +18,7 @@ const SimulationCreation = () => {
         
         // Navigate to the lore page with the simulation ID
         if (response && response.simulation && response.simulation.simId) {
+          setSimulationId(response.simulation.simId);
           navigate(`/simulation-lore/${response.simulation.simId}`);
         } else {
           setError('Invalid response from server. Missing simulation ID.');

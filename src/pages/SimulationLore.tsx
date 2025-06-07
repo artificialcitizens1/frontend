@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getSimulationLore } from '../api/simulationService';
+import { getSimulationLore, getSimulationStatus } from '../api/simulationService';
 
 const SimulationLore = () => {
   const { simId } = useParams<{ simId: string }>();
@@ -9,6 +9,7 @@ const SimulationLore = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [simulationData, setSimulationData] = useState<any | null>(null);
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -35,6 +36,21 @@ const SimulationLore = () => {
     };
 
     fetchLore();
+
+    const interval = setInterval(async () => {
+      try {
+        const status = await getSimulationStatus(1, simId!);
+        console.log('Simulation status:', status);
+        if(status){
+          setSimulationData(status);
+        }
+      } catch (error) {
+        console.error('Error fetching simulation status:', error);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+    
   }, [simId]);
 
   // Handle scrolling animation
@@ -157,7 +173,7 @@ const SimulationLore = () => {
       </div>
       
       {/* CSS Animations with enhanced effects */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
