@@ -48,9 +48,9 @@ const CreateSimulation = () => {
             if (error) setError(null);
           }}
           placeholder="Name your simulation"
-          className="w-[961px] h-[97px] bg-transparent text-white text-center text-[80px] focus:outline-none placeholder:text-white/50 placeholder:text-[80px] placeholder:transition-opacity focus:placeholder:opacity-0"
+          className="w-[961px] h-[80px] bg-transparent text-white text-center text-[40px] focus:outline-none placeholder:text-white/50 placeholder:text-[40px] placeholder:transition-opacity focus:placeholder:opacity-0"
           style={{
-            fontFamily: "Inter Display",
+            fontFamily: "Roboto Mono",
             fontWeight: 200,
             lineHeight: "97px",
           }}

@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useSimulationStore } from "../store";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const SimulationDescription = () => {
   const navigate = useNavigate();
   const { description, setDescription } = useSimulationStore();
-  const maxChars = 100;
+  const maxChars = 800;
   const [error, setError] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
@@ -15,6 +16,25 @@ const SimulationDescription = () => {
       if (error) setError(null);
     }
   };
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      const lineHeight = 42; // Corresponds to lineHeight: "42px"
+      const maxLines = 6;
+      const maxHeight = lineHeight * maxLines;
+
+      textareaRef.current.style.height = "auto";
+      const scrollHeight = textareaRef.current.scrollHeight;
+
+      if (scrollHeight > maxHeight) {
+        textareaRef.current.style.height = `${maxHeight}px`;
+        textareaRef.current.style.overflowY = "auto";
+      } else {
+        textareaRef.current.style.height = `${scrollHeight}px`;
+        textareaRef.current.style.overflowY = "hidden";
+      }
+    }
+  }, [description]);
 
   const handleContinue = () => {
     if (!description.trim()) {
@@ -51,19 +71,23 @@ const SimulationDescription = () => {
         {/* Text Area Field */}
         <div className="relative w-[961px]">
           <textarea
+            ref={textareaRef}
+            rows={1}
             value={description}
             onChange={handleDescriptionChange}
             placeholder="What's it all about?"
-            className="w-full min-h-[200px] bg-transparent text-white text-[80px] text-center focus:outline-none placeholder:text-white/50 placeholder:text-[80px] placeholder:transition-opacity focus:placeholder:opacity-0 resize-none"
+            className="w-[961px] bg-transparent text-white text-[28px] text-center focus:outline-none placeholder:text-white/50 placeholder:text-[28px] placeholder:transition-opacity focus:placeholder:opacity-0 resize-none"
             style={{
-              fontFamily: "Inter Display",
+              fontFamily: "Roboto Mono",
               fontWeight: 200,
-              lineHeight: "97px",
+              lineHeight: "42px",
+              scrollbarColor: "white rgba(255, 255, 255, 0.1)",
+              overflowY: "hidden",
             }}
           />
           <div
             className="absolute bottom-[-30px] right-0 text-white/50 text-sm"
-            style={{ fontFamily: "Inter Display" }}
+            style={{ fontFamily: "Roboto Mono" }}
           >
             {description.length}/{maxChars} characters
           </div>
