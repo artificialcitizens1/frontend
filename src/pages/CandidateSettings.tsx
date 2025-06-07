@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import type { Candidate, CommunicationStyle, MediaInteractions } from "../types/candidate";
-import { ParameterSlider } from "../components/candidate/ParameterSlider";
-import { PoliticalStandingGraph } from "../components/candidate/PoliticalStandingGraph";
-import { calculatePoliticalStanding } from "../utils/politicalCalculator";
-import { useSimulationStore } from "../store";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { Candidate, CommunicationStyle, MediaInteractions } from '../types/candidate';
+import { ParameterSlider } from '../components/candidate/ParameterSlider';
+import { PoliticalStandingGraph } from '../components/candidate/PoliticalStandingGraph';
+import { calculatePoliticalStanding } from '../utils/politicalCalculator';
+import { useSimulationStore } from '../store';
+import { startSimulationFlow } from '../api/simulationService';
 
 const defaultCandidate: Candidate = {
   id: "1",
@@ -30,6 +31,7 @@ const CandidateSettings = () => {
   const navigate = useNavigate();
   const { setCandidates: setStoreCandidates, getAllData } = useSimulationStore();
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Update store with candidates whenever they change
   useEffect(() => {
@@ -108,15 +110,17 @@ const CandidateSettings = () => {
     );
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!validateCandidates()) {
       return;
     }
 
     // Get all form data from store and console.log it
     const allData = getAllData();
-    console.log("Form Data:", allData);
-    navigate("/simulation-settings");
+    console.log('Form Data:', allData);
+    
+    // Navigate to simulation creation page
+    navigate('/simulation-creation');
   };
 
   return (
@@ -174,12 +178,12 @@ const CandidateSettings = () => {
             {error && <div className="text-red-500 mr-4 self-center">{error}</div>}
             <button
               className={`px-[88px] py-5 bg-white transition-colors text-black text-2xl font-['Roboto Mono'] ${
-                !isFormValid() ? "opacity-50 cursor-not-allowed" : "hover:bg-white/90"
+                !isFormValid() || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/90'
               }`}
               onClick={handleContinue}
-              disabled={!isFormValid()}
+              disabled={!isFormValid() || isLoading}
             >
-              Continue
+              {isLoading ? 'Loading...' : 'Continue'}
             </button>
           </div>
         </div>
