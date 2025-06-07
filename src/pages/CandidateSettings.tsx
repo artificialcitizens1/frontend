@@ -1,31 +1,31 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { Candidate, CommunicationStyle, MediaInteractions } from '../types/candidate';
-import { ParameterSlider } from '../components/candidate/ParameterSlider';
-import { PoliticalStandingGraph } from '../components/candidate/PoliticalStandingGraph';
-import { calculatePoliticalStanding } from '../utils/politicalCalculator';
-import { useSimulationStore } from '../store';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import type { Candidate, CommunicationStyle, MediaInteractions } from "../types/candidate";
+import { ParameterSlider } from "../components/candidate/ParameterSlider";
+import { PoliticalStandingGraph } from "../components/candidate/PoliticalStandingGraph";
+import { calculatePoliticalStanding } from "../utils/politicalCalculator";
+import { useSimulationStore } from "../store";
 
 const defaultCandidate: Candidate = {
-  id: '1',
-  name: '',
-  description: '',
-  avatarUrl: 'https://api.dicebear.com/7.x/personas/svg?seed=1',
+  id: "1",
+  name: "",
+  description: "",
+  avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=1",
   parameters: {
-    communicationStyle: 'Calm',
-    mediaInteractions: 'Few',
+    communicationStyle: "Calm",
+    mediaInteractions: "Few",
     charisma: 0.5,
     temper: 0.5,
     integrity: 0.5,
-    authenticity: 0.5
+    authenticity: 0.5,
   },
-  politicalStanding: { x: 0, y: 0 }
+  politicalStanding: { x: 0, y: 0 },
 };
 
 const CandidateSettings = () => {
   const [candidates, setCandidates] = useState<[Candidate, Candidate]>([
-    { ...defaultCandidate, id: '1' },
-    { ...defaultCandidate, id: '2', avatarUrl: 'https://api.dicebear.com/7.x/personas/svg?seed=2' }
+    { ...defaultCandidate, id: "1" },
+    { ...defaultCandidate, id: "2", avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=2" },
   ]);
   const navigate = useNavigate();
   const { setCandidates: setStoreCandidates, getAllData } = useSimulationStore();
@@ -51,36 +51,38 @@ const CandidateSettings = () => {
   }, []);
 
   const updateCandidate = (index: 0 | 1, updates: Partial<Candidate>) => {
-    setCandidates(prev => {
+    setCandidates((prev) => {
       const newCandidates = [...prev] as [Candidate, Candidate];
       const currentCandidate = newCandidates[index];
-      
+
       // Create the updated candidate
       const updatedCandidate = { ...currentCandidate, ...updates };
-      
+
       // If parameters were updated, recalculate political standing
       if (updates.parameters) {
-        updatedCandidate.politicalStanding = calculatePoliticalStanding(updatedCandidate.parameters);
+        updatedCandidate.politicalStanding = calculatePoliticalStanding(
+          updatedCandidate.parameters
+        );
       }
-      
+
       newCandidates[index] = updatedCandidate;
-      
+
       // Clear error when fields are updated
       setError(null);
-      
+
       return newCandidates;
     });
   };
 
   const handleStyleSelect = (index: 0 | 1, style: CommunicationStyle) => {
     updateCandidate(index, {
-      parameters: { ...candidates[index].parameters, communicationStyle: style }
+      parameters: { ...candidates[index].parameters, communicationStyle: style },
     });
   };
 
   const handleMediaSelect = (index: 0 | 1, media: MediaInteractions) => {
     updateCandidate(index, {
-      parameters: { ...candidates[index].parameters, mediaInteractions: media }
+      parameters: { ...candidates[index].parameters, mediaInteractions: media },
     });
   };
 
@@ -101,9 +103,8 @@ const CandidateSettings = () => {
 
   // Check if both candidates have filled required fields
   const isFormValid = () => {
-    return candidates.every(candidate => 
-      candidate.name.trim() !== '' && 
-      candidate.description.trim() !== ''
+    return candidates.every(
+      (candidate) => candidate.name.trim() !== "" && candidate.description.trim() !== ""
     );
   };
 
@@ -111,23 +112,23 @@ const CandidateSettings = () => {
     if (!validateCandidates()) {
       return;
     }
-    
+
     // Get all form data from store and console.log it
     const allData = getAllData();
-    console.log('Form Data:', allData);
-    navigate('/simulation-settings');
+    console.log("Form Data:", allData);
+    navigate("/simulation-settings");
   };
 
   return (
     <div className="min-h-screen w-full relative overflow-x-hidden">
       {/* Fixed Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-[#131B39] to-[#0F1322]">
-        <img 
+        <img
           src="/images/top_grid.png"
           alt="Top grid"
           className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
         />
-        <img 
+        <img
           src="/images/bottom_grid.png"
           alt="Bottom grid"
           className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
@@ -137,15 +138,27 @@ const CandidateSettings = () => {
       {/* Main Content Container */}
       <div className="relative z-10 overflow-hidden">
         {/* Header */}
-        <div className="sticky top-0 z-50 bg-gradient-to-br from-[#131B39] to-[#0F1322] py-6 px-4 sm:px-8 overflow-hidden">
-          <div className="max-w-[1728px] mx-auto flex flex-col md:flex-row justify-between items-start gap-4 md:gap-0">
-            <div className="flex items-center gap-2 sm:gap-6">
-              <button 
-                className="w-16 h-16 sm:w-32 sm:h-32 text-white text-6xl hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center"
+        <div className="sticky top-0 z-50 bg-gradient-to-br from-[#131B39] to-[#0F1322] py-6 px-8">
+          <div className="max-w-[1728px] mx-auto flex justify-between items-start">
+            <div className="flex items-center gap-6">
+              <button
+                className="w-32 h-32 text-white text-6xl hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center"
                 onClick={() => navigate(-1)}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-12 sm:h-12">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </button>
               <div>
@@ -158,14 +171,10 @@ const CandidateSettings = () => {
                 </p>
               </div>
             </div>
-            {error && (
-              <div className="text-red-500 mr-4 self-center">
-                {error}
-              </div>
-            )}
-            <button 
+            {error && <div className="text-red-500 mr-4 self-center">{error}</div>}
+            <button
               className={`px-[88px] py-5 bg-white transition-colors text-black text-2xl font-['Roboto Mono'] ${
-                !isFormValid() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/90'
+                !isFormValid() ? "opacity-50 cursor-not-allowed" : "hover:bg-white/90"
               }`}
               onClick={handleContinue}
               disabled={!isFormValid()}
@@ -180,7 +189,7 @@ const CandidateSettings = () => {
           {/* Main Content */}
           <div className="flex flex-col md:flex-row gap-14 relative">
             {candidates.map((candidate, index) => (
-              <div 
+              <div
                 key={candidate.id}
                 className="flex-1 bg-black/10 border border-white/20 backdrop-blur-lg rounded-sm"
               >
@@ -190,7 +199,7 @@ const CandidateSettings = () => {
                     Select Avatars
                   </span>
                   <div className="mt-8 flex flex-col items-center">
-                    <img 
+                    <img
                       src={candidate.avatarUrl}
                       alt="Avatar"
                       className="w-[166px] h-[166px] rounded-full bg-white/10"
@@ -216,7 +225,9 @@ const CandidateSettings = () => {
                       <input
                         type="text"
                         value={candidate.description}
-                        onChange={(e) => updateCandidate(index as 0 | 1, { description: e.target.value })}
+                        onChange={(e) =>
+                          updateCandidate(index as 0 | 1, { description: e.target.value })
+                        }
                         className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
                         placeholder="Enter description"
                       />
@@ -230,22 +241,20 @@ const CandidateSettings = () => {
                     <h3 className="text-white font-medium text-xl">
                       Set Parameters for this candidate
                     </h3>
-                    <button className="text-[#EF69B6] font-medium text-xl">
-                      View Routine
-                    </button>
+                    <button className="text-[#EF69B6] font-medium text-xl">View Routine</button>
                   </div>
 
                   {/* Communication Style */}
                   <div className="mb-6">
                     <span className="text-white/80 text-sm">Communication Style</span>
                     <div className="flex gap-1 mt-2">
-                      {(['Aggressive', 'Calm', 'Trendy'] as const).map((style) => (
+                      {(["Aggressive", "Calm", "Trendy"] as const).map((style) => (
                         <button
                           key={style}
                           className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
                             candidate.parameters.communicationStyle === style
-                              ? 'border-white text-white'
-                              : 'border-white/30 text-white/60'
+                              ? "border-white text-white"
+                              : "border-white/30 text-white/60"
                           }`}
                           onClick={() => handleStyleSelect(index as 0 | 1, style)}
                         >
@@ -259,13 +268,13 @@ const CandidateSettings = () => {
                   <div className="mb-6">
                     <span className="text-white/80 text-sm">Media Interactions</span>
                     <div className="flex gap-1 mt-2">
-                      {(['None', 'Few', 'Many'] as const).map((media) => (
+                      {(["None", "Few", "Many"] as const).map((media) => (
                         <button
                           key={media}
                           className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
                             candidate.parameters.mediaInteractions === media
-                              ? 'border-white text-white'
-                              : 'border-white/30 text-white/60'
+                              ? "border-white text-white"
+                              : "border-white/30 text-white/60"
                           }`}
                           onClick={() => handleMediaSelect(index as 0 | 1, media)}
                         >
@@ -280,30 +289,38 @@ const CandidateSettings = () => {
                     <ParameterSlider
                       label="Charisma"
                       value={candidate.parameters.charisma}
-                      onChange={(value) => updateCandidate(index as 0 | 1, {
-                        parameters: { ...candidate.parameters, charisma: value }
-                      })}
+                      onChange={(value) =>
+                        updateCandidate(index as 0 | 1, {
+                          parameters: { ...candidate.parameters, charisma: value },
+                        })
+                      }
                     />
                     <ParameterSlider
                       label="Temper"
                       value={candidate.parameters.temper}
-                      onChange={(value) => updateCandidate(index as 0 | 1, {
-                        parameters: { ...candidate.parameters, temper: value }
-                      })}
+                      onChange={(value) =>
+                        updateCandidate(index as 0 | 1, {
+                          parameters: { ...candidate.parameters, temper: value },
+                        })
+                      }
                     />
                     <ParameterSlider
                       label="Integrity"
                       value={candidate.parameters.integrity}
-                      onChange={(value) => updateCandidate(index as 0 | 1, {
-                        parameters: { ...candidate.parameters, integrity: value }
-                      })}
+                      onChange={(value) =>
+                        updateCandidate(index as 0 | 1, {
+                          parameters: { ...candidate.parameters, integrity: value },
+                        })
+                      }
                     />
                     <ParameterSlider
                       label="Authenticity"
                       value={candidate.parameters.authenticity}
-                      onChange={(value) => updateCandidate(index as 0 | 1, {
-                        parameters: { ...candidate.parameters, authenticity: value }
-                      })}
+                      onChange={(value) =>
+                        updateCandidate(index as 0 | 1, {
+                          parameters: { ...candidate.parameters, authenticity: value },
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -312,7 +329,9 @@ const CandidateSettings = () => {
                 <div className="p-8 border-t border-white/20">
                   <PoliticalStandingGraph
                     value={candidate.politicalStanding}
-                    onChange={(value) => updateCandidate(index as 0 | 1, { politicalStanding: value })}
+                    onChange={(value) =>
+                      updateCandidate(index as 0 | 1, { politicalStanding: value })
+                    }
                   />
                 </div>
               </div>
@@ -329,4 +348,4 @@ const CandidateSettings = () => {
   );
 };
 
-export default CandidateSettings; 
+export default CandidateSettings;

@@ -7,7 +7,7 @@ export interface ElectionSettings {
   simulationType: number; // 0 to 1, where 0 is Realistic and 1 is Satirical
 }
 
-export type Duration = '1 Day' | '2 Days' | '3 Days' | '4 Days';
+export type Duration = "1 Day" | "2 Days" | "3 Days" | "4 Days";
 export type Speed = 0.25 | 0.5 | 1 | 1.25 | 1.5 | 2;
 
 export interface TimeSettings {
@@ -17,7 +17,7 @@ export interface TimeSettings {
 
 export interface MediaOutlet {
   name: string;
-  bias: 'Left Leaning' | 'Right Leaning';
+  bias: "Left Leaning" | "Right Leaning";
   isSelected: boolean;
 }
 
@@ -35,4 +35,4 @@ export interface SimulationSettings {
   timeSettings: TimeSettings;
   mediaSettings: MediaSettings;
   majoritySentiment: MajoritySentiment;
-} 
+}

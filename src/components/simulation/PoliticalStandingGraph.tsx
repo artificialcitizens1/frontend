@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { MajoritySentiment } from '../../types/simulation';
+import { useState, useEffect, useCallback } from "react";
+import type { MajoritySentiment } from "../../types/simulation";
 
 interface PoliticalStandingGraphProps {
   value: MajoritySentiment;
@@ -7,10 +7,10 @@ interface PoliticalStandingGraphProps {
   description?: string;
 }
 
-export const PoliticalStandingGraph = ({ 
-  value, 
+export const PoliticalStandingGraph = ({
+  value,
   onChange,
-  description = "This defines where the majority crowd leans, this favours the candidate that also has similar views. Although this can change as the simulation runs."
+  description = "This defines where the majority crowd leans, this favours the candidate that also has similar views. Although this can change as the simulation runs.",
 }: PoliticalStandingGraphProps) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -26,17 +26,20 @@ export const PoliticalStandingGraph = ({
     setIsDragging(true);
   };
 
-  const handleDragMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
+  const handleDragMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging) return;
 
-    const graphElement = document.getElementById('political-graph');
-    if (!graphElement) return;
+      const graphElement = document.getElementById("political-graph");
+      if (!graphElement) return;
 
-    const rect = graphElement.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-    onChange({ x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, -y)) });
-  }, [isDragging, onChange]);
+      const rect = graphElement.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+      onChange({ x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, -y)) });
+    },
+    [isDragging, onChange]
+  );
 
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
@@ -44,12 +47,12 @@ export const PoliticalStandingGraph = ({
 
   useEffect(() => {
     if (isDragging) {
-      window.addEventListener('mousemove', handleDragMove);
-      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener("mousemove", handleDragMove);
+      window.addEventListener("mouseup", handleDragEnd);
     }
     return () => {
-      window.removeEventListener('mousemove', handleDragMove);
-      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener("mousemove", handleDragMove);
+      window.removeEventListener("mouseup", handleDragEnd);
     };
   }, [isDragging, handleDragMove, handleDragEnd]);
 
@@ -57,8 +60,8 @@ export const PoliticalStandingGraph = ({
     <div className="flex flex-col gap-4">
       <h3 className="text-white text-xl">Majority Sentiment</h3>
       <p className="text-white/80 text-sm">{description}</p>
-      
-      <div 
+
+      <div
         id="political-graph"
         className="relative w-[305px] h-[305px] cursor-crosshair"
         onClick={handleGraphClick}
@@ -83,11 +86,11 @@ export const PoliticalStandingGraph = ({
         </span>
 
         {/* Position indicator */}
-        <div 
+        <div
           className="absolute w-6 h-6 bg-[#D25EA9] border-2 border-white/60 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing"
           style={{
             left: `${50 + value.x * 50}%`,
-            top: `${50 - value.y * 50}%`
+            top: `${50 - value.y * 50}%`,
           }}
           onMouseDown={handleDragStart}
         />
@@ -101,4 +104,4 @@ export const PoliticalStandingGraph = ({
       </div>
     </div>
   );
-}; 
+};

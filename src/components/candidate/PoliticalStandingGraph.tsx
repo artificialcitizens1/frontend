@@ -1,4 +1,4 @@
-import type { PoliticalStanding } from '../../types/candidate';
+import type { PoliticalStanding } from "../../types/candidate";
 
 interface PoliticalStandingGraphProps {
   value: PoliticalStanding;
@@ -9,8 +9,8 @@ export const PoliticalStandingGraph = ({ value, onChange }: PoliticalStandingGra
   const handleGraphClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const size = rect.width;
-    const x = Math.max(-1, Math.min(1, 2 * (e.clientX - rect.left - size / 2) / size));
-    const y = Math.max(-1, Math.min(1, 2 * (e.clientY - rect.top - size / 2) / size));
+    const x = Math.max(-1, Math.min(1, (2 * (e.clientX - rect.left - size / 2)) / size));
+    const y = Math.max(-1, Math.min(1, (2 * (e.clientY - rect.top - size / 2)) / size));
     onChange({ x, y });
   };
 
@@ -22,18 +22,18 @@ export const PoliticalStandingGraph = ({ value, onChange }: PoliticalStandingGra
     const handleDrag = (e: MouseEvent) => {
       const rect = graph.getBoundingClientRect();
       const size = rect.width;
-      const x = Math.max(-1, Math.min(1, 2 * (e.clientX - rect.left - size / 2) / size));
-      const y = Math.max(-1, Math.min(1, 2 * (e.clientY - rect.top - size / 2) / size));
+      const x = Math.max(-1, Math.min(1, (2 * (e.clientX - rect.left - size / 2)) / size));
+      const y = Math.max(-1, Math.min(1, (2 * (e.clientY - rect.top - size / 2)) / size));
       onChange({ x, y });
     };
 
     const handleDragEnd = () => {
-      document.removeEventListener('mousemove', handleDrag);
-      document.removeEventListener('mouseup', handleDragEnd);
+      document.removeEventListener("mousemove", handleDrag);
+      document.removeEventListener("mouseup", handleDragEnd);
     };
 
-    document.addEventListener('mousemove', handleDrag);
-    document.addEventListener('mouseup', handleDragEnd);
+    document.addEventListener("mousemove", handleDrag);
+    document.addEventListener("mouseup", handleDragEnd);
   };
 
   return (
@@ -41,11 +41,8 @@ export const PoliticalStandingGraph = ({ value, onChange }: PoliticalStandingGra
       <h3 className="text-white font-medium text-[20px] font-['Inter']">
         Set political standing for this candidate
       </h3>
-      
-      <div 
-        className="relative w-full max-w-[305px] h-[305px] cursor-crosshair mx-auto"
-        onClick={handleGraphClick}
-      >
+
+      <div className="relative w-[305px] h-[305px] cursor-crosshair" onClick={handleGraphClick}>
         {/* Grid lines */}
         <div className="absolute inset-0 border border-white/30 opacity-30" />
         <div className="absolute left-1/2 top-0 bottom-0 w-[1.5px] bg-white opacity-30" />
@@ -66,11 +63,11 @@ export const PoliticalStandingGraph = ({ value, onChange }: PoliticalStandingGra
         </span>
 
         {/* Position indicator */}
-        <div 
+        <div
           className="absolute w-6 h-6 bg-[#D25EA9] border-2 border-white/60 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing"
           style={{
             left: `${50 + value.x * 50}%`,
-            top: `${50 + value.y * 50}%`
+            top: `${50 + value.y * 50}%`,
           }}
           onMouseDown={handleDragStart}
         />
@@ -84,4 +81,4 @@ export const PoliticalStandingGraph = ({ value, onChange }: PoliticalStandingGra
       </div>
     </div>
   );
-}; 
+};
