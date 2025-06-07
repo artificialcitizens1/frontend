@@ -50,6 +50,11 @@ const CreateSimulation = () => {
             setSimulationName(e.target.value);
             if (error) setError(null);
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleContinue();
+            }
+          }}
           placeholder="Name your simulation"
           autoFocus
           className="w-[961px] h-[80px] bg-transparent text-white text-center text-[40px] focus:outline-none placeholder:text-white/50 placeholder:text-[40px] placeholder:transition-opacity focus:placeholder:opacity-0"

@@ -78,6 +78,12 @@ const SimulationDescription = () => {
             rows={1}
             value={description}
             onChange={handleDescriptionChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleContinue();
+              }
+            }}
             placeholder="What's it all about?"
             autoFocus
             className="w-[961px] bg-transparent text-white text-[28px] text-center focus:outline-none placeholder:text-white/50 placeholder:text-[28px] placeholder:transition-opacity focus:placeholder:opacity-0 resize-none"
