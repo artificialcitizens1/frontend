@@ -12,6 +12,7 @@ import CandidateSettings from "./pages/CandidateSettings";
 import { SimulationSettingsPage } from "./pages/SimulationSettings";
 import { SimulationLoading } from "./pages/SimulationLoading";
 import { SimulationResult } from "./pages/SimulationResult";
+import VoterDetails from "./pages/VoterDetails";
 
 const App: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const App: React.FC = () => {
         <Route path="/simulation-settings" element={<SimulationSettingsPage />} />
         <Route path="/simulation-loading" element={<SimulationLoading />} />
         <Route path="/simulation-result" element={<SimulationResult />} />
+        <Route path="/voter-details" element={<VoterDetails />} />
       </Routes>
     </Router>
   );

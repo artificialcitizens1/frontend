@@ -7,16 +7,16 @@ interface SimulationState {
   description: string;
   candidates: [Candidate, Candidate] | null;
   simulationSettings: SimulationSettings | null;
-  
+
   // Actions
   setSimulationName: (name: string) => void;
   setDescription: (desc: string) => void;
   setCandidates: (candidates: [Candidate, Candidate]) => void;
   setSimulationSettings: (settings: SimulationSettings) => void;
-  
+
   // Reset function
   reset: () => void;
-  
+
   // Get all data at once
   getAllData: () => {
     simulationName: string;
@@ -31,23 +31,24 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   description: "",
   candidates: null,
   simulationSettings: null,
-  
+
   setSimulationName: (name) => set({ simulationName: name }),
   setDescription: (desc) => set({ description: desc }),
   setCandidates: (candidates) => set({ candidates }),
   setSimulationSettings: (settings) => set({ simulationSettings: settings }),
-  
-  reset: () => set({ 
-    simulationName: "",
-    description: "",
-    candidates: null,
-    simulationSettings: null
-  }),
-  
+
+  reset: () =>
+    set({
+      simulationName: "",
+      description: "",
+      candidates: null,
+      simulationSettings: null,
+    }),
+
   getAllData: () => ({
     simulationName: get().simulationName,
     description: get().description,
     candidates: get().candidates,
-    simulationSettings: get().simulationSettings
-  })
-})); 
+    simulationSettings: get().simulationSettings,
+  }),
+}));

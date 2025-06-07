@@ -1,11 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 /* Import Roboto Mono from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap");
+
+/* Import Arcade Interlaced font */
+@font-face {
+  font-family: "Arcade Interlaced";
+  src: url("/fonts/arcade-interlaced.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ManifoldExtendedCF';
+  src: url('/fonts/manifoldextendedcf-bold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 /* Global styles */
 body {
   margin: 0;
   padding: 0;
   background-color: black;
-} 
+}
+
+.roboto-mono {
+  font-family: 'Roboto Mono', monospace;
+}

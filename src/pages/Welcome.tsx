@@ -1,5 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import '../styles/fonts.css';
+import { useNavigate } from "react-router-dom";
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -10,16 +9,16 @@ const Welcome = () => {
       <div className="max-w-[1728px] mx-auto relative min-h-screen">
         {/* Background image */}
         <div className="absolute right-0 top-0 w-[1117px] h-full">
-          <img 
+          <img
             src="/images/home_image.png"
             alt="Throne background"
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay */}
-          <div 
+          <div
             className="absolute left-[-591px] top-0 w-[591px] h-full"
             style={{
-              background: 'linear-gradient(83.07deg, #000000 24.7%, rgba(0, 0, 0, 0) 69.47%)'
+              background: "linear-gradient(83.07deg, #000000 24.7%, rgba(0, 0, 0, 0) 69.47%)",
             }}
           />
         </div>
@@ -27,14 +26,11 @@ const Welcome = () => {
         {/* Content */}
         <div className="relative z-20 pt-[104px] pl-[72px]">
           {/* Logo/Title */}
-          <h1 
-            className="text-[52px] leading-[52px] text-white mb-[53px]"
-            style={{ 
-              fontFamily: '"Press Start 2P", monospace',
-              fontWeight: 400,
-              fontSize: '52px',
-              lineHeight: '100%',
-              letterSpacing: '0%'
+          <h1
+            className="text-[52px] leading-[65px] text-white mb-[53px]"
+            style={{
+              fontFamily: "Arcade Interlaced",
+              letterSpacing: "0.02em",
             }}
           >
             SIMLECTIONS
@@ -43,13 +39,13 @@ const Welcome = () => {
           {/* Navigation Buttons */}
           <div className="flex flex-col space-y-6 w-[555px]">
             {/* Create Simulation Button */}
-            <button 
+            <button
               className="w-full h-[104px] bg-white border border-white/30 hover:bg-white/90 transition-colors"
-              onClick={() => navigate('/create-simulation')}
+              onClick={() => navigate("/create-simulation")}
             >
-              <span 
+              <span
                 className="flex items-center justify-center h-full text-[28px] leading-[37px] text-black"
-                style={{ fontFamily: 'Roboto Mono' }}
+                style={{ fontFamily: "Roboto Mono" }}
               >
                 Create A Simulation
               </span>
@@ -57,9 +53,9 @@ const Welcome = () => {
 
             {/* All Simulations Button */}
             <button className="w-full h-[104px] bg-transparent border border-white/30 hover:bg-white/10 transition-colors">
-              <span 
+              <span
                 className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
-                style={{ fontFamily: 'Roboto Mono' }}
+                style={{ fontFamily: "Roboto Mono" }}
               >
                 All Simulations
               </span>
@@ -67,15 +63,27 @@ const Welcome = () => {
 
             {/* Settings Button */}
             <button className="w-full h-[104px] bg-transparent border border-white/30 hover:bg-white/10 transition-colors">
-              <span 
+              <span
                 className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
-                style={{ fontFamily: 'Roboto Mono' }}
+                style={{ fontFamily: "Roboto Mono" }}
               >
                 Settings
               </span>
             </button>
-          </div> 
-          
+
+            {/* Voter Details Button */}
+            <button
+              className="w-full h-[104px] bg-transparent border border-white/30 hover:bg-white/10 transition-colors"
+              onClick={() => navigate("/voter-details")}
+            >
+              <span
+                className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
+                style={{ fontFamily: "Roboto Mono" }}
+              >
+                Voter Details Demo
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

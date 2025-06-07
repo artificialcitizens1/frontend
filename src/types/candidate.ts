@@ -1,5 +1,5 @@
-export type CommunicationStyle = 'Aggressive' | 'Calm' | 'Trendy';
-export type MediaInteractions = 'None' | 'Few' | 'Many';
+export type CommunicationStyle = "Aggressive" | "Calm" | "Trendy";
+export type MediaInteractions = "None" | "Few" | "Many";
 
 export interface PoliticalStanding {
   x: number; // -1 to 1 for Left to Right
@@ -22,4 +22,4 @@ export interface Candidate {
   avatarUrl: string;
   parameters: CandidateParameters;
   politicalStanding: PoliticalStanding;
-} 
+}
