@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Candidate, CommunicationStyle, MediaInteractions } from '../types/candidate';
 import { ParameterSlider } from '../components/candidate/ParameterSlider';
 import { PoliticalStandingGraph } from '../components/candidate/PoliticalStandingGraph';
 import { calculatePoliticalStanding } from '../utils/politicalCalculator';
+import { useSimulationStore } from '../store';
 
 const defaultCandidate: Candidate = {
   id: '1',
@@ -27,6 +28,12 @@ const CandidateSettings = () => {
     { ...defaultCandidate, id: '2', avatarUrl: 'https://api.dicebear.com/7.x/personas/svg?seed=2' }
   ]);
   const navigate = useNavigate();
+  const { setCandidates: setStoreCandidates, getAllData } = useSimulationStore();
+
+  // Update store with candidates whenever they change
+  useEffect(() => {
+    setStoreCandidates(candidates);
+  }, [candidates, setStoreCandidates]);
 
   const updateCandidate = (index: 0 | 1, updates: Partial<Candidate>) => {
     setCandidates(prev => {
@@ -65,12 +72,12 @@ const CandidateSettings = () => {
         <img 
           src="/images/top_grid.png"
           alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-top"
+          className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
         />
         <img 
           src="/images/bottom_grid.png"
           alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-bottom"
+          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
         />
       </div>
 
@@ -100,9 +107,9 @@ const CandidateSettings = () => {
             <button 
               className="px-[88px] py-5 bg-white hover:bg-white/90 transition-colors text-black text-2xl font-['Roboto Mono']"
               onClick={() => {
-                // Store candidates in state/context if needed
-                console.log('Candidates:', candidates);
-                // Navigate to simulation settings
+                // Get all form data from store and console.log it
+                const allData = getAllData();
+                console.log('Form Data:', allData);
                 navigate('/simulation-settings');
               }}
             >

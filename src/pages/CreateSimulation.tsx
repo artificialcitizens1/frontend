@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSimulationStore } from '../store';
 
 const CreateSimulation = () => {
-  const [simulationName, setSimulationName] = useState('');
   const navigate = useNavigate();
+  const { simulationName, setSimulationName } = useSimulationStore();
 
   return (
     <div className="relative w-full h-screen bg-[#0A1929] overflow-hidden">
@@ -13,13 +13,13 @@ const CreateSimulation = () => {
         <img 
           src="/images/top_grid.png"
           alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-top"
+          className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
         />
         {/* Bottom Grid */}
         <img 
           src="/images/bottom_grid.png"
           alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-bottom"
+          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
         />
       </div>
 
@@ -46,7 +46,7 @@ const CreateSimulation = () => {
           }`}
           onClick={() => {
             if (simulationName.trim()) {
-              // Handle simulation creation
+              // Log the simulation name using the store
               console.log('Creating simulation:', simulationName);
               // Navigate to description page
               navigate('/simulation-description');
