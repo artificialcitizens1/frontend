@@ -37,13 +37,13 @@ export const PoliticalStandingGraph = ({ value, onChange }: PoliticalStandingGra
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full">
+    <div className="flex flex-col items-center gap-8 w-full overflow-visible">
       <h3 className="text-white font-medium text-[20px] font-['Inter']">
         Set political standing for this candidate
       </h3>
       
       <div 
-        className="relative w-[305px] h-[305px] cursor-crosshair"
+        className="relative w-full max-w-[305px] h-[305px] cursor-crosshair mx-auto"
         onClick={handleGraphClick}
       >
         {/* Grid lines */}
@@ -58,10 +58,10 @@ export const PoliticalStandingGraph = ({ value, onChange }: PoliticalStandingGra
         <span className="absolute left-1/2 -bottom-6 -translate-x-1/2 text-white text-[14px] font-light">
           Libertarian
         </span>
-        <span className="absolute top-1/2 -left-8 -translate-y-1/2 text-white text-[14px] font-light">
+        <span className="absolute top-1/2 -left-6 -translate-y-1/2 text-white text-[14px] font-light">
           Left
         </span>
-        <span className="absolute top-1/2 -right-8 -translate-y-1/2 text-white text-[14px] font-light">
+        <span className="absolute top-1/2 -right-6 -translate-y-1/2 text-white text-[14px] font-light">
           Right
         </span>
 

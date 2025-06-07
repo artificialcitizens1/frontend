@@ -36,6 +36,20 @@ const CandidateSettings = () => {
     setStoreCandidates(candidates);
   }, [candidates, setStoreCandidates]);
 
+  // Set overflow-x: hidden on document.body to prevent horizontal scroll
+  useEffect(() => {
+    // Save original style
+    const originalStyle = document.body.style.overflowX;
+    
+    // Set overflow-x hidden
+    document.body.style.overflowX = 'hidden';
+    
+    // Clean up function to restore original style
+    return () => {
+      document.body.style.overflowX = originalStyle;
+    };
+  }, []);
+
   const updateCandidate = (index: 0 | 1, updates: Partial<Candidate>) => {
     setCandidates(prev => {
       const newCandidates = [...prev] as [Candidate, Candidate];
@@ -105,7 +119,7 @@ const CandidateSettings = () => {
   };
 
   return (
-    <div className="min-h-screen w-full relative">
+    <div className="min-h-screen w-full relative overflow-x-hidden">
       {/* Fixed Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-[#131B39] to-[#0F1322]">
         <img 
@@ -121,24 +135,25 @@ const CandidateSettings = () => {
       </div>
 
       {/* Main Content Container */}
-      <div className="relative z-10">
+      <div className="relative z-10 overflow-hidden">
         {/* Header */}
-        <div className="sticky top-0 z-50 bg-gradient-to-br from-[#131B39] to-[#0F1322] py-6 px-8">
-          <div className="max-w-[1728px] mx-auto flex justify-between items-start">
-            <div className="flex items-center gap-6">
+        <div className="sticky top-0 z-50 bg-gradient-to-br from-[#131B39] to-[#0F1322] py-6 px-4 sm:px-8 overflow-hidden">
+          <div className="max-w-[1728px] mx-auto flex flex-col md:flex-row justify-between items-start gap-4 md:gap-0">
+            <div className="flex items-center gap-2 sm:gap-6">
               <button 
-                className="w-32 h-32 text-white text-6xl hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center"
+                className="w-16 h-16 sm:w-32 sm:h-32 text-white text-6xl hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center"
                 onClick={() => navigate(-1)}
               >
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-12 sm:h-12">
                   <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
               <div>
-                <h1 className="text-[56px] font-medium font-['Inter Display'] text-white">
+                
+                <h1 className="text-2xl sm:text-[56px] font-medium font-['Inter Display'] text-white mb-[20px]">
                   Candidate Settings
                 </h1>
-                <p className="text-white/80 text-base font-light">
+                <p className="text-white/80 text-xs sm:text-base font-light">
                   Select 2 candidate avatars and set their settings and their political standings
                 </p>
               </div>
@@ -161,9 +176,9 @@ const CandidateSettings = () => {
         </div>
 
         {/* Content */}
-        <div className="max-w-[1728px] mx-auto px-8 py-10">
+        <div className="max-w-[1728px] mx-auto px-4 sm:px-8 py-10 overflow-hidden">
           {/* Main Content */}
-          <div className="flex gap-14 relative">
+          <div className="flex flex-col md:flex-row gap-14 relative">
             {candidates.map((candidate, index) => (
               <div 
                 key={candidate.id}
