@@ -100,8 +100,10 @@ const CandidateSettings = () => {
             <button 
               className="px-[88px] py-5 bg-white hover:bg-white/90 transition-colors text-black text-2xl font-['Roboto Mono']"
               onClick={() => {
-                // Handle continue
+                // Store candidates in state/context if needed
                 console.log('Candidates:', candidates);
+                // Navigate to simulation settings
+                navigate('/simulation-settings');
               }}
             >
               Continue
