@@ -1,9 +1,23 @@
 import { useNavigate } from 'react-router-dom';
 import { useSimulationStore } from '../store';
+import { useState } from 'react';
 
 const CreateSimulation = () => {
   const navigate = useNavigate();
   const { simulationName, setSimulationName } = useSimulationStore();
+  const [error, setError] = useState<string | null>(null);
+
+  const handleContinue = () => {
+    if (!simulationName.trim()) {
+      setError("Simulation name is required");
+      return;
+    }
+    
+    // Log the simulation name using the store
+    console.log('Creating simulation:', simulationName);
+    // Navigate to description page
+    navigate('/simulation-description');
+  };
 
   return (
     <div className="relative w-full h-screen bg-[#0A1929] overflow-hidden">
@@ -29,7 +43,10 @@ const CreateSimulation = () => {
         <input
           type="text"
           value={simulationName}
-          onChange={(e) => setSimulationName(e.target.value)}
+          onChange={(e) => {
+            setSimulationName(e.target.value);
+            if (error) setError(null);
+          }}
           placeholder="Name your simulation"
           className="w-[961px] h-[97px] bg-transparent text-white text-center text-[80px] focus:outline-none placeholder:text-white/50 placeholder:text-[80px] placeholder:transition-opacity focus:placeholder:opacity-0"
           style={{ 
@@ -38,20 +55,19 @@ const CreateSimulation = () => {
             lineHeight: '97px'
           }}
         />
+        
+        {error && (
+          <div className="text-red-500 mt-2">
+            {error}
+          </div>
+        )}
 
         {/* Continue Button */}
         <button 
           className={`mt-16 w-[400px] h-[104px] bg-white hover:bg-white/90 transition-all ${
             !simulationName.trim() ? 'opacity-50 cursor-not-allowed' : ''
           }`}
-          onClick={() => {
-            if (simulationName.trim()) {
-              // Log the simulation name using the store
-              console.log('Creating simulation:', simulationName);
-              // Navigate to description page
-              navigate('/simulation-description');
-            }
-          }}
+          onClick={handleContinue}
           disabled={!simulationName.trim()}
         >
           <span 
