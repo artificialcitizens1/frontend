@@ -9,6 +9,9 @@ import Welcome from "./pages/Welcome";
 import CreateSimulation from "./pages/CreateSimulation";
 import SimulationDescription from "./pages/SimulationDescription";
 import CandidateSettings from "./pages/CandidateSettings";
+import { SimulationSettingsPage } from "./pages/SimulationSettings";
+import { SimulationLoading } from "./pages/SimulationLoading";
+import { SimulationResult } from "./pages/SimulationResult";
 
 // Example page components
 const About = () => (
@@ -36,6 +39,9 @@ const App: React.FC = () => {
         <Route path="/create-simulation" element={<CreateSimulation />} />
         <Route path="/simulation-description" element={<SimulationDescription />} />
         <Route path="/candidate-settings" element={<CandidateSettings />} />
+        <Route path="/simulation-settings" element={<SimulationSettingsPage />} />
+        <Route path="/simulation-loading" element={<SimulationLoading />} />
+        <Route path="/simulation-result" element={<SimulationResult />} />
       </Routes>
     </Router>
   );
