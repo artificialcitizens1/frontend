@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import '../styles/fonts.css';
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -27,10 +28,13 @@ const Welcome = () => {
         <div className="relative z-20 pt-[104px] pl-[72px]">
           {/* Logo/Title */}
           <h1 
-            className="text-[52px] leading-[65px] text-white mb-[53px]"
+            className="text-[52px] leading-[52px] text-white mb-[53px]"
             style={{ 
-              fontFamily: 'Arcade Interlaced',
-              letterSpacing: '0.02em'
+              fontFamily: '"Press Start 2P", monospace',
+              fontWeight: 400,
+              fontSize: '52px',
+              lineHeight: '100%',
+              letterSpacing: '0%'
             }}
           >
             SIMLECTIONS
