@@ -39,6 +39,9 @@ const CreateSimulation = () => {
 
       {/* Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full">
+        <label htmlFor="simulationName" className="text-white text-sm roboto-mono text-[18px] mb-4">
+          Name your simulation
+        </label>
         {/* Input Field */}
         <input
           type="text"
@@ -48,6 +51,7 @@ const CreateSimulation = () => {
             if (error) setError(null);
           }}
           placeholder="Name your simulation"
+          autoFocus
           className="w-[961px] h-[80px] bg-transparent text-white text-center text-[40px] focus:outline-none placeholder:text-white/50 placeholder:text-[40px] placeholder:transition-opacity focus:placeholder:opacity-0"
           style={{
             fontFamily: "Roboto Mono",
