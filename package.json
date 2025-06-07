@@ -15,7 +15,6 @@
     "@pixi/react": "^7.1.2",
     "@react-three/drei": "^9.108.3",
     "@react-three/fiber": "^8.16.8",
-    "@tailwindcss/vite": "^4.1.8",
     "@types/three": "^0.160.0",
     "axios": "^1.9.0",
     "pixi.js": "^7.4.3",
@@ -40,7 +39,7 @@
     "globals": "^16.0.0",
     "postcss": "^8.5.4",
     "prettier": "^3.5.3",
-    "tailwindcss": "^4.1.8",
+    "tailwindcss": "^3.4.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5"
