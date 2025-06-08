@@ -95,17 +95,17 @@ const CandidateDetails = () => {
         </div>
 
         {/* Content */}
-        <div className="max-w-[1728px] mx-auto px-4 py-6">
-          <div className="flex">
+        <div className="max-w-[1728px] mx-auto px-4 py-6 h-[calc(100vh-120px)] overflow-hidden">
+          <div className="flex h-full">
             {/* Left column - Candidate Profile */}
-            <div className="w-1/4 rounded-sm mr-6">
+            <div className="w-1/4 rounded-sm mr-6 overflow-y-auto h-full scrollbar-hide">
               <div className="border border-white/10 rounded-sm">
                 {/* Candidate status and name */}
                 <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
-                  <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CANDIDATE|BLUE PARTY</div>
-                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">
-                    RAHUL SINGH
+                  <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">
+                    CANDIDATE|BLUE PARTY
                   </div>
+                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">RAHUL SINGH</div>
                 </div>
 
                 {/* Candidate image and details */}
@@ -135,7 +135,9 @@ const CandidateDetails = () => {
 
                     {/* Cases and Scandals */}
                     <div className="py-4 ml-4">
-                      <div className="text-white/60 text-xs uppercase roboto-mono">CASES AND SCANDALS</div>
+                      <div className="text-white/60 text-xs uppercase roboto-mono">
+                        CASES AND SCANDALS
+                      </div>
                       <div className="text-white text-xl roboto-mono">24</div>
                     </div>
                   </div>
@@ -146,18 +148,18 @@ const CandidateDetails = () => {
               <div className="mt-6">
                 <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
                 <p className="text-white/80 text-sm leading-relaxed roboto-mono">
-                  Once a railway clerk who fixed trains with duct tape and hope, Rahul shot to fame 
-                  during the "Great Mango Subsidy Revolt," where he demanded two mangoes per citizen — 
-                  and got them. Now he's running on a platform of "common sense and uncommon snacks." 
-                  His fans call him The People's Patchwork. His critics call him unserious. Rahul 
-                  just hands them a samosa and moves on.
+                  Once a railway clerk who fixed trains with duct tape and hope, Rahul shot to fame
+                  during the "Great Mango Subsidy Revolt," where he demanded two mangoes per citizen
+                  — and got them. Now he's running on a platform of "common sense and uncommon
+                  snacks." His fans call him The People's Patchwork. His critics call him unserious.
+                  Rahul just hands them a samosa and moves on.
                 </p>
               </div>
 
               {/* Traits */}
               <div className="mt-6">
                 <h3 className="text-white text-xl mb-4 roboto-mono">Traits</h3>
-                
+
                 {/* Charisma */}
                 <div className="mb-4">
                   <div className="flex justify-between mb-1">
@@ -203,7 +205,7 @@ const CandidateDetails = () => {
             </div>
 
             {/* Center column - Laptop mockup with surveillance screen */}
-            <div className="w-full flex justify-center items-center relative">
+            <div className="w-full flex justify-center items-center relative h-full overflow-hidden">
               <div className="absolute w-[100%] pr-5 top-0">
                 {/* Surveillance screen content */}
                 <SurveillanceScreen />
@@ -211,7 +213,7 @@ const CandidateDetails = () => {
             </div>
 
             {/* Right column - Logs and Timeline */}
-            <div className="w-1/3 flex flex-col gap-6">
+            <div className="w-1/3 flex flex-col gap-6 overflow-y-auto h-full scrollbar-hide">
               {/* Logs section */}
               <div className="bg-black/60 border border-white/10 p-4 h-[300px] overflow-y-auto">
                 <h3 className="text-white text-xl mb-4 roboto-mono">Logs</h3>
