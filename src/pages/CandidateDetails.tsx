@@ -4,42 +4,6 @@ import SocialMediaFeed from "../components/SocialMediaFeed";
 import NewsChannel from "../components/NewsChannel";
 import DesktopInterface from "../components/candidate_components/DesktopInterface";
 
-// Candidate Political Standing Graph component
-const CandidatePoliticalLeaningGraph = () => {
-  return (
-    <div className="flex flex-col items-center mt-4 mb-4">
-      <div className="relative w-[175px] h-[175px]">
-        {/* Grid lines */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-white opacity-30" />
-        <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-white opacity-30" />
-
-        {/* Labels */}
-        <span className="absolute left-1/2 -top-6 -translate-x-1/2 text-white text-[12px] font-light roboto-mono">
-          Authoritarian
-        </span>
-        <span className="absolute left-1/2 -bottom-6 -translate-x-1/2 text-white text-[12px] font-light roboto-mono">
-          Libertarian
-        </span>
-        <span className="absolute top-1/2 -left-10 -translate-y-1/2 text-white text-[12px] font-light roboto-mono">
-          Left
-        </span>
-        <span className="absolute top-1/2 -right-10 -translate-y-1/2 text-white text-[12px] font-light roboto-mono">
-          Right
-        </span>
-
-        {/* Position indicator */}
-        <div
-          className="absolute w-4 h-4 bg-[#D25EA9] border-2 border-white/60 rounded-full -translate-x-1/2 -translate-y-1/2"
-          style={{
-            left: `${50 - 15}%`, // Sample value - more left leaning
-            top: `${50 + 10}%`, // Sample value - more libertarian
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
 // Surveillance Screen Component
 const SurveillanceScreen = () => {
   const [currentView, setCurrentView] = useState<"desktop" | "social" | "news">("desktop");
