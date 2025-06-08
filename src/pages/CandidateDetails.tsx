@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SocialMediaFeed from "../components/SocialMediaFeed";
 import NewsChannel from "../components/NewsChannel";
-import DesktopInterface from "../components/voter_components/DesktopInterface";
+import DesktopInterface from "../components/candidate_components/DesktopInterface";
 
-// Voter Political Standing Graph component
-const VoterPoliticalLeaningGraph = () => {
+// Candidate Political Standing Graph component
+const CandidatePoliticalLeaningGraph = () => {
   return (
     <div className="flex flex-col items-center mt-4 mb-4">
       <div className="relative w-[175px] h-[175px]">
@@ -31,8 +31,8 @@ const VoterPoliticalLeaningGraph = () => {
         <div
           className="absolute w-4 h-4 bg-[#D25EA9] border-2 border-white/60 rounded-full -translate-x-1/2 -translate-y-1/2"
           style={{
-            left: `${50 + 20}%`, // Sample value
-            top: `${50 - 20}%`, // Sample value
+            left: `${50 - 15}%`, // Sample value - more left leaning
+            top: `${50 + 10}%`, // Sample value - more libertarian
           }}
         />
       </div>
@@ -92,7 +92,7 @@ const SurveillanceScreen = () => {
   );
 };
 
-const VoterDetails = () => {
+const CandidateDetails = () => {
   const navigate = useNavigate();
   // For demo purposes, using a simple back function
   const handleBack = () => {
@@ -126,32 +126,32 @@ const VoterDetails = () => {
                 />
               </svg>
             </button>
-            <h1 className="text-[24px] font-medium text-white roboto-mono">VOTER DETAILS</h1>
+            <h1 className="text-[24px] font-medium text-white roboto-mono">CANDIDATE DETAILS</h1>
           </div>
         </div>
 
         {/* Content */}
         <div className="max-w-[1728px] mx-auto px-4 py-6">
           <div className="flex">
-            {/* Left column - Voter Profile */}
+            {/* Left column - Candidate Profile */}
             <div className="w-1/4 rounded-sm mr-6">
               <div className="border border-white/10 rounded-sm">
-                {/* Civilian status and name */}
+                {/* Candidate status and name */}
                 <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
-                  <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CIVILIAN</div>
+                  <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CANDIDATE|BLUE PARTY</div>
                   <div className="text-white text-2xl font-['ManifoldExtendedCF']">
-                    JACK FLANNAGAN
+                    RAHUL SINGH
                   </div>
                 </div>
 
-                {/* Voter image and details */}
+                {/* Candidate image and details */}
                 <div className="flex">
                   <div className="w-40 h-49 overflow-hidden">
                     {/* Using a placeholder since we don't have the actual image */}
                     <div className="w-full h-full flex items-center justify-center">
                       <img
-                        src="images/civilian_profile.png"
-                        alt="Jack Flannagan"
+                        src="images/candidate_photo.png"
+                        alt="Rahul Singh"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -160,19 +160,19 @@ const VoterDetails = () => {
                     {/* Age */}
                     <div className="border-b border-white/10 py-5 ml-4">
                       <div className="text-white/60 text-xs uppercase roboto-mono">AGE</div>
-                      <div className="text-white text-xl roboto-mono">32</div>
+                      <div className="text-white text-xl roboto-mono">50</div>
                     </div>
 
                     {/* Occupation */}
                     <div className="border-b border-white/10 py-5 ml-4">
                       <div className="text-white/60 text-xs uppercase roboto-mono">OCCUPATION</div>
-                      <div className="text-white text-xl roboto-mono">OCCUPATION</div>
+                      <div className="text-white text-xl roboto-mono">SENATOR</div>
                     </div>
 
-                    {/* Type */}
+                    {/* Cases and Scandals */}
                     <div className="py-4 ml-4">
-                      <div className="text-white/60 text-xs uppercase roboto-mono">TYPE</div>
-                      <div className="text-white text-xl roboto-mono">INFLUENCER</div>
+                      <div className="text-white/60 text-xs uppercase roboto-mono">CASES AND SCANDALS</div>
+                      <div className="text-white text-xl roboto-mono">24</div>
                     </div>
                   </div>
                 </div>
@@ -182,18 +182,58 @@ const VoterDetails = () => {
               <div className="mt-6">
                 <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
                 <p className="text-white/80 text-sm leading-relaxed roboto-mono">
-                  Jack Flanagan is a quirky, soft-spoken oddball with a knack for fixing broken
-                  gadgets using tape and blind optimism. He wears cargo shorts year-round, talks to
-                  his plants like coworkers, and once tried to start a detective agency with a stray
-                  cat.
+                  Once a railway clerk who fixed trains with duct tape and hope, Rahul shot to fame 
+                  during the "Great Mango Subsidy Revolt," where he demanded two mangoes per citizen — 
+                  and got them. Now he's running on a platform of "common sense and uncommon snacks." 
+                  His fans call him The People's Patchwork. His critics call him unserious. Rahul 
+                  just hands them a samosa and moves on.
                 </p>
               </div>
 
-              {/* Political Leaning */}
+              {/* Traits */}
               <div className="mt-6">
-                <h3 className="text-white text-xl pb-4 roboto-mono">Political Leaning</h3>
-                <div className="border border-white/30 p-4">
-                  <VoterPoliticalLeaningGraph />
+                <h3 className="text-white text-xl mb-4 roboto-mono">Traits</h3>
+                
+                {/* Charisma */}
+                <div className="mb-4">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-white roboto-mono">Charisma</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-white/60 text-xs roboto-mono mr-2">Low</span>
+                    <div className="flex-1 bg-gray-700 h-2 relative">
+                      <div className="bg-white h-full" style={{ width: "60%" }}></div>
+                    </div>
+                    <span className="text-white/60 text-xs roboto-mono ml-2">High</span>
+                  </div>
+                </div>
+
+                {/* Temper */}
+                <div className="mb-4">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-white roboto-mono">Temper</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-white/60 text-xs roboto-mono mr-2">Low</span>
+                    <div className="flex-1 bg-gray-700 h-2 relative">
+                      <div className="bg-white h-full" style={{ width: "30%" }}></div>
+                    </div>
+                    <span className="text-white/60 text-xs roboto-mono ml-2">High</span>
+                  </div>
+                </div>
+
+                {/* Integrity */}
+                <div className="mb-4">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-white roboto-mono">Integrity</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-white/60 text-xs roboto-mono mr-2">Low</span>
+                    <div className="flex-1 bg-gray-700 h-2 relative">
+                      <div className="bg-white h-full" style={{ width: "20%" }}></div>
+                    </div>
+                    <span className="text-white/60 text-xs roboto-mono ml-2">High</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -256,4 +296,4 @@ const VoterDetails = () => {
   );
 };
 
-export default VoterDetails;
+export default CandidateDetails;
