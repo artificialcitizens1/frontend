@@ -135,7 +135,7 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
     fetchSocialMediaData();
 
     // Set up periodic refresh
-    intervalId = setInterval(fetchSocialMediaData, 10000);
+    intervalId = setInterval(fetchSocialMediaData, 40000);
 
     return () => {
       if (intervalId) {
