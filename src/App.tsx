@@ -15,6 +15,7 @@ import VoterDetails from "./pages/VoterDetails";
 import GodMode from "./pages/GodMode";
 import SimulationCreation from "./pages/SimulationCreation";
 import SimulationLore from "./pages/SimulationLore";
+import ElectionResults from "./pages/ElectionResults";
 
 const App: React.FC = () => {
 
@@ -32,6 +33,7 @@ const App: React.FC = () => {
         <Route path="/simulation-creation" element={<SimulationCreation />} />
         <Route path="/simulation-lore/:simId" element={<SimulationLore />} />
         <Route path="/simulation/:simId" element={<SimulationResult />} />
+        <Route path="/election-results/:simId" element={<ElectionResults />} />
       </Routes>
     </Router>
   );
