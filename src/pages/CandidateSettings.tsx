@@ -267,9 +267,6 @@ const CandidateSettings = () => {
               >
                 {/* Avatar Section */}
                 <div className="p-6">
-                  <span className="text-[#EF69B6] text-sm uppercase" style={{ fontFamily: "Roboto Mono" }}>
-                    Select Avatars
-                  </span>
                   <div className="mt-8 flex flex-col items-center">
                     <img
                       src={candidate.avatarUrl}
@@ -279,7 +276,6 @@ const CandidateSettings = () => {
                     <div className="mt-6 w-full">
                       <div className="flex justify-between items-center">
                         <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Candidate name</span>
-                        <button className="text-white">✨</button>
                       </div>
                       <input
                         type="text"
@@ -293,7 +289,6 @@ const CandidateSettings = () => {
                     <div className="mt-6 w-full">
                       <div className="flex justify-between items-center">
                         <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Describe this candidate</span>
-                        <button className="text-white">✨</button>
                       </div>
                       <input
                         type="text"
@@ -315,7 +310,6 @@ const CandidateSettings = () => {
                     <h3 className="text-white font-medium text-xl" style={{ fontFamily: "Roboto Mono" }}>
                       Set Parameters for this candidate
                     </h3>
-                    <button className="text-[#EF69B6] font-medium text-xl" style={{ fontFamily: "Roboto Mono" }}>View Routine</button>
                   </div>
 
                   {/* Communication Style */}
