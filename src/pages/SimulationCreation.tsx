@@ -46,12 +46,12 @@ const SimulationCreation = () => {
         <img 
           src="/images/top_grid.png"
           alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-top"
+          className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
         />
         <img 
           src="/images/bottom_grid.png"
           alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-bottom"
+          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
         />
       </div>
 
