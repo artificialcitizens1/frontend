@@ -5,7 +5,7 @@ import { ParameterSlider } from '../components/candidate/ParameterSlider';
 import { PoliticalStandingGraph } from '../components/candidate/PoliticalStandingGraph';
 import { calculatePoliticalStanding } from '../utils/politicalCalculator';
 import { useSimulationStore } from '../store';
-import { startSimulationFlow } from '../api/simulationService';
+import '../styles/fonts.css'; // Import fonts for consistency
 
 const defaultCandidate: Candidate = {
   id: "1",
@@ -29,7 +29,12 @@ const CandidateSettings = () => {
     { ...defaultCandidate, id: "2", avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=2" },
   ]);
   const navigate = useNavigate();
-  const { setCandidates: setStoreCandidates, getAllData } = useSimulationStore();
+  const { 
+    setCandidates: setStoreCandidates, 
+    simulationName, 
+    description,
+    getAllData 
+  } = useSimulationStore();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -114,10 +119,18 @@ const CandidateSettings = () => {
     if (!validateCandidates()) {
       return;
     }
+    
+    // Set loading state
+    setIsLoading(true);
 
     // Get all form data from store and console.log it
     const allData = getAllData();
     console.log('Form Data:', allData);
+    
+    // Verify we have name and description from store
+    if (!simulationName && !description) {
+      console.warn('Simulation name or description missing. Using defaults.');
+    }
     
     // Navigate to simulation creation page
     navigate('/simulation-creation');
@@ -167,29 +180,31 @@ const CandidateSettings = () => {
               </button>
               <div>
                 
-                <h1 className="text-2xl sm:text-[56px] font-medium font-['Inter Display'] text-white mb-[20px]">
+                <h1 className="text-2xl sm:text-[56px] font-medium text-white mb-[20px]" style={{ fontFamily: "Roboto Mono" }}>
                   Candidate Settings
                 </h1>
-                <p className="text-white/80 text-xs sm:text-base font-light">
+                <p className="text-white/80 text-xs sm:text-base font-light" style={{ fontFamily: "Roboto Mono" }}>
                   Select 2 candidate avatars and set their settings and their political standings
                 </p>
               </div>
             </div>
             {error && <div className="text-red-500 mr-4 self-center">{error}</div>}
             <button
-              className={`px-[88px] py-5 bg-white transition-colors text-black text-2xl font-['Roboto Mono'] ${
+              className={`px-[88px] py-5 bg-white transition-colors text-black ${
                 !isFormValid() || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/90'
               }`}
               onClick={handleContinue}
               disabled={!isFormValid() || isLoading}
             >
-              {isLoading ? 'Loading...' : 'Continue'}
+              <span className="text-[28px] leading-[37px]" style={{ fontFamily: "Roboto Mono" }}>
+                {isLoading ? 'Loading...' : 'Continue'}
+              </span>
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="max-w-[1728px] mx-auto px-4 sm:px-8 py-10 overflow-hidden">
+        <div className="max-w-[1728px] mx-auto px-4 sm:px-8 py-10 overflow-hidden relative">
           {/* Main Content */}
           <div className="flex flex-col md:flex-row gap-14 relative">
             {candidates.map((candidate, index) => (
@@ -199,7 +214,7 @@ const CandidateSettings = () => {
               >
                 {/* Avatar Section */}
                 <div className="p-6">
-                  <span className="text-[#EF69B6] text-sm font-['Roboto Mono'] uppercase">
+                  <span className="text-[#EF69B6] text-sm uppercase" style={{ fontFamily: "Roboto Mono" }}>
                     Select Avatars
                   </span>
                   <div className="mt-8 flex flex-col items-center">
@@ -210,7 +225,7 @@ const CandidateSettings = () => {
                     />
                     <div className="mt-6 w-full">
                       <div className="flex justify-between items-center">
-                        <span className="text-white/80 text-sm">Candidate name</span>
+                        <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Candidate name</span>
                         <button className="text-white">✨</button>
                       </div>
                       <input
@@ -218,12 +233,13 @@ const CandidateSettings = () => {
                         value={candidate.name}
                         onChange={(e) => updateCandidate(index as 0 | 1, { name: e.target.value })}
                         className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                        style={{ fontFamily: "Roboto Mono" }}
                         placeholder="Enter name"
                       />
                     </div>
                     <div className="mt-6 w-full">
                       <div className="flex justify-between items-center">
-                        <span className="text-white/80 text-sm">Describe this candidate</span>
+                        <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Describe this candidate</span>
                         <button className="text-white">✨</button>
                       </div>
                       <input
@@ -233,6 +249,7 @@ const CandidateSettings = () => {
                           updateCandidate(index as 0 | 1, { description: e.target.value })
                         }
                         className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                        style={{ fontFamily: "Roboto Mono" }}
                         placeholder="Enter description"
                       />
                     </div>
@@ -242,15 +259,15 @@ const CandidateSettings = () => {
                 {/* Parameters Section */}
                 <div className="p-6 border-t border-white/20">
                   <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-white font-medium text-xl">
+                    <h3 className="text-white font-medium text-xl" style={{ fontFamily: "Roboto Mono" }}>
                       Set Parameters for this candidate
                     </h3>
-                    <button className="text-[#EF69B6] font-medium text-xl">View Routine</button>
+                    <button className="text-[#EF69B6] font-medium text-xl" style={{ fontFamily: "Roboto Mono" }}>View Routine</button>
                   </div>
 
                   {/* Communication Style */}
                   <div className="mb-6">
-                    <span className="text-white/80 text-sm">Communication Style</span>
+                    <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Communication Style</span>
                     <div className="flex gap-1 mt-2">
                       {(["Aggressive", "Calm", "Trendy"] as const).map((style) => (
                         <button
@@ -260,6 +277,7 @@ const CandidateSettings = () => {
                               ? "border-white text-white"
                               : "border-white/30 text-white/60"
                           }`}
+                          style={{ fontFamily: "Roboto Mono" }}
                           onClick={() => handleStyleSelect(index as 0 | 1, style)}
                         >
                           {style}
@@ -270,7 +288,7 @@ const CandidateSettings = () => {
 
                   {/* Media Interactions */}
                   <div className="mb-6">
-                    <span className="text-white/80 text-sm">Media Interactions</span>
+                    <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Media Interactions</span>
                     <div className="flex gap-1 mt-2">
                       {(["None", "Few", "Many"] as const).map((media) => (
                         <button
@@ -280,6 +298,7 @@ const CandidateSettings = () => {
                               ? "border-white text-white"
                               : "border-white/30 text-white/60"
                           }`}
+                          style={{ fontFamily: "Roboto Mono" }}
                           onClick={() => handleMediaSelect(index as 0 | 1, media)}
                         >
                           {media}
@@ -343,8 +362,8 @@ const CandidateSettings = () => {
           </div>
 
           {/* VS Text */}
-          <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
-            <span className="text-white/40 text-2xl font-['Roboto Mono']">VS</span>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none hidden md:flex items-center justify-center w-20 h-20">
+            <span className="text-white/40 text-[32px] font-light" style={{ fontFamily: "Roboto Mono" }}>VS</span>
           </div>
         </div>
       </div>

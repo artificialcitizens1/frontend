@@ -1,7 +1,6 @@
 /* package imports */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import React, { useEffect, useState } from 'react';
-import { socket } from './socket';
+import React from 'react';
 
 /* styles import */
 import "./styles/fonts.css";
@@ -20,29 +19,6 @@ import SimulationCreation from "./pages/SimulationCreation";
 import SimulationLore from "./pages/SimulationLore";
 
 const App: React.FC = () => {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-      console.log('connected to socket server');
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-      console.log('disconnected from socket server');
-    }
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.connect();
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.disconnect();
-    };
-  }, []);
 
   return (
     <Router>

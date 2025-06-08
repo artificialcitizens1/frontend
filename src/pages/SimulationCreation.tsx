@@ -6,14 +6,18 @@ import { startSimulationFlow } from '../api/simulationService';
 const SimulationCreation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { candidates, setSimulationId } = useSimulationStore();
+  const { candidates, simulationName, description, setSimulationId } = useSimulationStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     const createSimulation = async () => {
       try {
-        // Make API call to start simulation
-        const response = await startSimulationFlow(candidates || []);
+        // Make API call to start simulation with name and description from store
+        const response = await startSimulationFlow(
+          candidates || [],
+          simulationName || "2025 General Election", 
+          description || "A simulation of the 2025 general election with two major candidates."
+        );
         console.log('Simulation created:', response);
         
         // Navigate to the lore page with the simulation ID
