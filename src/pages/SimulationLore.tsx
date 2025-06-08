@@ -11,12 +11,16 @@ const SimulationLore = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   // We're keeping simulationData for future expansion but not currently displaying it
-  const [_simulationData, setSimulationData] = useState<any | null>(null);
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false);
   const [displayedWords, setDisplayedWords] = useState<string[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const finalText = 'The choice now rests with the citizens…';
+  const [finalTextTyped, setFinalTextTyped] = useState('');
+  const [isFinalTyping, setIsFinalTyping] = useState(false);
+  const typingAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [isTypingLore, setIsTypingLore] = useState(false);
 
   // Fetch lore data
   useEffect(() => {
@@ -45,9 +49,6 @@ const SimulationLore = () => {
       try {
         const status = await getSimulationStatus(1, simId!);
         console.log('Simulation status:', status);
-        if(status){
-          setSimulationData(status);
-        }
       } catch (error) {
         console.error('Error fetching simulation status:', error);
       }
@@ -62,49 +63,93 @@ const SimulationLore = () => {
     if (!isLoading && loreTitle) {
       const titleTimer = setTimeout(() => {
         setTitleAnimationComplete(true);
+        // Prepare audio for use after title animation
+        if (!typingAudioRef.current) {
+          typingAudioRef.current = new window.Audio('/sounds/keyboard_sound.mp3');
+          typingAudioRef.current.loop = true;
+          typingAudioRef.current.volume = 0.5;
+          // Preload audio
+          typingAudioRef.current.load();
+        }
       }, 4000); // Allow 4 seconds for the title animation
       
       return () => clearTimeout(titleTimer);
     }
   }, [isLoading, loreTitle]);
 
+  // Handle audio playback separately for better control
+  useEffect(() => {
+    // Start audio when title animation complete and lore content is being typed
+    if (titleAnimationComplete && currentLineIndex < loreContent.length && !isAnimationComplete) {
+      if (typingAudioRef.current) {
+        // Make sure we restart from the beginning
+        typingAudioRef.current.currentTime = 0;
+        
+        // Handle autoplay restrictions
+        const playPromise = typingAudioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.log(error);
+            // Auto-play was prevented, add click listener to resume
+            const resumeAudio = () => {
+              if (typingAudioRef.current) typingAudioRef.current.play();
+              document.removeEventListener('click', resumeAudio);
+              document.removeEventListener('keydown', resumeAudio);
+            };
+            document.addEventListener('click', resumeAudio, { once: true });
+            document.addEventListener('keydown', resumeAudio, { once: true });
+          });
+        }
+      }
+    }
+    
+    // Stop audio when typing is complete or component unmounts
+    return () => {
+      if (isAnimationComplete && typingAudioRef.current) {
+        typingAudioRef.current.pause();
+        typingAudioRef.current.currentTime = 0;
+      }
+    };
+  }, [titleAnimationComplete, currentLineIndex, loreContent.length, isAnimationComplete]);
+
   // Handle word-by-word animation with adaptive speed and auto-scrolling
   useEffect(() => {
+    let wordInterval: NodeJS.Timeout | null = null;
+    let paragraphTimer: NodeJS.Timeout | null = null;
+
     if (!isLoading && titleAnimationComplete && loreContent.length > 0 && currentLineIndex < loreContent.length) {
-      // Split current paragraph into words
+      setIsTypingLore(true);
+      
       const words = loreContent[currentLineIndex].split(' ');
       setDisplayedWords([]);
-      
-      // Word by word animation with slower speed for better readability
       let wordIndex = 0;
-      const wordInterval = setInterval(() => {
+      wordInterval = setInterval(() => {
         if (wordIndex < words.length) {
           setDisplayedWords(prev => [...prev, words[wordIndex]]);
           wordIndex++;
-          
-          // Adaptive scroll with smooth behavior
           if (contentRef.current) {
-            // Scroll with animation
             contentRef.current.scrollTo({
               top: contentRef.current.scrollHeight,
               behavior: 'smooth'
             });
           }
         } else {
-          clearInterval(wordInterval);
-          
-          // Add a pause after paragraph completion proportional to paragraph length
+          if (wordInterval) clearInterval(wordInterval);
+          // Pause after paragraph
           const pauseDuration = Math.min(2000, Math.max(1000, words.length * 50));
-          
-          // Move to next paragraph after finishing current one
-          const paragraphTimer = setTimeout(() => {
+          paragraphTimer = setTimeout(() => {
             const nextIndex = currentLineIndex + 1;
-            
-            // Check if we've reached the end
             if (nextIndex >= loreContent.length) {
               setIsAnimationComplete(true);
+              setIsFinalTyping(true);
+              setIsTypingLore(false);
               
-              // Auto scroll to reveal the final line after a brief pause
+              // Stop the typing sound when all lore content is typed
+              if (typingAudioRef.current) {
+                typingAudioRef.current.pause();
+                typingAudioRef.current.currentTime = 0;
+              }
+              
               setTimeout(() => {
                 if (contentRef.current) {
                   contentRef.current.scrollTo({
@@ -116,17 +161,34 @@ const SimulationLore = () => {
             } else {
               setCurrentLineIndex(nextIndex);
             }
-          }, pauseDuration); 
-          
-          return () => clearTimeout(paragraphTimer);
+          }, pauseDuration);
         }
-      }, 180); // Slowed down for even better readability
-      
-      return () => clearInterval(wordInterval);
+      }, 180);
     }
+    
+    return () => {
+      if (wordInterval) clearInterval(wordInterval);
+      if (paragraphTimer) clearTimeout(paragraphTimer);
+      setIsTypingLore(false);
+    };
   }, [isLoading, titleAnimationComplete, loreContent, currentLineIndex]);
 
-  // Handle continue to simulation
+  // Final text typing effect
+  useEffect(() => {
+    if (isFinalTyping) {
+      setFinalTextTyped('');
+      let charIndex = 0;
+      const typeInterval = setInterval(() => {
+        setFinalTextTyped(finalText.slice(0, charIndex + 1));
+        charIndex++;
+        if (charIndex >= finalText.length) {
+          clearInterval(typeInterval);
+          setIsFinalTyping(false);
+        }
+      }, 60);
+      return () => clearInterval(typeInterval);
+    }
+  }, [isFinalTyping, finalText]);
 
   // Handle continue to simulation
   const handleContinue = () => {
@@ -213,11 +275,11 @@ const SimulationLore = () => {
                         }}
                       >
                         {displayedWords.join(' ')}
-                        <span className="cursor-animation"></span>
+                        {isTypingLore && <span className="cursor-animation"></span>}
                       </p>
                     )}
                     
-                    {/* Final line with special animation and improved spacing - Star Wars style */}
+                    {/* Final line with typing effect and improved spacing - Star Wars style */}
                     {isAnimationComplete && (
                       <div className="mt-20 mb-8 overflow-visible">
                         <p 
@@ -230,45 +292,8 @@ const SimulationLore = () => {
                             whiteSpace: 'nowrap'
                           }}
                         >
-                          <span className="letter-animation">T</span>
-                          <span className="letter-animation" style={{animationDelay: '0.15s'}}>h</span>
-                          <span className="letter-animation" style={{animationDelay: '0.3s'}}>e</span>
-                          <span className="letter-animation" style={{animationDelay: '0.45s'}}>&nbsp;</span>
-                          <span className="letter-animation" style={{animationDelay: '0.6s'}}>c</span>
-                          <span className="letter-animation" style={{animationDelay: '0.75s'}}>h</span>
-                          <span className="letter-animation" style={{animationDelay: '0.9s'}}>o</span>
-                          <span className="letter-animation" style={{animationDelay: '1.05s'}}>i</span>
-                          <span className="letter-animation" style={{animationDelay: '1.2s'}}>c</span>
-                          <span className="letter-animation" style={{animationDelay: '1.35s'}}>e</span>
-                          <span className="letter-animation" style={{animationDelay: '1.5s'}}>&nbsp;</span>
-                          <span className="letter-animation" style={{animationDelay: '1.65s'}}>n</span>
-                          <span className="letter-animation" style={{animationDelay: '1.8s'}}>o</span>
-                          <span className="letter-animation" style={{animationDelay: '1.95s'}}>w</span>
-                          <span className="letter-animation" style={{animationDelay: '2.1s'}}>&nbsp;</span>
-                          <span className="letter-animation" style={{animationDelay: '2.25s'}}>r</span>
-                          <span className="letter-animation" style={{animationDelay: '2.4s'}}>e</span>
-                          <span className="letter-animation" style={{animationDelay: '2.55s'}}>s</span>
-                          <span className="letter-animation" style={{animationDelay: '2.7s'}}>t</span>
-                          <span className="letter-animation" style={{animationDelay: '2.85s'}}>s</span>
-                          <span className="letter-animation" style={{animationDelay: '3.0s'}}>&nbsp;</span>
-                          <span className="letter-animation" style={{animationDelay: '3.15s'}}>w</span>
-                          <span className="letter-animation" style={{animationDelay: '3.3s'}}>i</span>
-                          <span className="letter-animation" style={{animationDelay: '3.45s'}}>t</span>
-                          <span className="letter-animation" style={{animationDelay: '3.6s'}}>h</span>
-                          <span className="letter-animation" style={{animationDelay: '3.75s'}}>&nbsp;</span>
-                          <span className="letter-animation" style={{animationDelay: '3.9s'}}>t</span>
-                          <span className="letter-animation" style={{animationDelay: '4.05s'}}>h</span>
-                          <span className="letter-animation" style={{animationDelay: '4.2s'}}>e</span>
-                          <span className="letter-animation" style={{animationDelay: '4.35s'}}>&nbsp;</span>
-                          <span className="letter-animation" style={{animationDelay: '4.5s'}}>c</span>
-                          <span className="letter-animation" style={{animationDelay: '4.65s'}}>i</span>
-                          <span className="letter-animation" style={{animationDelay: '4.8s'}}>t</span>
-                          <span className="letter-animation" style={{animationDelay: '4.95s'}}>i</span>
-                          <span className="letter-animation" style={{animationDelay: '5.1s'}}>z</span>
-                          <span className="letter-animation" style={{animationDelay: '5.25s'}}>e</span>
-                          <span className="letter-animation" style={{animationDelay: '5.4s'}}>n</span>
-                          <span className="letter-animation" style={{animationDelay: '5.55s'}}>s</span>
-                          <span className="letter-animation" style={{animationDelay: '5.7s'}}>…</span>
+                          {finalTextTyped}
+                          {!isTypingLore && <span className="cursor-animation" />}
                         </p>
                       </div>
                     )}
@@ -381,31 +406,6 @@ const SimulationLore = () => {
         /* Final line animation */
         .final-line {
           perspective: 400px;
-        }
-        
-        .letter-animation {
-          display: inline-block;
-          opacity: 0;
-          animation: letterFadeIn 0.8s forwards;
-          transform-style: preserve-3d;
-        }
-        
-        @keyframes letterFadeIn {
-          0% { 
-            opacity: 0;
-            transform: translateY(15px) rotateX(40deg);
-            text-shadow: 0 0 0px rgba(255,215,0,0);
-          }
-          60% { 
-            opacity: 1;
-            transform: translateY(-8px) rotateX(-15deg);
-            text-shadow: 0 0 35px rgba(255,215,0,0.9);
-          }
-          100% { 
-            opacity: 1;
-            transform: translateY(0) rotateX(0);
-            text-shadow: 0 0 25px rgba(255,215,0,0.7);
-          }
         }
         
         /* Starfield effect */
