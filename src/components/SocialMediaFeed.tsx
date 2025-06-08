@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Tweet, { type TweetProps } from "./Tweet";
 import { getSocialMediaPosts, type SocialMediaPost } from "../api/socialMediaService";
-import { useSimulationStore } from "../store";
 
 // ==========================================
 // ICON COMPONENTS
@@ -29,7 +28,6 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [feed, setFeed] = useState<TweetProps[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { simulationId, currentTick } = useSimulationStore();
 
   // ==========================================
   // HELPER FUNCTIONS
@@ -77,6 +75,18 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
   };
 
   const convertApiPostToTweet = (post: SocialMediaPost): TweetProps => {
+    // Convert API comments to Tweet comments
+    const convertedComments = post.comments?.map(comment => ({
+      id: comment._id,
+      avatar: generateAvatarUrl(comment.authorId),
+      name: comment.author.name,
+      username: generateUsername(comment.author.name, comment.author.role),
+      time: formatTime(comment.createdAt),
+      content: comment.content,
+      likes: 0, // Comments don't have individual like counts in the API
+      verified: comment.author.role === 'candidate'
+    })) || [];
+
     return {
       avatar: generateAvatarUrl(post.authorId),
       name: post.author.name,
@@ -84,7 +94,9 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
       time: formatTime(post.createdAt),
       content: post.content,
       likes: post.likeCount || 0,
-      verified: post.author.role === 'candidate' // Candidates are verified
+      verified: post.author.role === 'candidate', // Candidates are verified
+      commentCount: post.commentCount || 0,
+      comments: convertedComments
     };
   };
 
@@ -92,21 +104,16 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
   // API DATA FETCHING
   // ==========================================
   useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
     const fetchSocialMediaData = async () => {
-      console.log('🚀 SocialMediaFeed - Store values:', { simulationId, currentTick });
-      
-      if (!simulationId) {
-        console.warn('⚠️ SocialMediaFeed - No simulation ID found in store');
-        setError("No simulation ID found");
-        setIsLoading(false);
-        return;
-      }
+      console.log('🚀 SocialMediaFeed - Fetching social media data');
 
       try {
         setIsLoading(true);
         setError(null);
         
-        console.log('🔍 SocialMediaFeed - Fetching data for:', { simulationId, currentTick });
+        console.log('🔍 SocialMediaFeed - Fetching data with hardcoded values');
         const response = await getSocialMediaPosts('baba9c30-f7d7-4f3e-933c-eeb9bd7cc547', 5);
         
         if (response.success && response.data) {
@@ -127,11 +134,15 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
     // Initial fetch
     fetchSocialMediaData();
 
-    // Set up periodic refresh every 10 seconds
-    const interval = setInterval(fetchSocialMediaData, 10000);
+    // Set up periodic refresh
+    intervalId = setInterval(fetchSocialMediaData, 10000);
 
-    return () => clearInterval(interval);
-  }, [simulationId, currentTick]);
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, []); // Empty dependency array - only run once on mount
 
   // ==========================================
   // COMPONENT RENDER
