@@ -113,7 +113,9 @@ export const getSimulationLore = async (simId: string): Promise<LoreResponse> =>
   let paragraphs: string[] = [];
   if (data && data.lore) {
     // Split the text by newline characters to get paragraphs
-    paragraphs = data.lore.split('\n\n').filter((p: string) => p.trim() !== '');
+    paragraphs = data.lore.split('\n\n')
+      .filter((p: string) => p.trim() !== '')
+      .filter((p: string) => !p.includes("The choice now rests with the citizens"));
   }
 
   // Try to get candidate names from the store for a more specific title
