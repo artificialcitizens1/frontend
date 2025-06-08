@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SocialMediaFeed from "../components/SocialMediaFeed";
 import NewsChannel from "../components/NewsChannel";
 import DesktopInterface from "../components/voter_components/DesktopInterface";
+import Logs from "../components/Logs";
 
 // Voter Political Standing Graph component
 const VoterPoliticalLeaningGraph = () => {
@@ -206,49 +207,12 @@ const VoterDetails = () => {
               </div>
             </div>
 
-            {/* Right column - Logs and Timeline */}
-            <div className="w-1/3 flex flex-col gap-6">
-              {/* Logs section */}
-              <div className="bg-black/60 border border-white/10 p-4 h-[300px] overflow-y-auto">
-                <h3 className="text-white text-xl mb-4 roboto-mono">Logs</h3>
-                <div className="font-mono text-white/80 text-xs roboto-mono">
-                  <p className="my-1">&gt;&gt;18:00 Day 1 is over</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                  <p className="my-1">&gt;&gt;Acts of vandalism seen on Rahul's posters</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                  <p className="my-1">&gt;&gt;Earthquake caused in Simpolis</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                  <p className="my-1">&gt;&gt;Earthquake caused in Simpolis</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                </div>
-              </div>
-
-              {/* Timeline section */}
-              <div className="bg-black/60 border border-white/10 p-4">
-                <h3 className="text-white text-xl mb-4 roboto-mono">Timeline</h3>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <p className="text-white mb-1 roboto-mono">
-                      Current Location: <span className="text-white/80">Office</span>
-                    </p>
-                    <p className="text-white roboto-mono">
-                      Current Activity: <span className="text-white/80">Working</span>
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-white/80 roboto-mono">3:00 PM</span>
-                    <div className="w-full h-[40px] bg-black/30 mt-2 relative">
-                      <div className="absolute h-full w-[2px] bg-white left-[65%] top-0"></div>
-                      <div className="absolute w-full h-full flex">
-                        {Array.from({ length: 24 }).map((_, i) => (
-                          <div key={i} className="flex-1 border-r border-white/20 h-full"></div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* Right column - Logs */}
+            <div className="w-[45%]">
+                <Logs />
             </div>
+
+
           </div>
         </div>
       </div>
