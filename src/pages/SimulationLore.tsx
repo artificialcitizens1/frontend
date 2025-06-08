@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSimulationLore, getSimulationStatus } from '../api/simulationService';
 import '../styles/fonts.css'; // Import fonts
+import { useTickStore } from '../store/tickStore';
 
 const SimulationLore = () => {
   const { simId } = useParams<{ simId: string }>();
@@ -22,6 +23,9 @@ const SimulationLore = () => {
   const typingAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isTypingLore, setIsTypingLore] = useState(false);
 
+  const [isbuttonDisabled, setIsButtonDisabled] = useState<boolean>(true);
+  const { setTickData, initializeCharacters } = useTickStore();
+  
   // Fetch lore data
   useEffect(() => {
     const fetchLore = async () => {
@@ -49,6 +53,13 @@ const SimulationLore = () => {
       try {
         const status = await getSimulationStatus(1, simId!);
         console.log('Simulation status:', status);
+        if(status.length > 0 && simulationData === null){
+          setSimulationData(status);
+          console.log('setting tick data : ', status);
+          setTickData(status);
+          initializeCharacters(status[0].characters);
+          setIsButtonDisabled(false);
+        }
       } catch (error) {
         console.error('Error fetching simulation status:', error);
       }
@@ -196,7 +207,7 @@ const SimulationLore = () => {
   // Handle continue to simulation
   const handleContinue = () => {
     // Navigate to the simulation page
-    navigate(`/simulation/${simId}`);
+    navigate(`/simulation/${simId}`); // simulation result page.
   };
 
   return (

@@ -10,6 +10,7 @@ interface SimulationState {
   simulationId: string | null;
   currentTick: number;
 
+  simulationData: any | null;
   // Actions
   setSimulationName: (name: string) => void;
   setDescription: (desc: string) => void;
@@ -17,6 +18,7 @@ interface SimulationState {
   setSimulationSettings: (settings: SimulationSettings) => void;
   setSimulationId: (id: string) => void;
   setCurrentTick: (tick: number) => void;
+  setSimulationData: (data: any) => void;
   // Reset function
   reset: () => void;
 
@@ -27,6 +29,9 @@ interface SimulationState {
     candidates: [Candidate, Candidate] | null;
     simulationSettings: SimulationSettings | null;
   };
+
+  // Get simulation data
+  getSimulationData: () => any | null;
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
@@ -36,12 +41,14 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   simulationSettings: null,
   simulationId: null,
   currentTick: 1,
+  simulationData: null,
   setSimulationName: (name) => set({ simulationName: name }),
   setDescription: (desc) => set({ description: desc }),
   setCandidates: (candidates) => set({ candidates }),
   setSimulationSettings: (settings) => set({ simulationSettings: settings }),
   setSimulationId: (id) => set({ simulationId: id }),
   setCurrentTick: (tick) => set({ currentTick: tick }),
+  setSimulationData: (data) => set({ simulationData: data }),
   reset: () =>
     set({
       simulationName: "",
@@ -49,6 +56,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       candidates: null,
       simulationSettings: null,
       currentTick: 1,
+      simulationData: null,
     }),
 
   getAllData: () => ({
@@ -57,4 +65,5 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     candidates: get().candidates,
     simulationSettings: get().simulationSettings,
   }),
+  getSimulationData: () => get().simulationData,
 }));

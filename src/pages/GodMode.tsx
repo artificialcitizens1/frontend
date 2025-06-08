@@ -1,112 +1,99 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Stage, Graphics, Text, Container, useTick, useApp, TilingSprite } from '@pixi/react';
 import * as PIXI from 'pixi.js';
+import Character from '../components/simulation/Character';
+import GridOverlay from '../components/simulation/GridOverlay';
+import { Stage, Graphics, Text, Container, useApp } from '@pixi/react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTickStore } from '../store/tickStore';
+import SimulationControls from '../components/simulation/SimulationControls';
 
 // --- Type Definitions (Refactored for Declarative State) ---
 interface Point { x: number; y: number; }
-interface DistrictData { id: number; name: string; x: number; y: number; width: number; height: number; gateway: Point; }
-// MODIFICATION: Renamed districtId and added targetDistrictId
+interface DistrictData { id: number; name: string; alias: 'home' | 'office' | 'amphitheatre' | 'outside'; x: number; y: number; width: number; height: number; gateway: Point; }
+
 interface CharacterData { 
-    id: number; 
-    currentDistrictId: number; 
-    targetDistrictId: number;
+    characterId: string;
+    initialDistrict: 'home' | 'office' | 'amphitheatre' | 'outside'; 
+    targetDistrict: 'home' | 'office' | 'amphitheatre' | 'outside'; 
+    name: string;
     color: number; 
-    type: 'citizen' | 'candidate'; 
-}
-// This is now only used for local animation state within the Character component
-interface AnimationPath { 
-    path: Point[]; 
-    currentPathIndex: number; 
+    type: 'citizen' | 'candidate' | 'reporter'; 
+    log: string;
+    district: 'home' | 'office' | 'amphitheatre' | 'outside';
 }
 
 // --- Constants ---
-const LOGICAL_WIDTH = 800;
-const LOGICAL_HEIGHT = 600;
-const DISTRICT_GAP = 50;
-const DISTRICT_WIDTH = (LOGICAL_WIDTH - DISTRICT_GAP * 3) / 2;
-const DISTRICT_HEIGHT = (LOGICAL_HEIGHT - DISTRICT_GAP * 3) / 2;
-const CITIZEN_RADIUS = 10;
-const CANDIDATE_RADIUS = 18;
-const CITIZEN_SPEED = 1.5;
-const TRAVEL_SPEED = 1.5;
-const CENTRAL_ROAD_X = DISTRICT_GAP + DISTRICT_WIDTH + DISTRICT_GAP / 2;
+export const LOGICAL_WIDTH = 800;
+export const LOGICAL_HEIGHT = 600;
+export const DISTRICT_GAP = 50;
+export const DISTRICT_WIDTH = (LOGICAL_WIDTH - DISTRICT_GAP * 3) / 2;
+export const DISTRICT_HEIGHT = (LOGICAL_HEIGHT - DISTRICT_GAP * 3) / 2;
+export const CITIZEN_RADIUS = 10;
+export const CANDIDATE_RADIUS = 18;
+export const CITIZEN_SPEED = 1.5;
+export const TRAVEL_SPEED = 1.5;
+export const CENTRAL_ROAD_X = DISTRICT_GAP + DISTRICT_WIDTH + DISTRICT_GAP / 2;
 
 // --- Data Definitions ---
-const DISTRICT_DEFINITIONS: DistrictData[] = [
-    { id: 1, name: "BAY STREET RESIDENTIAL", x: DISTRICT_GAP, y: DISTRICT_GAP, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_GAP + DISTRICT_WIDTH, y: DISTRICT_GAP + DISTRICT_HEIGHT / 2 } },
-    { id: 2, name: "CORPORATE PARK", x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_GAP, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_GAP + DISTRICT_HEIGHT / 2 } },
-    { id: 3, name: "THE ORANGETORIUM", x: DISTRICT_GAP, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_GAP + DISTRICT_WIDTH, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2 + DISTRICT_HEIGHT / 2 } },
-    { id: 4, name: "IDLE ENCLAVE", x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2 + DISTRICT_HEIGHT / 2 } },
+export const DISTRICT_DEFINITIONS: DistrictData[] = [
+    { id: 1, name: "BAY STREET RESIDENTIAL", alias: 'home', x: DISTRICT_GAP, y: DISTRICT_GAP, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_GAP + DISTRICT_WIDTH, y: DISTRICT_GAP + DISTRICT_HEIGHT / 2 } },
+    { id: 2, name: "CORPORATE PARK", alias: 'office', x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_GAP, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_GAP + DISTRICT_HEIGHT / 2 } },
+    { id: 3, name: "THE RHETORICTORIUM", alias: 'amphitheatre', x: DISTRICT_GAP, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_GAP + DISTRICT_WIDTH, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2 + DISTRICT_HEIGHT / 2 } },
+    { id: 4, name: "IDLE ENCLAVE", alias: 'outside', x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2, width: DISTRICT_WIDTH, height: DISTRICT_HEIGHT, gateway: { x: DISTRICT_WIDTH + DISTRICT_GAP * 2, y: DISTRICT_HEIGHT + DISTRICT_GAP * 2 + DISTRICT_HEIGHT / 2 } },
 ];
 
-const generateInitialCharacters = (count: number): CharacterData[] => {
-    const characters: CharacterData[] = [];
-    // MODIFICATION: current and target district IDs are the same initially
-    characters.push({ id: 0, currentDistrictId: 1, targetDistrictId: 1, color: 0x4d82f7, type: 'candidate' });
-    characters.push({ id: 1, currentDistrictId: 2, targetDistrictId: 2, color: 0xf7934d, type: 'candidate' });
+// const generateInitialCharacters = (count: number): CharacterData[] => {
+//     const characters: CharacterData[] = [];
+//     // MODIFICATION: current and target district IDs are the same initially
+//     characters.push({ characterId: 0, currentDistrictId: 1, targetDistrictId: 1, color: 0x4d82f7, type: 'candidate' });
+//     characters.push({ characterId: 1, currentDistrictId: 2, targetDistrictId: 2, color: 0xf7934d, type: 'candidate' });
 
-    for (let i = 2; i < count; i++) {
-        const districtId = Math.floor(Math.random() * 4) + 1;
-        characters.push({
-            id: i,
-            currentDistrictId: districtId,
-            targetDistrictId: districtId,
-            color: Math.random() > 0.4 ? 0x4d82f7 : 0xf7934d,
-            type: 'citizen',
-        });
-    }
-    return characters;
-};
-
-const getTravelPath = (startDistrictId: number, endDistrictId: number): Point[] => {
-    const startDistrict = DISTRICT_DEFINITIONS.find(d => d.id === startDistrictId);
-    const endDistrict = DISTRICT_DEFINITIONS.find(d => d.id === endDistrictId);
-    if (!startDistrict || !endDistrict || startDistrictId === endDistrictId) return [];
-    const path: Point[] = [];
-    const startRoadNode: Point = { x: CENTRAL_ROAD_X, y: startDistrict.gateway.y };
-    const endRoadNode: Point = { x: CENTRAL_ROAD_X, y: endDistrict.gateway.y };
-    path.push(startDistrict.gateway);
-    path.push(startRoadNode);
-    if (startRoadNode.y !== endRoadNode.y) path.push(endRoadNode);
-    path.push(endDistrict.gateway);
-    const settlePoint = { ...endDistrict.gateway };
-    if (endDistrict.id === 1 || endDistrict.id === 3) settlePoint.x -= 30;
-    else settlePoint.x += 30;
-    path.push(settlePoint);
-    return path;
-};
+//     for (let i = 2; i < count; i++) {
+//         const districtId = Math.floor(Math.random() * 4) + 1;
+//         characters.push({
+//             characterId: i,
+//             currentDistrictId: districtId,
+//             targetDistrictId: districtId,
+//             color: Math.random() > 0.4 ? 0x4d82f7 : 0xf7934d,
+//             type: 'citizen',
+//         });
+//     }
+//     return characters;
+// };
 
 // --- Main App Component ---
 export default function GodMode() {
-  const [characters, setCharacters] = useState(() => generateInitialCharacters(40));
-  const [selectedCharacterId, setSelectedCharacterId] = useState<number | null>(null);
+
+  const { charactersData } = useTickStore();
+  console.log('charactersData in god mode: ', Array.from(charactersData?.values() || []) );
+  const [characters, setCharacters] = useState(Array.from(charactersData?.values() || []));
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
   // MODIFICATION: travelPlans state is removed
 
-  const handleCharacterClick = (characterId: number) => {
-      const char = characters.find(c => c.id === characterId);
-      if (char && char.currentDistrictId !== char.targetDistrictId) return;
+  const handleCharacterClick = (characterId: string) => {
+      const char = characters.find(c => c.characterId === characterId);
+      if (char && char.initialDistrict !== char.targetDistrict) return;
       setSelectedCharacterId(characterId);
   };
   
   // MODIFICATION: Logic simplified to only update the target district
-  const handleMoveCharacter = (targetDistrictId: number) => {
+  const handleMoveCharacter = (targetDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => {
     if (selectedCharacterId === null) return;
     setCharacters(prevChars => 
         prevChars.map(c => 
-            c.id === selectedCharacterId ? { ...c, targetDistrictId: targetDistrictId } : c
+            c.characterId === selectedCharacterId ? { ...c, targetDistrict: targetDistrict } : c
         )
     );
     setSelectedCharacterId(null);
   };
   
   // MODIFICATION: Logic simplified to set the current district to the target
-  const handleTravelComplete = (characterId: number, finalDistrictId: number) => {
+  const handleTravelComplete = (characterId: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => {
       setCharacters(prev => prev.map(c => 
-          c.id === characterId ? { ...c, currentDistrictId: finalDistrictId } : c
+          c.characterId === characterId ? { ...c, initialDistrict: finalDistrict } : c
       ));
   }
 
-  const selectedCharacter = characters.find(c => c.id === selectedCharacterId);
+  const selectedCharacter = characters.find(c => c.characterId === selectedCharacterId);
 
   return (
     <div className="bg-[#0f172a] min-h-screen flex flex-col font-mono text-gray-300">
@@ -138,14 +125,13 @@ function LeaderProfile({ name, approval, align = 'left' }: { name: string, appro
 function ActsOfGodPanel() { const actions = [ { icon: '▲', text: 'Earthquake' }, { icon: '♦', text: 'Scandal Expose' }, { icon: '→', text: 'Market Crash' }, { icon: '♦', text: 'Assassination Attempt' }]; return (<div className="h-full p-4 bg-black/20 rounded-lg"><h3 className="font-bold text-lg mb-4 tracking-wider">Acts Of God</h3><ul className="space-y-3">{actions.map((action, i) => (<li key={i} className="p-3 bg-gray-800/80 border border-gray-700 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-200"><span className="mr-3 text-cyan-400">{action.icon}</span>{action.text}</li>))}</ul></div>); }
 function LogsPanel() { const logEntries = ["Day 10", "Charlie Singh held a rally to please his voters.", "Acts of vandalism on Rahul's posters.", "Earthquake caused 1m casualties."]; return (<div className="h-full p-4 bg-black/20 rounded-lg"><h3 className="font-bold text-lg mb-4 tracking-wider">Logs</h3><ul className="space-y-3 text-sm text-gray-400">{logEntries.map((entry, i) => <li key={i} className="leading-relaxed">{`*** ${entry}`}</li>)}</ul><div className="mt-4 flex flex-col gap-2"><button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">News</button><button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">Social Media</button></div></div>); }
 function NewsTicker() { return (<footer className="w-full bg-black/30 p-2 overflow-hidden border-t border-gray-700/50"><div className="whitespace-nowrap animate-marquee"><span className="mx-8 text-gray-400">Local politician caught arguing with ChatGPT over vote count.</span><span className="mx-8 text-gray-400">New startup offers subscription-based fresh air; premium tier includes "pine forest" scent.</span><span className="mx-8 text-gray-400">Minister declares Earth is flat 'in some constituencies'.</span></div><style>{`@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } } .animate-marquee { display: inline-block; animation: marquee 30s linear infinite; }`}</style></footer>); }
-function SimulationControls() { const days = ['DAY 1', 'DAY 2', 'DAY 3', 'DAY 4']; return (<div className="flex flex-col gap-2 mt-2 px-2"><div className="flex justify-center items-center gap-2 text-sm">{days.map((day, i) => <button key={day} className={`px-4 py-1 text-xs rounded-md ${i === 0 ? 'bg-cyan-500 text-black' : 'bg-gray-700'}`}>{day}</button>)}</div><div className="flex justify-between items-center text-sm"><button className="px-4 py-1 border-2 border-gray-600 rounded-md hover:bg-gray-700">Expand Map</button><button className="px-4 py-1 border-2 border-gray-600 rounded-md hover:bg-gray-700">Pause Sim</button></div></div>) }
-function CharacterControlModal({ character, onMove, onClose }: { character: CharacterData; onMove: (districtId: number) => void; onClose: () => void; }) { return (<div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 p-4"><div className="bg-gray-900 border-2 border-cyan-500 rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full"><button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white font-bold text-lg">×</button><h3 className="font-bold text-lg capitalize">{character.type} <span className="text-yellow-400">#{character.id}</span></h3><p className="text-sm text-gray-400 mb-4">Current District: {DISTRICT_DEFINITIONS.find(d => d.id === character.currentDistrictId)?.name}</p><p className="text-sm mb-2">Move to:</p><div className="grid grid-cols-2 gap-2">{DISTRICT_DEFINITIONS.map(d => (<button key={d.id} onClick={() => { onMove(d.id); onClose(); }} className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded text-xs disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={d.id === character.currentDistrictId}>{d.name}</button>))}</div></div></div>); }
+function CharacterControlModal({ character, onMove, onClose }: { character: CharacterData; onMove: (district: 'home' | 'office' | 'amphitheatre' | 'outside') => void; onClose: () => void; }) { return (<div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 p-4"><div className="bg-gray-900 border-2 border-cyan-500 rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full"><button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white font-bold text-lg">×</button><h3 className="font-bold text-lg capitalize">{character.type} <span className="text-yellow-400">#{character.characterId}</span></h3><p className="text-sm text-gray-400 mb-4">Current District: {DISTRICT_DEFINITIONS.find(d => d.alias === character.initialDistrict)?.name}</p><p className="text-sm mb-2">Move to:</p><div className="grid grid-cols-2 gap-2">{DISTRICT_DEFINITIONS.map(d => (<button key={d.id} onClick={() => { onMove(d.alias); onClose(); }} className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded text-xs disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={d.alias === character.initialDistrict}>{d.name}</button>))}</div></div></div>); }
 
 interface MapContainerProps {
     characters: CharacterData[];
-    selectedCharacterId: number | null;
-    onCharacterClick: (id: number) => void;
-    onTravelComplete: (id: number, finalDistrictId: number) => void;
+    selectedCharacterId: string | null;
+    onCharacterClick: (id: string) => void;
+    onTravelComplete: (id: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => void;
 }
 
 function MapContainer({characters, selectedCharacterId, onCharacterClick, onTravelComplete}: MapContainerProps) {
@@ -154,29 +140,29 @@ function MapContainer({characters, selectedCharacterId, onCharacterClick, onTrav
     
     useEffect(() => { 
         if (containerRef.current) {
-            const timer = setTimeout(() => setIsReady(true), 100);
-            return () => clearTimeout(timer);
+          const timer = setTimeout(() => setIsReady(true), 100);
+          return () => clearTimeout(timer);
         }
     }, []);
     
     return (
         <div className="bg-black/30 p-4 rounded-lg shadow-2xl border-4 border-gray-700/80 w-full flex-grow relative" ref={containerRef}>
             <h2 className="text-center text-cyan-400 mb-2 tracking-widest absolute top-2 left-1/2 -translate-x-1/2 z-10">SIMPLOLIS POLITICAL MAP</h2>
-            {isReady && (
+            {isReady && characters !== null && characters.length > 0 ? (
                 <Stage className="w-full h-full" options={{ backgroundColor: 0x080808, resizeTo: containerRef.current!, autoDensity: true }}>
                     <Scene>
-                        <GridOverlay />
+                        <GridOverlay width={LOGICAL_WIDTH} height={LOGICAL_HEIGHT} />
                         {DISTRICT_DEFINITIONS.map(district => <District key={district.id} {...district} /> )}
                         {characters
-                            .filter((character: CharacterData) => DISTRICT_DEFINITIONS.find(d => d.id === character.currentDistrictId))
+                            .filter((character: CharacterData) => DISTRICT_DEFINITIONS.find(d => d.alias === character.initialDistrict))
                             .map((character: CharacterData) => {
-                                const district = DISTRICT_DEFINITIONS.find(d => d.id === character.currentDistrictId)!;
+                                const district = DISTRICT_DEFINITIONS.find(d => d.alias === character.initialDistrict)!;
                                 return ( 
                                     <Character 
-                                        key={character.id} 
+                                        key={character.characterId} 
                                         {...character} 
                                         bounds={district} 
-                                        isSelected={character.id === selectedCharacterId} 
+                                        isSelected={character.characterId === selectedCharacterId} 
                                         onClick={onCharacterClick} 
                                         onTravelComplete={onTravelComplete} 
                                     />
@@ -184,6 +170,10 @@ function MapContainer({characters, selectedCharacterId, onCharacterClick, onTrav
                             })}
                     </Scene>
                 </Stage>
+            ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+                </div>
             )}
         </div>
     );
@@ -198,7 +188,7 @@ const Scene = ({ children }: { children: React.ReactNode}) => {
             if (app && app.screen && app.screen.width > 0) {
                 setIsReady(true);
             }
-        }, 100);
+        }, 500);
         return () => clearTimeout(timer);
     }, [app]);
     
@@ -213,128 +203,6 @@ const Scene = ({ children }: { children: React.ReactNode}) => {
     return <Container x={x} y={y} scale={scale}>{children}</Container>
 }
 
-const GridOverlay = () => { 
-    const gridTexture = useMemo(() => { 
-        const canvas = document.createElement('canvas'); 
-        const gridSize = 40; 
-        canvas.width = gridSize; 
-        canvas.height = gridSize; 
-        const ctx = canvas.getContext('2d'); 
-        if (ctx) { 
-            ctx.strokeStyle = 'rgba(128, 128, 128, 0.3)'; 
-            ctx.beginPath(); 
-            ctx.moveTo(gridSize, 0); 
-            ctx.lineTo(gridSize, gridSize); 
-            ctx.lineTo(0, gridSize); 
-            ctx.stroke(); 
-        } 
-        return PIXI.Texture.from(canvas); 
-    }, []); 
-    
-    return <TilingSprite texture={gridTexture} width={LOGICAL_WIDTH} height={LOGICAL_HEIGHT} tilePosition={{ x: 0, y: 0 }} />; 
-};
-
-interface CharacterProps {
-    id: number; color: number; type: 'citizen' | 'candidate'; 
-    currentDistrictId: number; targetDistrictId: number;
-    bounds: DistrictData; isSelected: boolean;
-    onClick: (id: number) => void;
-    onTravelComplete: (id: number, finalDistrictId: number) => void;
-}
-
-function Character({ id, color, bounds, isSelected, onClick, onTravelComplete, type, currentDistrictId, targetDistrictId }: CharacterProps) {
-    const radius = type === 'candidate' ? CANDIDATE_RADIUS : CITIZEN_RADIUS;
-    const [position, setPosition] = useState<Point>(() => ({ 
-        x: bounds.x + radius + Math.random() * (bounds.width - radius * 2), 
-        y: bounds.y + radius + Math.random() * (bounds.height - radius * 2)
-    }));
-    const [isHovered, setIsHovered] = useState(false);
-    const [animationPath, setAnimationPath] = useState<AnimationPath | null>(null);
-    const velocityRef = useRef({ x: (Math.random() - 0.5) * CITIZEN_SPEED, y: (Math.random() - 0.5) * CITIZEN_SPEED });
-    
-    useEffect(() => {
-        if (currentDistrictId !== targetDistrictId) {
-            const path = getTravelPath(currentDistrictId, targetDistrictId);
-            if (path.length > 0) {
-                setAnimationPath({ path, currentPathIndex: 0 });
-            }
-        }
-    }, [currentDistrictId, targetDistrictId]);
-
-    useEffect(() => {
-        if (!animationPath) {
-             setPosition({ 
-                 x: bounds.x + radius + Math.random() * (bounds.width - radius * 2), 
-                 y: bounds.y + radius + Math.random() * (bounds.height - radius * 2)
-             });
-        }
-    }, [bounds, animationPath, radius]);
-
-    useTick(delta => {
-        if (isHovered && !animationPath) return;
-        if (animationPath && animationPath.path.length > animationPath.currentPathIndex) {
-            const target = animationPath.path[animationPath.currentPathIndex];
-            const dx = target.x - position.x, dy = target.y - position.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < TRAVEL_SPEED * delta) {
-                const nextPathIndex = animationPath.currentPathIndex + 1;
-                if (nextPathIndex >= animationPath.path.length) { 
-                    onTravelComplete(id, targetDistrictId); 
-                    setAnimationPath(null); 
-                } else { 
-                    setAnimationPath(prev => prev ? ({ ...prev, currentPathIndex: nextPathIndex }) : null); 
-                }
-                setPosition(target);
-            } else {
-                const angle = Math.atan2(dy, dx);
-                setPosition(prev => ({ 
-                    x: prev.x + Math.cos(angle) * TRAVEL_SPEED * delta, 
-                    y: prev.y + Math.sin(angle) * TRAVEL_SPEED * delta, 
-                }));
-            }
-        } else {
-            setPosition(prevPosition => {
-                let newX = prevPosition.x + velocityRef.current.x * delta;
-                let newY = prevPosition.y + velocityRef.current.y * delta;
-                const left = bounds.x + radius;
-                const right = bounds.x + bounds.width - radius;
-                const top = bounds.y + radius;
-                const bottom = bounds.y + bounds.height - radius;
-                
-                if(newX < left) { newX = left; velocityRef.current.x *= -1; } 
-                else if(newX > right) { newX = right; velocityRef.current.x *= -1; }
-                
-                if(newY < top) { newY = top; velocityRef.current.y *= -1; } 
-                else if(newY > bottom) { newY = bottom; velocityRef.current.y *= -1; }
-                
-                return { x: newX, y: newY };
-            });
-        }
-    });
-
-    const draw = useCallback((g: PIXI.Graphics) => {
-        g.clear(); 
-        g.beginFill(color);
-        if (isSelected) g.lineStyle(3, 0xFBBF24, 1);
-        else if (isHovered) g.lineStyle(2, 0xffffff, 1);
-        else g.lineStyle(0);
-        g.drawCircle(0, 0, radius); 
-        g.endFill();
-    }, [color, isHovered, isSelected, radius]);
-
-    return (
-        <Graphics 
-            x={position.x} 
-            y={position.y} 
-            eventMode={'static'} 
-            draw={draw} 
-            pointerover={() => setIsHovered(true)} 
-            pointerout={() => setIsHovered(false)} 
-            pointerdown={() => onClick(id)}
-        />
-    );
-}
-
 function Gateway({ x, y }: Point) { 
     const draw = useCallback((g: PIXI.Graphics) => { 
         g.clear(); 
@@ -346,7 +214,7 @@ function Gateway({ x, y }: Point) {
     return <Graphics x={x} y={y} draw={draw} alpha={0.5} />; 
 }
 
-function District({ id: _id, x, y, width, height, name, gateway }: DistrictData) { 
+function District({ id, alias, x, y, width, height, name, gateway }: DistrictData) { 
     const draw = useCallback((g: PIXI.Graphics) => { 
         g.clear(); 
         g.lineStyle(2, 0x4E4E4E, 1); 

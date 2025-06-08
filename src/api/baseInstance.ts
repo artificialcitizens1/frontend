@@ -24,7 +24,7 @@ baseInstance.interceptors.request.use(
 
     // Log request in development
     if (import.meta.env.DEV) {
-      console.log("🚀 Request:", config);
+      // console.log("🚀 Request:", config);
     }
 
     return config;
@@ -40,7 +40,7 @@ baseInstance.interceptors.response.use(
   (response: AxiosResponse) => {
     // Log response in development
     if (import.meta.env.DEV) {
-      console.log("✅ Response:", response);
+      // console.log("✅ Response:", response)
     }
 
     return response;
