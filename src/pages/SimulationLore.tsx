@@ -73,7 +73,10 @@ const SimulationLore = () => {
         }
       }, 4000); // Allow 4 seconds for the title animation
       
-      return () => clearTimeout(titleTimer);
+      return () => {
+        clearTimeout(titleTimer)
+        typingAudioRef.current = null; // Clean up audio reference
+      };
     }
   }, [isLoading, loreTitle]);
 

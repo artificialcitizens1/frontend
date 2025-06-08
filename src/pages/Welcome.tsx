@@ -83,6 +83,19 @@ const Welcome = () => {
                 Voter Details Demo
               </span>
             </button>
+
+            {/* Candidate Details Button */}
+            <button
+              className="w-full h-[104px] bg-transparent border border-white/30 hover:bg-white/10 transition-colors"
+              onClick={() => navigate("/candidate-details")}
+            >
+              <span
+                className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
+                style={{ fontFamily: "Roboto Mono" }}
+              >
+                Candidate Details Demo
+              </span>
+            </button>
           </div>
         </div>
       </div>

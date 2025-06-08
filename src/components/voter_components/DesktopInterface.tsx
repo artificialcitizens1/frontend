@@ -57,12 +57,12 @@ const DesktopInterface: React.FC<DesktopInterfaceProps> = ({ onSocialMediaClick,
       {/* Desktop Icons at bottom */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
         {/* Pink Folder Icon */}
-        <div className="flex flex-col items-center cursor-pointer hover:bg-white/20 p-2 rounded">
+        {/* <div className="flex flex-col items-center cursor-pointer hover:bg-white/20 p-2 rounded">
           <div className="w-12 h-12 bg-pink-400 border-2 border-pink-600 rounded-sm flex items-center justify-center shadow-lg">
             <div className="w-8 h-6 bg-pink-300 border border-pink-500 rounded-sm"></div>
           </div>
           <span className="text-white text-xs mt-1">Folder</span>
-        </div>
+        </div> */}
 
         {/* Red/Pink Circle Icon (Browser) */}
         <div
