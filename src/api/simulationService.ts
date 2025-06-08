@@ -51,7 +51,11 @@ interface LoreResponse {
   content: string[];
 }
 
-export const startSimulationFlow = async (candidates: Candidate[]): Promise<SimulationResponse> => {
+export const startSimulationFlow = async (
+  candidates: Candidate[], 
+  simulationName: string = "2025 General Election", 
+  simulationDescription: string = "A simulation of the 2025 general election with two major candidates."
+): Promise<SimulationResponse> => {
   // Transform the candidates data to match the API requirements
   const candidatesData = candidates.map(candidate => {
     // Map political standing to ideology position
@@ -89,8 +93,8 @@ export const startSimulationFlow = async (candidates: Candidate[]): Promise<Simu
   
   const payload: SimulationStartRequest = {
     simulationData: {
-      name: "2025 General Election",
-      description: "A simulation of the 2025 general election with two major candidates."
+      name: simulationName,
+      description: simulationDescription
     },
     candidatesData
   };
@@ -109,7 +113,9 @@ export const getSimulationLore = async (simId: string): Promise<LoreResponse> =>
   let paragraphs: string[] = [];
   if (data && data.lore) {
     // Split the text by newline characters to get paragraphs
-    paragraphs = data.lore.split('\n\n').filter((p: string) => p.trim() !== '');
+    paragraphs = data.lore.split('\n\n')
+      .filter((p: string) => p.trim() !== '')
+      .filter((p: string) => !p.includes("The choice now rests with the citizens"));
   }
 
   // Try to get candidate names from the store for a more specific title

@@ -6,14 +6,18 @@ import { startSimulationFlow } from '../api/simulationService';
 const SimulationCreation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { candidates, setSimulationId } = useSimulationStore();
+  const { candidates, simulationName, description, setSimulationId } = useSimulationStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     const createSimulation = async () => {
       try {
-        // Make API call to start simulation
-        const response = await startSimulationFlow(candidates || []);
+        // Make API call to start simulation with name and description from store
+        const response = await startSimulationFlow(
+          candidates || [],
+          simulationName || "2025 General Election", 
+          description || "A simulation of the 2025 general election with two major candidates."
+        );
         console.log('Simulation created:', response);
         
         // Navigate to the lore page with the simulation ID
@@ -42,12 +46,12 @@ const SimulationCreation = () => {
         <img 
           src="/images/top_grid.png"
           alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-top"
+          className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
         />
         <img 
           src="/images/bottom_grid.png"
           alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-bottom"
+          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
         />
       </div>
 
