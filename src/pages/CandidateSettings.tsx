@@ -23,6 +23,40 @@ const defaultCandidate: Candidate = {
   politicalStanding: { x: 0, y: 0 },
 };
 
+// Modify the getRandomizedCandidate function to accept existing candidate data
+const getRandomizedCandidate = (existingCandidate: Candidate): Candidate => {
+  // Communication styles
+  const communicationStyles: CommunicationStyle[] = ["Aggressive", "Calm", "Trendy"];
+  const randomCommunicationStyle = communicationStyles[Math.floor(Math.random() * communicationStyles.length)];
+  
+  // Media interactions
+  const mediaInteractions: MediaInteractions[] = ["None", "Few", "Many"];
+  const randomMediaInteraction = mediaInteractions[Math.floor(Math.random() * mediaInteractions.length)];
+  
+  // Random float between min and max
+  const randomFloat = (min: number, max: number) => Math.min(max, Math.max(min, Math.random()));
+  
+  // Create random parameters
+  const parameters = {
+    communicationStyle: randomCommunicationStyle,
+    mediaInteractions: randomMediaInteraction,
+    charisma: randomFloat(0.2, 0.9),
+    temper: randomFloat(0.2, 0.9),
+    integrity: randomFloat(0.2, 0.9),
+    authenticity: randomFloat(0.2, 0.9),
+  };
+  
+  // Calculate political standing based on parameters
+  const politicalStanding = calculatePoliticalStanding(parameters);
+  
+  return {
+    ...existingCandidate,
+    avatarUrl: `https://api.dicebear.com/7.x/personas/svg?seed=${existingCandidate.id}-${Math.random().toString(36).substring(2, 8)}`,
+    parameters,
+    politicalStanding,
+  };
+};
+
 const CandidateSettings = () => {
   const [candidates, setCandidates] = useState<[Candidate, Candidate]>([
     { ...defaultCandidate, id: "1" },
@@ -136,6 +170,16 @@ const CandidateSettings = () => {
     navigate('/simulation-creation');
   };
 
+  // Update the randomizeCharacteristics function
+  const randomizeCharacteristics = () => {
+    setCandidates(prevCandidates => {
+      return [
+        getRandomizedCandidate(prevCandidates[0]),
+        getRandomizedCandidate(prevCandidates[1])
+      ] as [Candidate, Candidate];
+    });
+  };
+
   return (
     <div className="min-h-screen w-full relative overflow-x-hidden">
       {/* Fixed Background */}
@@ -188,18 +232,27 @@ const CandidateSettings = () => {
                 </p>
               </div>
             </div>
-            {error && <div className="text-red-500 mr-4 self-center">{error}</div>}
-            <button
-              className={`px-[88px] py-5 bg-white transition-colors text-black ${
-                !isFormValid() || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/90'
-              }`}
-              onClick={handleContinue}
-              disabled={!isFormValid() || isLoading}
-            >
-              <span className="text-[28px] leading-[37px]" style={{ fontFamily: "Roboto Mono" }}>
-                {isLoading ? 'Loading...' : 'Continue'}
-              </span>
-            </button>
+            <div className="flex items-center gap-4">
+              {error && <div className="text-red-500 mr-4 self-center">{error}</div>}
+              <button
+                className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-lg"
+                onClick={randomizeCharacteristics}
+                style={{ fontFamily: "Roboto Mono" }}
+              >
+                Randomize Characteristics
+              </button>
+              <button
+                className={`px-[88px] py-5 bg-white transition-colors text-black ${
+                  !isFormValid() || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/90'
+                }`}
+                onClick={handleContinue}
+                disabled={!isFormValid() || isLoading}
+              >
+                <span className="text-[28px] leading-[37px]" style={{ fontFamily: "Roboto Mono" }}>
+                  {isLoading ? 'Loading...' : 'Continue'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 

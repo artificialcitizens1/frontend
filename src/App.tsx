@@ -8,7 +8,6 @@ import "./styles/fonts.css";
 /* page/component imports */
 import Welcome from "./pages/Welcome";
 import CreateSimulation from "./pages/CreateSimulation";
-import SimulationDescription from "./pages/SimulationDescription";
 import CandidateSettings from "./pages/CandidateSettings";
 import { SimulationSettingsPage } from "./pages/SimulationSettings";
 import { SimulationResult } from "./pages/SimulationResult";
@@ -25,7 +24,6 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/create-simulation" element={<CreateSimulation />} />
-        <Route path="/simulation-description" element={<SimulationDescription />} />
         <Route path="/candidate-settings" element={<CandidateSettings />} />
         <Route path="/simulation-settings" element={<SimulationSettingsPage />} />
         <Route path="/simulation-result" element={<SimulationResult />} />
