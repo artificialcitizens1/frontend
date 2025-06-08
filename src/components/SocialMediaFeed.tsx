@@ -12,6 +12,10 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // ==========================================
 // INTERFACE DEFINITIONS
 // ==========================================
+interface SocialMediaFeedProps {
+  onClose?: () => void;
+}
+
 interface TweetProps {
   avatar: string;
   name: string;
@@ -26,23 +30,14 @@ interface TweetProps {
 // ==========================================
 // TWEET COMPONENT
 // ==========================================
-const Tweet = ({
-  avatar,
-  name,
-  username,
-  time,
-  content,
-  image,
-  likes,
-  verified,
-}: TweetProps) => (
+const Tweet = ({ avatar, name, username, time, content, image, likes, verified }: TweetProps) => (
   <div className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
     <div className="flex">
       <div className="flex-1 min-w-0">
         <div className="flex items-start align-center">
           <img src={avatar} alt="avatar" className="w-12 h-12 rounded-full mr-3 flex-shrink-0" />
           <div>
-            <div className="flex" >
+            <div className="flex">
               <span className="font-bold text-black truncate">{name}</span>
               <div className="flex items-center">
                 {verified && (
@@ -103,7 +98,7 @@ const Tweet = ({
 // ==========================================
 // MAIN SOCIAL MEDIA FEED COMPONENT
 // ==========================================
-const SocialMediaFeed = () => {
+const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
   // ==========================================
   // LOADING STATE
   // ==========================================
@@ -156,7 +151,8 @@ const SocialMediaFeed = () => {
       name: "Maya Johnson",
       username: "MayaJ_Official",
       time: "8:15 PM · Jun 8, 2022",
-      content: "Just witnessed the most inspiring town hall meeting! Both candidates presented their visions, but only one spoke to the heart of our community's needs. Democracy in action! 🗳️",
+      content:
+        "Just witnessed the most inspiring town hall meeting! Both candidates presented their visions, but only one spoke to the heart of our community's needs. Democracy in action! 🗳️",
       likes: 156,
       verified: true,
     },
@@ -165,7 +161,8 @@ const SocialMediaFeed = () => {
       name: "Tech Insider",
       username: "TechInsider",
       time: "7:30 PM · Jun 8, 2022",
-      content: "BREAKING: New AI-powered voting systems being tested for the upcoming election. Enhanced security and faster results promised. What are your thoughts on digital democracy?",
+      content:
+        "BREAKING: New AI-powered voting systems being tested for the upcoming election. Enhanced security and faster results promised. What are your thoughts on digital democracy?",
       image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=300&fit=crop",
       likes: 89,
       verified: true,
@@ -175,7 +172,8 @@ const SocialMediaFeed = () => {
       name: "Local News Today",
       username: "LocalNewsToday",
       time: "6:45 PM · Jun 8, 2022",
-      content: "Weather alert: Thunderstorms expected during tomorrow's campaign rally. Both candidates confirm events will proceed as planned with indoor backup venues ready.",
+      content:
+        "Weather alert: Thunderstorms expected during tomorrow's campaign rally. Both candidates confirm events will proceed as planned with indoor backup venues ready.",
       likes: 23,
       verified: true,
     },
@@ -184,7 +182,8 @@ const SocialMediaFeed = () => {
       name: "Sarah Chen",
       username: "SarahC_Voter",
       time: "5:20 PM · Jun 8, 2022",
-      content: "As a first-time voter, I'm taking this election seriously. Spent the weekend researching both candidates' policies. Healthcare and education are my top priorities. Who else is doing their homework? 📚",
+      content:
+        "As a first-time voter, I'm taking this election seriously. Spent the weekend researching both candidates' policies. Healthcare and education are my top priorities. Who else is doing their homework? 📚",
       likes: 67,
       verified: false,
     },
@@ -193,7 +192,8 @@ const SocialMediaFeed = () => {
       name: "Political Analyst Hub",
       username: "PoliAnalystHub",
       time: "4:10 PM · Jun 8, 2022",
-      content: "Latest polling data shows a tightening race! Singh leads by 3 points, within the margin of error. Patel's recent policy announcements seem to be resonating with undecided voters. Thread 🧵",
+      content:
+        "Latest polling data shows a tightening race! Singh leads by 3 points, within the margin of error. Patel's recent policy announcements seem to be resonating with undecided voters. Thread 🧵",
       likes: 234,
       verified: true,
     },
@@ -202,7 +202,8 @@ const SocialMediaFeed = () => {
       name: "Community Voice",
       username: "CommunityVoice22",
       time: "3:55 PM · Jun 8, 2022",
-      content: "Attended both candidate forums this week. Here's my honest take: Singh has bold ideas but needs more concrete plans. Patel has experience but seems resistant to change. We need leadership that listens to ALL voices.",
+      content:
+        "Attended both candidate forums this week. Here's my honest take: Singh has bold ideas but needs more concrete plans. Patel has experience but seems resistant to change. We need leadership that listens to ALL voices.",
       likes: 45,
       verified: false,
     },
@@ -211,7 +212,8 @@ const SocialMediaFeed = () => {
       name: "Youth for Change",
       username: "Youth4Change",
       time: "2:30 PM · Jun 8, 2022",
-      content: "Climate action NOW! 🌍 Both candidates need to address the environmental crisis affecting our generation. We won't accept empty promises anymore. #ClimateVote #YouthVoice",
+      content:
+        "Climate action NOW! 🌍 Both candidates need to address the environmental crisis affecting our generation. We won't accept empty promises anymore. #ClimateVote #YouthVoice",
       image: "https://images.unsplash.com/photo-1569163139394-de44303f1e88?w=400&h=300&fit=crop",
       likes: 178,
       verified: false,
@@ -254,7 +256,10 @@ const SocialMediaFeed = () => {
       content: (
         <>
           <p className="font-bold">LIVE: Election Debate Tonight</p>
-          <p>Both candidates to face off in primetime debate. Key topics: economy, healthcare, education.</p>
+          <p>
+            Both candidates to face off in primetime debate. Key topics: economy, healthcare,
+            education.
+          </p>
         </>
       ),
       image: "https://images.unsplash.com/photo-1607473256721-4a23e96a2e10?w=400&h=300&fit=crop",
@@ -266,7 +271,8 @@ const SocialMediaFeed = () => {
       name: "Reuters",
       username: "Reuters",
       time: "7:15 PM · Jun 8, 2022",
-      content: "EXCLUSIVE: New poll reveals voter priorities - 68% say economy is top concern, followed by healthcare at 54% and education at 47%. Immigration ranks 4th at 23%.",
+      content:
+        "EXCLUSIVE: New poll reveals voter priorities - 68% say economy is top concern, followed by healthcare at 54% and education at 47%. Immigration ranks 4th at 23%.",
       likes: 289,
       verified: true,
     },
@@ -278,7 +284,9 @@ const SocialMediaFeed = () => {
       content: (
         <>
           <p className="font-bold">Campaign Finance Report</p>
-          <p>Singh raises $2.3M this quarter, Patel at $1.8M. Small donor contributions surge 40%.</p>
+          <p>
+            Singh raises $2.3M this quarter, Patel at $1.8M. Small donor contributions surge 40%.
+          </p>
         </>
       ),
       likes: 156,
@@ -289,7 +297,8 @@ const SocialMediaFeed = () => {
       name: "Election Watch",
       username: "ElectionWatch22",
       time: "5:45 PM · Jun 8, 2022",
-      content: "🚨 TRENDING: #DebateTonight #Singh2022 #Patel2022 #VoteReady - Social media buzzing ahead of tonight's debate. Early voter turnout up 15% from last cycle.",
+      content:
+        "🚨 TRENDING: #DebateTonight #Singh2022 #Patel2022 #VoteReady - Social media buzzing ahead of tonight's debate. Early voter turnout up 15% from last cycle.",
       likes: 92,
       verified: false,
     },
@@ -301,7 +310,10 @@ const SocialMediaFeed = () => {
       content: (
         <>
           <p className="font-bold">Local Business Leaders Weigh In</p>
-          <p>Chamber of Commerce hosts candidate forum focused on economic policies and job creation initiatives.</p>
+          <p>
+            Chamber of Commerce hosts candidate forum focused on economic policies and job creation
+            initiatives.
+          </p>
         </>
       ),
       image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop",
@@ -313,7 +325,8 @@ const SocialMediaFeed = () => {
       name: "Fact Check Central",
       username: "FactCheckCentral",
       time: "3:10 PM · Jun 8, 2022",
-      content: "✅ FACT CHECK: Recent claims about education funding verified. Singh's proposal would increase funding by 12%, Patel's by 8%. Both within proposed budget constraints.",
+      content:
+        "✅ FACT CHECK: Recent claims about education funding verified. Singh's proposal would increase funding by 12%, Patel's by 8%. Both within proposed budget constraints.",
       likes: 203,
       verified: true,
     },
@@ -322,7 +335,8 @@ const SocialMediaFeed = () => {
       name: "Social Media Analytics",
       username: "SocialAnalytics",
       time: "2:35 PM · Jun 8, 2022",
-      content: "📊 Viral Moment Alert: Singh's town hall response about healthcare has 2.3M views. Patel's infrastructure speech hits 1.8M. Engagement rates highest among 25-34 age group.",
+      content:
+        "📊 Viral Moment Alert: Singh's town hall response about healthcare has 2.3M views. Patel's infrastructure speech hits 1.8M. Engagement rates highest among 25-34 age group.",
       likes: 134,
       verified: false,
     },
@@ -339,10 +353,10 @@ const SocialMediaFeed = () => {
             ========================================== */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white z-20 flex-shrink-0">
           <div className="flex">
-              <img src="/icons/ic_shit.svg" alt="Twitter Logo" className="w-8 h-8" />
-              <h1 className="text-2xl font-bold">Shitter</h1>
-          </div>          
-          <XIcon className="w-6 h-6 cursor-pointer" />
+            <img src="/icons/ic_shit.svg" alt="Twitter Logo" className="w-8 h-8" />
+            <h1 className="text-2xl font-bold">Shitter</h1>
+          </div>
+          <XIcon className="w-6 h-6 cursor-pointer" onClick={onClose} />
         </div>
 
         {/* ==========================================
@@ -386,10 +400,10 @@ const SocialMediaFeed = () => {
           ========================================== */}
       <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white z-20 flex-shrink-0">
         <div className="flex">
-              <img src="/icons/ic_shit.svg" alt="Twitter Logo" className="w-8 h-8" />
-              <h1 className="text-2xl font-bold">Shitter</h1>
-          </div>  
-        <XIcon className="w-6 h-6 cursor-pointer" />
+          <img src="/icons/ic_shit.svg" alt="Twitter Logo" className="w-8 h-8" />
+          <h1 className="text-2xl font-bold">Shitter</h1>
+        </div>
+        <XIcon className="w-6 h-6 cursor-pointer" onClick={onClose} />
       </div>
 
       {/* ==========================================
@@ -432,4 +446,4 @@ const SocialMediaFeed = () => {
   );
 };
 
-export default SocialMediaFeed; 
+export default SocialMediaFeed;

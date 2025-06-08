@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SocialMediaFeed from "../components/SocialMediaFeed";
+import NewsChannel from "../components/NewsChannel";
+import DesktopInterface from "../components/DesktopInterface";
 
 // Voter Political Standing Graph component
 const VoterPoliticalLeaningGraph = () => {
@@ -40,25 +42,50 @@ const VoterPoliticalLeaningGraph = () => {
 
 // Surveillance Screen Component
 const SurveillanceScreen = () => {
-  const [showWarning, setShowWarning] = useState(true);
+  const [currentView, setCurrentView] = useState<"desktop" | "social" | "news">("desktop");
+
+  const handleSocialMediaClick = () => {
+    setCurrentView("social");
+  };
+
+  const handleNewsClick = () => {
+    setCurrentView("news");
+  };
+
+  const handleBackToDesktop = () => {
+    setCurrentView("desktop");
+  };
 
   return (
     <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
       {/* Laptop mockup container */}
       <div className="relative">
         {/* Replace 'laptop-mockup.png' with your actual laptop PNG file */}
-        <img src="images/monitor_mockup.png" alt="Laptop" className="w-full max-w-4xl object-cover" />
-        
+        <img
+          src="images/monitor_mockup.png"
+          alt="Laptop"
+          className="w-full max-w-4xl object-cover"
+        />
+
         {/* Screen overlay - positioned to match the laptop screen area with subtle CRT bulge effect */}
-        <div 
+        <div
           className="absolute top-[8%] left-[8%] right-[8%] bottom-[32%] bg-white overflow-hidden"
           style={{
-            borderRadius: '0.5rem 0.5rem 0.5rem 0.5rem',
-            transform: 'perspective(80vw) rotateX(0.8deg)',
-            transformOrigin: 'center center',
+            borderRadius: "0.5rem 0.5rem 0.5rem 0.5rem",
+            transform: "perspective(80vw) rotateX(0.8deg)",
+            transformOrigin: "center center",
           }}
         >
-          <SocialMediaFeed />
+          {currentView === "desktop" ? (
+            <DesktopInterface
+              onSocialMediaClick={handleSocialMediaClick}
+              onNewsClick={handleNewsClick}
+            />
+          ) : currentView === "social" ? (
+            <SocialMediaFeed onClose={handleBackToDesktop} />
+          ) : (
+            <NewsChannel onClose={handleBackToDesktop} />
+          )}
         </div>
       </div>
     </div>
@@ -99,9 +126,7 @@ const VoterDetails = () => {
                 />
               </svg>
             </button>
-            <h1 className="text-[24px] font-medium text-white roboto-mono">
-              VOTER DETAILS
-            </h1>
+            <h1 className="text-[24px] font-medium text-white roboto-mono">VOTER DETAILS</h1>
           </div>
         </div>
 
@@ -114,7 +139,9 @@ const VoterDetails = () => {
                 {/* Civilian status and name */}
                 <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
                   <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CIVILIAN</div>
-                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">JACK FLANNAGAN</div>
+                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">
+                    JACK FLANNAGAN
+                  </div>
                 </div>
 
                 {/* Voter image and details */}
@@ -166,7 +193,7 @@ const VoterDetails = () => {
               <div className="mt-6">
                 <h3 className="text-white text-xl pb-4 roboto-mono">Political Leaning</h3>
                 <div className="border border-white/30 p-4">
-                    <VoterPoliticalLeaningGraph />
+                  <VoterPoliticalLeaningGraph />
                 </div>
               </div>
             </div>
