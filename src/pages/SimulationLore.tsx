@@ -11,7 +11,7 @@ const SimulationLore = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   // We're keeping simulationData for future expansion but not currently displaying it
-  const [simulationData, setSimulationData] = useState<any | null>(null);
+  const [_simulationData, setSimulationData] = useState<any | null>(null);
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false);
   const [displayedWords, setDisplayedWords] = useState<string[]>([]);

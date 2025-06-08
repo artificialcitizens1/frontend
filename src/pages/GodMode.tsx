@@ -346,7 +346,7 @@ function Gateway({ x, y }: Point) {
     return <Graphics x={x} y={y} draw={draw} alpha={0.5} />; 
 }
 
-function District({ id, x, y, width, height, name, gateway }: DistrictData) { 
+function District({ id: _id, x, y, width, height, name, gateway }: DistrictData) { 
     const draw = useCallback((g: PIXI.Graphics) => { 
         g.clear(); 
         g.lineStyle(2, 0x4E4E4E, 1); 
