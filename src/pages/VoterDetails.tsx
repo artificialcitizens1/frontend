@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SocialMediaFeed from "../components/SocialMediaFeed";
+import NewsChannel from "../components/NewsChannel";
+import DesktopInterface from "../components/DesktopInterface";
 
 // Voter Political Standing Graph component
 const VoterPoliticalLeaningGraph = () => {
@@ -39,115 +42,50 @@ const VoterPoliticalLeaningGraph = () => {
 
 // Surveillance Screen Component
 const SurveillanceScreen = () => {
-  const [showWarning, setShowWarning] = useState(true);
+  const [currentView, setCurrentView] = useState<"desktop" | "social" | "news">("desktop");
+
+  const handleSocialMediaClick = () => {
+    setCurrentView("social");
+  };
+
+  const handleNewsClick = () => {
+    setCurrentView("news");
+  };
+
+  const handleBackToDesktop = () => {
+    setCurrentView("desktop");
+  };
 
   return (
     <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
       {/* Laptop mockup container */}
       <div className="relative">
         {/* Replace 'laptop-mockup.png' with your actual laptop PNG file */}
-        <img src="images/monitor_mockup.png" alt="Laptop" className="w-full max-w-4xl object-cover" />
-        
-        {/* Screen overlay - positioned to match the laptop screen area */}
-        <div className="absolute top-[8%] left-[8%] right-[8%] bottom-[25%] bg-gradient-to-b from-cyan-400 to-blue-500 overflow-hidden rounded-lg">
-          {/* Horizontal scan lines effect */}
-          <div className="absolute inset-0 z-10 pointer-events-none">
-            {Array.from({ length: 50 }).map((_, i) => (
-              <div
-                key={i}
-                className="w-full h-[2px] bg-black/20"
-                style={{
-                  position: "absolute",
-                  top: `${(i / 50) * 100}%`,
-                  animationDelay: `${i * 0.02}s`,
-                }}
-              />
-            ))}
-          </div>
+        <img
+          src="images/monitor_mockup.png"
+          alt="Laptop"
+          className="w-full max-w-4xl object-cover"
+        />
 
-          {/* Portrait grid - 3x2 layout adjusted for laptop screen */}
-          <div className="absolute inset-0 grid grid-cols-3 grid-rows-2 gap-2 p-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="relative">
-                {/* Portrait placeholder with cyan tint effect */}
-                <div
-                  className="w-full h-full bg-gradient-to-br from-cyan-300/30 to-blue-400/50 rounded-md flex items-center justify-center relative overflow-hidden"
-                  style={{
-                    backgroundImage: `linear-gradient(45deg, rgba(0,255,255,0.3) 0%, rgba(0,150,255,0.4) 100%)`,
-                  }}
-                >
-                  {/* Simulated portrait */}
-                  <div className="w-12 h-16 bg-gradient-to-b from-orange-200 to-orange-300 rounded-full relative">
-                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-orange-400 rounded-full"></div>
-                    <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-6 h-4 bg-orange-300 rounded-lg"></div>
-                  </div>
-
-                  {/* Scan line overlay for each portrait */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-300/20 to-transparent animate-pulse"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Semi-circle scanner in center */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-            <div className="w-32 h-16 border-t-4 border-cyan-200 rounded-t-full opacity-80 animate-pulse"></div>
-            <div
-              className="w-24 h-12 border-t-2 border-cyan-100 rounded-t-full opacity-60 mt-1 mx-auto animate-pulse"
-              style={{ animationDelay: "0.5s" }}
-            ></div>
-          </div>
-
-          {/* Warning Dialog */}
-          {showWarning && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-200 border-2 border-gray-400 shadow-xl z-30">
-              {/* Dialog Title Bar */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 py-1 flex justify-between items-center text-xs">
-                <span className="font-bold">Warning</span>
-                <div className="flex gap-1">
-                  <button className="w-4 h-3 bg-gray-300 border border-gray-400 text-xs flex items-center justify-center hover:bg-gray-400">
-                    _
-                  </button>
-                  <button className="w-4 h-3 bg-gray-300 border border-gray-400 text-xs flex items-center justify-center hover:bg-gray-400">
-                    □
-                  </button>
-                  <button
-                    onClick={() => setShowWarning(false)}
-                    className="w-4 h-3 bg-red-500 border border-gray-400 text-xs flex items-center justify-center text-white hover:bg-red-600"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-
-              {/* Dialog Content */}
-              <div className="p-4 bg-gray-100 min-w-[180px] text-center">
-                <div className="mb-3">
-                  <div className="text-2xl mb-2">⚠️</div>
-                  <p className="text-gray-800 font-medium text-sm leading-tight">
-                    You are being
-                    <br />
-                    watched
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowWarning(false)}
-                  className="px-4 py-1 bg-gray-300 border-2 border-gray-400 text-black hover:bg-gray-400 font-medium text-xs"
-                >
-                  OK
-                </button>
-              </div>
-            </div>
+        {/* Screen overlay - positioned to match the laptop screen area with subtle CRT bulge effect */}
+        <div
+          className="absolute top-[8%] left-[8%] right-[8%] bottom-[32%] bg-white overflow-hidden"
+          style={{
+            borderRadius: "0.5rem 0.5rem 0.5rem 0.5rem",
+            transform: "perspective(80vw) rotateX(0.8deg)",
+            transformOrigin: "center center",
+          }}
+        >
+          {currentView === "desktop" ? (
+            <DesktopInterface
+              onSocialMediaClick={handleSocialMediaClick}
+              onNewsClick={handleNewsClick}
+            />
+          ) : currentView === "social" ? (
+            <SocialMediaFeed onClose={handleBackToDesktop} />
+          ) : (
+            <NewsChannel onClose={handleBackToDesktop} />
           )}
-
-          {/* Glitch effects */}
-          <div className="absolute inset-0 pointer-events-none z-5">
-            <div className="absolute top-1/4 left-0 right-0 h-[1px] bg-cyan-200 opacity-60 animate-pulse"></div>
-            <div
-              className="absolute top-3/4 left-0 right-0 h-[1px] bg-cyan-200 opacity-60 animate-pulse"
-              style={{ animationDelay: "1s" }}
-            ></div>
-          </div>
         </div>
       </div>
     </div>
@@ -166,8 +104,8 @@ const VoterDetails = () => {
       {/* Main Content Container */}
       <div className="relative">
         {/* Header */}
-        <div className="sticky top-0 z-50 bg-black py-6 px-8">
-          <div className="max-w-[1728px] mx-auto flex items-center gap-6">
+        <div className="sticky top-0 z-50 bg-black py-2 px-8">
+          <div className="max-w-full mx-auto flex items-center gap-6">
             <button
               className="text-white hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center"
               onClick={handleBack}
@@ -188,9 +126,7 @@ const VoterDetails = () => {
                 />
               </svg>
             </button>
-            <h1 className="text-[32px] font-medium font-['Inter Display'] text-white roboto-mono">
-              VOTER DETAILS
-            </h1>
+            <h1 className="text-[24px] font-medium text-white roboto-mono">VOTER DETAILS</h1>
           </div>
         </div>
 
@@ -203,7 +139,9 @@ const VoterDetails = () => {
                 {/* Civilian status and name */}
                 <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
                   <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CIVILIAN</div>
-                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">JACK FLANNAGAN</div>
+                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">
+                    JACK FLANNAGAN
+                  </div>
                 </div>
 
                 {/* Voter image and details */}
@@ -255,13 +193,13 @@ const VoterDetails = () => {
               <div className="mt-6">
                 <h3 className="text-white text-xl pb-4 roboto-mono">Political Leaning</h3>
                 <div className="border border-white/30 p-4">
-                    <VoterPoliticalLeaningGraph />
+                  <VoterPoliticalLeaningGraph />
                 </div>
               </div>
             </div>
 
             {/* Center column - Laptop mockup with surveillance screen */}
-            <div className="w-1/2 flex justify-center items-center relative">
+            <div className="w-full flex justify-center items-center relative">
               <div className="absolute w-[100%] pr-5 top-0">
                 {/* Surveillance screen content */}
                 <SurveillanceScreen />
@@ -269,7 +207,7 @@ const VoterDetails = () => {
             </div>
 
             {/* Right column - Logs and Timeline */}
-            <div className="w-1/4 flex flex-col gap-6">
+            <div className="w-1/3 flex flex-col gap-6">
               {/* Logs section */}
               <div className="bg-black/60 border border-white/10 p-4 h-[300px] overflow-y-auto">
                 <h3 className="text-white text-xl mb-4 roboto-mono">Logs</h3>

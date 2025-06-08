@@ -33,7 +33,7 @@ const Welcome = () => {
               letterSpacing: "0.02em",
             }}
           >
-            SIMLECTIONS
+            Pol IO
           </h1>
 
           {/* Navigation Buttons */}
