@@ -15,6 +15,7 @@ const SimulationLore = () => {
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false);
   const [displayedWords, setDisplayedWords] = useState<string[]>([]);
+  const [simulationData, setSimulationData] = useState<any | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const finalText = 'The choice now rests with the citizens…';
