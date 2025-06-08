@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSimulationStore } from "../store";
 import "../styles/fonts.css";
@@ -14,7 +14,6 @@ const CreateSimulation = () => {
   const navigate = useNavigate();
   const { simulationName, setSimulationName, description, setDescription } = useSimulationStore();
   const [error, setError] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const maxChars = 800;
   const [isLoading, setIsLoading] = useState(false);
 
