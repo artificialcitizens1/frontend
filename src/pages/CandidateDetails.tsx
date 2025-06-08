@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SocialMediaFeed from "../components/SocialMediaFeed";
 import NewsChannel from "../components/NewsChannel";
 import DesktopInterface from "../components/candidate_components/DesktopInterface";
+import Logs from "../components/Logs";
 
 // Surveillance Screen Component
 const SurveillanceScreen = () => {
@@ -21,14 +22,14 @@ const SurveillanceScreen = () => {
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
+    <div className="relative w-full h-full flex items-center justify-center">
       {/* Laptop mockup container */}
-      <div className="relative">
+      <div className="relative w-full max-w-4xl">
         {/* Replace 'laptop-mockup.png' with your actual laptop PNG file */}
         <img
           src="images/monitor_mockup.png"
           alt="Laptop"
-          className="w-full max-w-4xl object-cover"
+          className="w-full h-auto object-contain"
         />
 
         {/* Screen overlay - positioned to match the laptop screen area with subtle CRT bulge effect */}
@@ -95,7 +96,7 @@ const CandidateDetails = () => {
         </div>
 
         {/* Content */}
-        <div className="max-w-[1728px] mx-auto px-4 py-6 h-[calc(100vh-120px)] overflow-hidden">
+        <div className="max-w-[1728px] mx-auto px-4 py-6 h-[calc(100vh-60px)] overflow-hidden">
           <div className="flex h-full">
             {/* Left column - Candidate Profile */}
             <div className="w-1/4 rounded-sm mr-6 overflow-y-auto h-full scrollbar-hide">
@@ -205,8 +206,8 @@ const CandidateDetails = () => {
             </div>
 
             {/* Center column - Laptop mockup with surveillance screen */}
-            <div className="w-full flex justify-center items-center relative h-full overflow-hidden">
-              <div className="absolute w-[100%] pr-5 top-0">
+            <div className="w-full flex justify-center items-start relative h-[100vh] pt-2">
+              <div className="w-full h-full flex items-center justify-center">
                 {/* Surveillance screen content */}
                 <SurveillanceScreen />
               </div>
@@ -215,45 +216,7 @@ const CandidateDetails = () => {
             {/* Right column - Logs and Timeline */}
             <div className="w-1/3 flex flex-col gap-6 overflow-y-auto h-full scrollbar-hide">
               {/* Logs section */}
-              <div className="bg-black/60 border border-white/10 p-4 h-[300px] overflow-y-auto">
-                <h3 className="text-white text-xl mb-4 roboto-mono">Logs</h3>
-                <div className="font-mono text-white/80 text-xs roboto-mono">
-                  <p className="my-1">&gt;&gt;18:00 Day 1 is over</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                  <p className="my-1">&gt;&gt;Acts of vandalism seen on Rahul's posters</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                  <p className="my-1">&gt;&gt;Earthquake caused in Simpolis</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                  <p className="my-1">&gt;&gt;Earthquake caused in Simpolis</p>
-                  <p className="my-1">&gt;&gt;Charlie Singh held a rally to please his voters</p>
-                </div>
-              </div>
-
-              {/* Timeline section */}
-              <div className="bg-black/60 border border-white/10 p-4">
-                <h3 className="text-white text-xl mb-4 roboto-mono">Timeline</h3>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <p className="text-white mb-1 roboto-mono">
-                      Current Location: <span className="text-white/80">Office</span>
-                    </p>
-                    <p className="text-white roboto-mono">
-                      Current Activity: <span className="text-white/80">Working</span>
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-white/80 roboto-mono">3:00 PM</span>
-                    <div className="w-full h-[40px] bg-black/30 mt-2 relative">
-                      <div className="absolute h-full w-[2px] bg-white left-[65%] top-0"></div>
-                      <div className="absolute w-full h-full flex">
-                        {Array.from({ length: 24 }).map((_, i) => (
-                          <div key={i} className="flex-1 border-r border-white/20 h-full"></div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <Logs />
             </div>
           </div>
         </div>
