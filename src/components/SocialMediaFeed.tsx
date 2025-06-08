@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Tweet, { type TweetProps } from "./Tweet";
+import { getSocialMediaPosts, type SocialMediaPost } from "../api/socialMediaService";
+import { useSimulationStore } from "../store";
 
 // ==========================================
 // ICON COMPONENTS
@@ -25,122 +27,111 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
   // STATE MANAGEMENT
   // ==========================================
   const [isLoading, setIsLoading] = useState(true);
+  const [feed, setFeed] = useState<TweetProps[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const { simulationId, currentTick } = useSimulationStore();
 
+  // ==========================================
+  // HELPER FUNCTIONS
+  // ==========================================
+  const generateAvatarUrl = (authorId: string): string => {
+    // Generate a consistent hash from authorId for consistent avatar selection
+    let hash = 0;
+    for (let i = 0; i < authorId.length; i++) {
+      const char = authorId.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    const avatarNumber = Math.abs(hash) % 50 + 1; // Use numbers 1-50
+    return `https://i.pravatar.cc/150?img=${avatarNumber}`;
+  };
+
+  const formatTime = (createdAt: string): string => {
+    const date = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffDays > 0) {
+      return `${diffDays}d`;
+    } else if (diffHours > 0) {
+      return `${diffHours}h`;
+    } else {
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      return `${diffMins}m`;
+    }
+  };
+
+  const generateUsername = (name: string, role: string): string => {
+    if (role === 'candidate') {
+      return `${name.replace(/\s+/g, '')}_Official`;
+    }
+    
+    // For citizens, create a username from their name
+    const nameParts = name.split(' ');
+    if (nameParts.length > 1) {
+      return `${nameParts[0]}${nameParts[1].charAt(0)}${Math.floor(Math.random() * 99)}`;
+    }
+    return `${nameParts[0]}${Math.floor(Math.random() * 999)}`;
+  };
+
+  const convertApiPostToTweet = (post: SocialMediaPost): TweetProps => {
+    return {
+      avatar: generateAvatarUrl(post.authorId),
+      name: post.author.name,
+      username: generateUsername(post.author.name, post.author.role),
+      time: formatTime(post.createdAt),
+      content: post.content,
+      likes: post.likeCount || 0,
+      verified: post.author.role === 'candidate' // Candidates are verified
+    };
+  };
+
+  // ==========================================
+  // API DATA FETCHING
+  // ==========================================
   useEffect(() => {
-    // Simulate API call with 5 second delay
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
+    const fetchSocialMediaData = async () => {
+      console.log('🚀 SocialMediaFeed - Store values:', { simulationId, currentTick });
+      
+      if (!simulationId) {
+        console.warn('⚠️ SocialMediaFeed - No simulation ID found in store');
+        setError("No simulation ID found");
+        setIsLoading(false);
+        return;
+      }
 
-    return () => clearTimeout(timer);
-  }, []);
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        console.log('🔍 SocialMediaFeed - Fetching data for:', { simulationId, currentTick });
+        const response = await getSocialMediaPosts('baba9c30-f7d7-4f3e-933c-eeb9bd7cc547', 5);
+        
+        if (response.success && response.data) {
+          const tweetData = response.data.map(convertApiPostToTweet);
+          console.log('✅ SocialMediaFeed - Converted tweet data:', tweetData);
+          setFeed(tweetData);
+        } else {
+          setError("No social media data available");
+        }
+      } catch (err) {
+        console.error('Error fetching social media posts:', err);
+        setError("Failed to load social media posts");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // ==========================================
-  // FEED DATA (LEFT COLUMN)
-  // ==========================================
-  const feed: TweetProps[] = [
-    {
-      avatar: "https://i.pravatar.cc/150?img=1",
-      name: "Arman Patel",
-      username: "ChShrm",
-      time: "9:41 PM · Jun 8, 2022",
-      content: "Covefefefefee!!!!",
-      likes: 32,
-      verified: true,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=2",
-      name: "Chirag Sharma",
-      username: "ChShrm",
-      time: "9:41 PM · Jun 8, 2022",
-      content:
-        "In the latest political showdown, Rahul Singh and Arman Patel are at odds over key policies. Singh advocates for progressive reforms, while Patel emphasizes traditional values. The debate heats up as both leaders rally their supporters for the upcoming election!",
-      likes: 32,
-      verified: false,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=3",
-      name: "Ashvini Rathi",
-      username: "1212Ash2",
-      time: "9:41 PM · Jun 8, 2022",
-      content:
-        "Rahul Singh is clearly the voice of reason, while Arman Patel is just a relic of the past. Patel's outdated beliefs are not only irrelevant but also a barrier to the community's growth. Singh's vision for progressive reforms is what the people truly need, while Patel's stubbornness shows he has...",
-      likes: 0,
-      verified: false,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=5",
-      name: "Maya Johnson",
-      username: "MayaJ_Official",
-      time: "8:15 PM · Jun 8, 2022",
-      content:
-        "Just witnessed the most inspiring town hall meeting! Both candidates presented their visions, but only one spoke to the heart of our community's needs. Democracy in action! 🗳️",
-      likes: 156,
-      verified: true,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=6",
-      name: "Tech Insider",
-      username: "TechInsider",
-      time: "7:30 PM · Jun 8, 2022",
-      content:
-        "BREAKING: New AI-powered voting systems being tested for the upcoming election. Enhanced security and faster results promised. What are your thoughts on digital democracy?",
-      image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=300&fit=crop",
-      likes: 89,
-      verified: true,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=7",
-      name: "Local News Today",
-      username: "LocalNewsToday",
-      time: "6:45 PM · Jun 8, 2022",
-      content:
-        "Weather alert: Thunderstorms expected during tomorrow's campaign rally. Both candidates confirm events will proceed as planned with indoor backup venues ready.",
-      likes: 23,
-      verified: true,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=8",
-      name: "Sarah Chen",
-      username: "SarahC_Voter",
-      time: "5:20 PM · Jun 8, 2022",
-      content:
-        "As a first-time voter, I'm taking this election seriously. Spent the weekend researching both candidates' policies. Healthcare and education are my top priorities. Who else is doing their homework? 📚",
-      likes: 67,
-      verified: false,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=9",
-      name: "Political Analyst Hub",
-      username: "PoliAnalystHub",
-      time: "4:10 PM · Jun 8, 2022",
-      content:
-        "Latest polling data shows a tightening race! Singh leads by 3 points, within the margin of error. Patel's recent policy announcements seem to be resonating with undecided voters. Thread 🧵",
-      likes: 234,
-      verified: true,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=10",
-      name: "Community Voice",
-      username: "CommunityVoice22",
-      time: "3:55 PM · Jun 8, 2022",
-      content:
-        "Attended both candidate forums this week. Here's my honest take: Singh has bold ideas but needs more concrete plans. Patel has experience but seems resistant to change. We need leadership that listens to ALL voices.",
-      likes: 45,
-      verified: false,
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?img=11",
-      name: "Youth for Change",
-      username: "Youth4Change",
-      time: "2:30 PM · Jun 8, 2022",
-      content:
-        "Climate action NOW! 🌍 Both candidates need to address the environmental crisis affecting our generation. We won't accept empty promises anymore. #ClimateVote #YouthVoice",
-      image: "https://images.unsplash.com/photo-1569163139394-de44303f1e88?w=400&h=300&fit=crop",
-      likes: 178,
-      verified: false,
-    },
-  ];
+    // Initial fetch
+    fetchSocialMediaData();
+
+    // Set up periodic refresh every 10 seconds
+    const interval = setInterval(fetchSocialMediaData, 10000);
+
+    return () => clearInterval(interval);
+  }, [simulationId, currentTick]);
 
   // ==========================================
   // COMPONENT RENDER
@@ -181,12 +172,45 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
 
       {/* Main Content Area - Feed */}
       <div className="flex-1 overflow-hidden flex justify-center mt-4">
-        <div className="h-full overflow-y-auto w-[60%] ">
-          {feed.map((tweet, index) => (
-            <div key={`feed-${index}`} className="mb-4 border border-gray-200 rounded-lg">
-              <Tweet {...tweet} />
+        <div className="h-full overflow-y-auto w-[60%]">
+          {error ? (
+            /* Error State */
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
+              <div className="text-red-500 text-center">
+                <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <h3 className="text-xl font-semibold mb-2">Oops! Something went wrong</h3>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
             </div>
-          ))}
+          ) : feed.length === 0 ? (
+            /* Empty State */
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
+              <div className="text-gray-500 text-center">
+                <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
+                <p className="text-gray-600">
+                  The political discourse hasn't started yet. Check back in a moment!
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* Feed Content */
+            feed.map((tweet, index) => (
+              <div key={`feed-${index}`} className="mb-4 border border-gray-200 rounded-lg">
+                <Tweet {...tweet} />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

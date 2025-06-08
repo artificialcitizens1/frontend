@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SocialMediaFeed from "../components/SocialMediaFeed";
 import NewsChannel from "../components/NewsChannel";
 import DesktopInterface from "../components/candidate_components/DesktopInterface";
+import { useSimulationStore } from "../store";
 import Logs from "../components/Logs";
 
 // Surveillance Screen Component
@@ -59,6 +60,18 @@ const SurveillanceScreen = () => {
 
 const CandidateDetails = () => {
   const navigate = useNavigate();
+  const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
+  
+  // Set up demo simulation data if not already set
+  useEffect(() => {
+    if (!simulationId) {
+      // Use a demo simulation ID for the candidate details page
+      setSimulationId('demo-simulation-candidate-details');
+      setCurrentTick(1);
+      console.log('🎭 CandidateDetails - Setting up demo simulation data');
+    }
+  }, [simulationId, setSimulationId, setCurrentTick]);
+
   // For demo purposes, using a simple back function
   const handleBack = () => {
     navigate(-1);
