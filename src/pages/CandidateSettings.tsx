@@ -7,6 +7,11 @@ import { calculatePoliticalStanding } from '../utils/politicalCalculator';
 import { useSimulationStore } from '../store';
 import '../styles/fonts.css'; // Import fonts for consistency
 
+// Import common components
+import PageLayout from "../components/layout/PageLayout";
+import Toolbar from "../components/layout/Toolbar";
+import Button from "../components/layout/Button";
+
 const defaultCandidate: Candidate = {
   id: "1",
   name: "",
@@ -180,241 +185,326 @@ const CandidateSettings = () => {
     });
   };
 
+  // Toolbar actions
+  const toolbarActions = (
+    <>
+      {error && <div className="text-red-500 mr-4 self-center">{error}</div>}
+      <Button
+        variant="secondary"
+        onClick={randomizeCharacteristics}
+        className="px-4 py-3"
+      >
+        Randomize
+        <br>
+        </br>
+        Characteristics
+      </Button>
+      <div className="mr-4" />
+      <Button
+        onClick={handleContinue}
+        disabled={!isFormValid()}
+        isLoading={isLoading}
+      >
+        Continue
+      </Button>
+    </>
+  );
+
   return (
-    <div className="min-h-screen w-full relative overflow-x-hidden">
-      {/* Fixed Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#131B39] to-[#0F1322]">
-        <img
-          src="/images/top_grid.png"
-          alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
-        />
-        <img
-          src="/images/bottom_grid.png"
-          alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
-        />
-      </div>
+    <PageLayout>
+      <Toolbar 
+        title="Candidate Settings" 
+        subtitle="Select 2 candidate and set their settings and their political standings"
+        actions={toolbarActions}
+      />
 
-      {/* Main Content Container */}
-      <div className="relative z-10 overflow-hidden">
-        {/* Header */}
-        <div className="sticky top-0 z-50 bg-gradient-to-br from-[#131B39] to-[#0F1322] py-6 px-8">
-          <div className="max-w-[1728px] mx-auto flex justify-between items-start">
-            <div className="flex items-center gap-6">
-              <button
-                className="w-32 h-32 text-white text-6xl hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center"
-                onClick={() => navigate(-1)}
-              >
-                <svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M15 18L9 12L15 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-              <div>
-                
-                <h1 className="text-2xl sm:text-[56px] font-medium text-white mb-[20px]" style={{ fontFamily: "Roboto Mono" }}>
-                  Candidate Settings
-                </h1>
-                <p className="text-white/80 text-xs sm:text-base font-light" style={{ fontFamily: "Roboto Mono" }}>
-                  Select 2 candidate avatars and set their settings and their political standings
-                </p>
+      {/* Content */}
+      <div className="w-full px-4 py-10 overflow-hidden relative flex justify-center">
+        {/* Main Content - Much wider boxes with significant spacing */}
+        <div className="flex flex-row justify-between relative w-full max-w-[1600px]">
+          <div className="w-[45%] bg-[#0F1322] border border-white/20 backdrop-blur-lg rounded-sm p-6">
+            {/* Left Candidate */}
+            <div className="flex flex-col items-center">
+              <img
+                src={candidates[0].avatarUrl}
+                alt="Avatar"
+                className="w-[166px] h-[166px] rounded-full bg-white/10"
+              />
+              <div className="mt-6 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Candidate name</span>
+                </div>
+                <input
+                  type="text"
+                  value={candidates[0].name}
+                  onChange={(e) => updateCandidate(0, { name: e.target.value })}
+                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  style={{ fontFamily: "Roboto Mono" }}
+                  placeholder="Enter name"
+                />
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              {error && <div className="text-red-500 mr-4 self-center">{error}</div>}
-              <button
-                className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-lg"
-                onClick={randomizeCharacteristics}
-                style={{ fontFamily: "Roboto Mono" }}
-              >
-                Randomize Characteristics
-              </button>
-              <button
-                className={`px-[88px] py-5 bg-white transition-colors text-black ${
-                  !isFormValid() || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/90'
-                }`}
-                onClick={handleContinue}
-                disabled={!isFormValid() || isLoading}
-              >
-                <span className="text-[28px] leading-[37px]" style={{ fontFamily: "Roboto Mono" }}>
-                  {isLoading ? 'Loading...' : 'Continue'}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
+              <div className="mt-6 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Describe this candidate</span>
+                </div>
+                <input
+                  type="text"
+                  value={candidates[0].description}
+                  onChange={(e) => updateCandidate(0, { description: e.target.value })}
+                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  style={{ fontFamily: "Roboto Mono" }}
+                  placeholder="Enter description"
+                />
+              </div>
 
-        {/* Content */}
-        <div className="max-w-[1728px] mx-auto px-4 sm:px-8 py-10 overflow-hidden relative">
-          {/* Main Content */}
-          <div className="flex flex-col md:flex-row gap-14 relative">
-            {candidates.map((candidate, index) => (
-              <div
-                key={candidate.id}
-                className="flex-1 bg-black/10 border border-white/20 backdrop-blur-lg rounded-sm"
-              >
-                {/* Avatar Section */}
-                <div className="p-6">
-                  <div className="mt-8 flex flex-col items-center">
-                    <img
-                      src={candidate.avatarUrl}
-                      alt="Avatar"
-                      className="w-[166px] h-[166px] rounded-full bg-white/10"
-                    />
-                    <div className="mt-6 w-full">
-                      <div className="flex justify-between items-center">
-                        <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Candidate name</span>
-                      </div>
-                      <input
-                        type="text"
-                        value={candidate.name}
-                        onChange={(e) => updateCandidate(index as 0 | 1, { name: e.target.value })}
-                        className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+              {/* Parameters Section */}
+              <div className="mt-8 w-full">
+                <div className="flex justify-between items-start mb-6">
+                  <h3 className="text-white font-medium text-xl" style={{ fontFamily: "Roboto Mono" }}>
+                    Set Parameters for this candidate
+                  </h3>
+                </div>
+
+                {/* Communication Style */}
+                <div className="mb-6">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Communication Style</span>
+                  <div className="flex gap-1 mt-2">
+                    {(["Aggressive", "Calm", "Trendy"] as const).map((style) => (
+                      <button
+                        key={style}
+                        className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
+                          candidates[0].parameters.communicationStyle === style
+                            ? "border-white text-white"
+                            : "border-white/30 text-white/60"
+                        }`}
                         style={{ fontFamily: "Roboto Mono" }}
-                        placeholder="Enter name"
-                      />
-                    </div>
-                    <div className="mt-6 w-full">
-                      <div className="flex justify-between items-center">
-                        <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Describe this candidate</span>
-                      </div>
-                      <input
-                        type="text"
-                        value={candidate.description}
-                        onChange={(e) =>
-                          updateCandidate(index as 0 | 1, { description: e.target.value })
-                        }
-                        className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
-                        style={{ fontFamily: "Roboto Mono" }}
-                        placeholder="Enter description"
-                      />
-                    </div>
+                        onClick={() => handleStyleSelect(0, style)}
+                      >
+                        {style}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {/* Parameters Section */}
-                <div className="p-6 border-t border-white/20">
-                  <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-white font-medium text-xl" style={{ fontFamily: "Roboto Mono" }}>
-                      Set Parameters for this candidate
-                    </h3>
-                  </div>
-
-                  {/* Communication Style */}
-                  <div className="mb-6">
-                    <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Communication Style</span>
-                    <div className="flex gap-1 mt-2">
-                      {(["Aggressive", "Calm", "Trendy"] as const).map((style) => (
-                        <button
-                          key={style}
-                          className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
-                            candidate.parameters.communicationStyle === style
-                              ? "border-white text-white"
-                              : "border-white/30 text-white/60"
-                          }`}
-                          style={{ fontFamily: "Roboto Mono" }}
-                          onClick={() => handleStyleSelect(index as 0 | 1, style)}
-                        >
-                          {style}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Media Interactions */}
-                  <div className="mb-6">
-                    <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Media Interactions</span>
-                    <div className="flex gap-1 mt-2">
-                      {(["None", "Few", "Many"] as const).map((media) => (
-                        <button
-                          key={media}
-                          className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
-                            candidate.parameters.mediaInteractions === media
-                              ? "border-white text-white"
-                              : "border-white/30 text-white/60"
-                          }`}
-                          style={{ fontFamily: "Roboto Mono" }}
-                          onClick={() => handleMediaSelect(index as 0 | 1, media)}
-                        >
-                          {media}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Sliders */}
-                  <div className="space-y-6">
-                    <ParameterSlider
-                      label="Charisma"
-                      value={candidate.parameters.charisma}
-                      onChange={(value) =>
-                        updateCandidate(index as 0 | 1, {
-                          parameters: { ...candidate.parameters, charisma: value },
-                        })
-                      }
-                    />
-                    <ParameterSlider
-                      label="Temper"
-                      value={candidate.parameters.temper}
-                      onChange={(value) =>
-                        updateCandidate(index as 0 | 1, {
-                          parameters: { ...candidate.parameters, temper: value },
-                        })
-                      }
-                    />
-                    <ParameterSlider
-                      label="Integrity"
-                      value={candidate.parameters.integrity}
-                      onChange={(value) =>
-                        updateCandidate(index as 0 | 1, {
-                          parameters: { ...candidate.parameters, integrity: value },
-                        })
-                      }
-                    />
-                    <ParameterSlider
-                      label="Authenticity"
-                      value={candidate.parameters.authenticity}
-                      onChange={(value) =>
-                        updateCandidate(index as 0 | 1, {
-                          parameters: { ...candidate.parameters, authenticity: value },
-                        })
-                      }
-                    />
+                {/* Media Interactions */}
+                <div className="mb-6">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Media Interactions</span>
+                  <div className="flex gap-1 mt-2">
+                    {(["None", "Few", "Many"] as const).map((media) => (
+                      <button
+                        key={media}
+                        className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
+                          candidates[0].parameters.mediaInteractions === media
+                            ? "border-white text-white"
+                            : "border-white/30 text-white/60"
+                        }`}
+                        style={{ fontFamily: "Roboto Mono" }}
+                        onClick={() => handleMediaSelect(0, media)}
+                      >
+                        {media}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {/* Political Standing Section */}
-                <div className="p-8 border-t border-white/20">
-                  <PoliticalStandingGraph
-                    value={candidate.politicalStanding}
+                {/* Sliders */}
+                <div className="space-y-6">
+                  <ParameterSlider
+                    label="Charisma"
+                    value={candidates[0].parameters.charisma}
                     onChange={(value) =>
-                      updateCandidate(index as 0 | 1, { politicalStanding: value })
+                      updateCandidate(0, {
+                        parameters: { ...candidates[0].parameters, charisma: value },
+                      })
+                    }
+                  />
+                  <ParameterSlider
+                    label="Temper"
+                    value={candidates[0].parameters.temper}
+                    onChange={(value) =>
+                      updateCandidate(0, {
+                        parameters: { ...candidates[0].parameters, temper: value },
+                      })
+                    }
+                  />
+                  <ParameterSlider
+                    label="Integrity"
+                    value={candidates[0].parameters.integrity}
+                    onChange={(value) =>
+                      updateCandidate(0, {
+                        parameters: { ...candidates[0].parameters, integrity: value },
+                      })
+                    }
+                  />
+                  <ParameterSlider
+                    label="Authenticity"
+                    value={candidates[0].parameters.authenticity}
+                    onChange={(value) =>
+                      updateCandidate(0, {
+                        parameters: { ...candidates[0].parameters, authenticity: value },
+                      })
                     }
                   />
                 </div>
               </div>
-            ))}
+
+              {/* Political Standing Section */}
+              <div className="mt-8 w-full">
+                <PoliticalStandingGraph
+                  value={candidates[0].politicalStanding}
+                  onChange={(value) =>
+                    updateCandidate(0, { politicalStanding: value })
+                  }
+                />
+              </div>
+            </div>
           </div>
 
-          {/* VS Text */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none hidden md:flex items-center justify-center w-20 h-20">
+          {/* Center Gap with VS Text */}
+          <div className="w-[10%] flex items-start justify-center pt-[120px]">
             <span className="text-white/40 text-[32px] font-light" style={{ fontFamily: "Roboto Mono" }}>VS</span>
+          </div>
+
+          <div className="w-[45%] bg-[#0F1322] border border-white/20 backdrop-blur-lg rounded-sm p-6">
+            {/* Right Candidate */}
+            <div className="flex flex-col items-center">
+              <img
+                src={candidates[1].avatarUrl}
+                alt="Avatar"
+                className="w-[166px] h-[166px] rounded-full bg-white/10"
+              />
+              <div className="mt-6 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Candidate name</span>
+                </div>
+                <input
+                  type="text"
+                  value={candidates[1].name}
+                  onChange={(e) => updateCandidate(1, { name: e.target.value })}
+                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  style={{ fontFamily: "Roboto Mono" }}
+                  placeholder="Enter name"
+                />
+              </div>
+              <div className="mt-6 w-full">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Describe this candidate</span>
+                </div>
+                <input
+                  type="text"
+                  value={candidates[1].description}
+                  onChange={(e) => updateCandidate(1, { description: e.target.value })}
+                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  style={{ fontFamily: "Roboto Mono" }}
+                  placeholder="Enter description"
+                />
+              </div>
+
+              {/* Parameters Section */}
+              <div className="mt-8 w-full">
+                <div className="flex justify-between items-start mb-6">
+                  <h3 className="text-white font-medium text-xl" style={{ fontFamily: "Roboto Mono" }}>
+                    Set Parameters for this candidate
+                  </h3>
+                </div>
+
+                {/* Communication Style */}
+                <div className="mb-6">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Communication Style</span>
+                  <div className="flex gap-1 mt-2">
+                    {(["Aggressive", "Calm", "Trendy"] as const).map((style) => (
+                      <button
+                        key={style}
+                        className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
+                          candidates[1].parameters.communicationStyle === style
+                            ? "border-white text-white"
+                            : "border-white/30 text-white/60"
+                        }`}
+                        style={{ fontFamily: "Roboto Mono" }}
+                        onClick={() => handleStyleSelect(1, style)}
+                      >
+                        {style}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Media Interactions */}
+                <div className="mb-6">
+                  <span className="text-white/80 text-sm" style={{ fontFamily: "Roboto Mono" }}>Media Interactions</span>
+                  <div className="flex gap-1 mt-2">
+                    {(["None", "Few", "Many"] as const).map((media) => (
+                      <button
+                        key={media}
+                        className={`flex-1 py-1 px-3 text-sm border rounded-lg ${
+                          candidates[1].parameters.mediaInteractions === media
+                            ? "border-white text-white"
+                            : "border-white/30 text-white/60"
+                        }`}
+                        style={{ fontFamily: "Roboto Mono" }}
+                        onClick={() => handleMediaSelect(1, media)}
+                      >
+                        {media}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sliders */}
+                <div className="space-y-6">
+                  <ParameterSlider
+                    label="Charisma"
+                    value={candidates[1].parameters.charisma}
+                    onChange={(value) =>
+                      updateCandidate(1, {
+                        parameters: { ...candidates[1].parameters, charisma: value },
+                      })
+                    }
+                  />
+                  <ParameterSlider
+                    label="Temper"
+                    value={candidates[1].parameters.temper}
+                    onChange={(value) =>
+                      updateCandidate(1, {
+                        parameters: { ...candidates[1].parameters, temper: value },
+                      })
+                    }
+                  />
+                  <ParameterSlider
+                    label="Integrity"
+                    value={candidates[1].parameters.integrity}
+                    onChange={(value) =>
+                      updateCandidate(1, {
+                        parameters: { ...candidates[1].parameters, integrity: value },
+                      })
+                    }
+                  />
+                  <ParameterSlider
+                    label="Authenticity"
+                    value={candidates[1].parameters.authenticity}
+                    onChange={(value) =>
+                      updateCandidate(1, {
+                        parameters: { ...candidates[1].parameters, authenticity: value },
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Political Standing Section */}
+              <div className="mt-8 w-full">
+                <PoliticalStandingGraph
+                  value={candidates[1].politicalStanding}
+                  onChange={(value) =>
+                    updateCandidate(1, { politicalStanding: value })
+                  }
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

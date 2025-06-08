@@ -1,7 +1,14 @@
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSimulationStore } from "../store";
-import { useState, useRef, useEffect } from "react";
 import "../styles/fonts.css";
+import type { CSSProperties } from "react";
+
+// Import common components
+import PageLayout from "../components/layout/PageLayout";
+import Toolbar from "../components/layout/Toolbar";
+import Button from "../components/layout/Button";
+import TextField from "../components/layout/TextField";
 
 const CreateSimulation = () => {
   const navigate = useNavigate();
@@ -9,6 +16,7 @@ const CreateSimulation = () => {
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const maxChars = 800;
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleContinue = () => {
     if (!simulationName.trim()) {
@@ -21,6 +29,8 @@ const CreateSimulation = () => {
       return;
     }
 
+    setIsLoading(true);
+    
     // Log the simulation data
     console.log("Creating simulation:", { name: simulationName, description });
     
@@ -28,25 +38,10 @@ const CreateSimulation = () => {
     navigate("/candidate-settings");
   };
 
-  // Handle textarea auto-resize for description
-  useEffect(() => {
-    if (textareaRef.current) {
-      const lineHeight = 42; // Corresponds to lineHeight: "42px"
-      const maxLines = 6;
-      const maxHeight = lineHeight * maxLines;
-
-      textareaRef.current.style.height = "auto";
-      const scrollHeight = textareaRef.current.scrollHeight;
-
-      if (scrollHeight > maxHeight) {
-        textareaRef.current.style.height = `${maxHeight}px`;
-        textareaRef.current.style.overflowY = "auto";
-      } else {
-        textareaRef.current.style.height = `${scrollHeight}px`;
-        textareaRef.current.style.overflowY = "hidden";
-      }
-    }
-  }, [description]);
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSimulationName(e.target.value);
+    if (error) setError(null);
+  };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
@@ -56,73 +51,69 @@ const CreateSimulation = () => {
     }
   };
 
+  // Form container styles
+  const formContainerStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: 'calc(100vh - 180px)', // Account for increased toolbar height
+    overflowX: 'hidden',
+  };
+
+  // Fields container style
+  const fieldsContainerStyle: CSSProperties = {
+    width: '90%',
+    maxWidth: '1200px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '58px',
+  };
+
   return (
-    <div className="relative w-full h-screen bg-[#0A1929] overflow-hidden">
-      {/* Grid Background */}
-      <div className="absolute inset-0 w-full h-full">
-        {/* Top Grid */}
-        <img
-          src="/images/top_grid.png"
-          alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
-        />
-        {/* Bottom Grid */}
-        <img
-          src="/images/bottom_grid.png"
-          alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
-        />
-      </div>
+    <PageLayout>
+      <Toolbar 
+        title="Create Your World" 
+        actions={
+          <Button 
+            variant="gray"
+            onClick={handleContinue} 
+            disabled={!simulationName.trim() || !description.trim()}
+            isLoading={isLoading}
+            className="w-[300px] h-[80px] px-0 py-0"
+          >
+            Continue
+          </Button>
+        }
+      />
 
-      {/* Content Container */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full">
-        {/* Name Input Section */}
-        <div className="mb-16">
-          <label htmlFor="simulationName" className="text-white text-sm text-[18px] mb-4 block text-center" style={{ fontFamily: "Roboto Mono" }}>
-            Name your simulation
-          </label>
-          {/* Input Field */}
-          <input
-            type="text"
+      {/* Main content container */}
+      <div style={formContainerStyle}>
+        {/* Form fields container */}
+        <div style={fieldsContainerStyle}>
+          {/* Name Field */}
+          <TextField
+            label="Name this election"
+            placeholder="Write Name"
             value={simulationName}
-            onChange={(e) => {
-              setSimulationName(e.target.value);
-              if (error) setError(null);
-            }}
-            placeholder="Name your simulation"
-            autoFocus
-            className="w-[961px] h-[80px] bg-transparent text-white text-center text-[40px] focus:outline-none placeholder:text-white/50 placeholder:text-[40px] placeholder:transition-opacity focus:placeholder:opacity-0"
-            style={{
-              fontFamily: "Roboto Mono",
-              fontWeight: 200,
-              lineHeight: "97px",
-            }}
+            onChange={handleNameChange}
+            error={error && !simulationName.trim() ? error : undefined}
           />
-        </div>
-
-        {/* Description Input Section */}
-        <div className="mb-16">
-          <label htmlFor="simulationDescription" className="text-white text-sm text-[18px] mb-4 block text-center" style={{ fontFamily: "Roboto Mono" }}>
-            What's it all about?
-          </label>
-          {/* Text Area Field */}
-          <div className="relative w-[961px]">
-            <textarea
-              ref={textareaRef}
-              rows={1}
+          
+          {/* Description Field */}
+          <div className="relative w-full">
+            <TextField
+              label="Describe this election"
+              placeholder="Write this description"
               value={description}
               onChange={handleDescriptionChange}
-              placeholder="What's it all about?"
-              className="w-[961px] bg-transparent text-white text-[28px] text-center focus:outline-none placeholder:text-white/50 placeholder:text-[28px] placeholder:transition-opacity focus:placeholder:opacity-0 resize-none"
-              style={{
-                fontFamily: "Roboto Mono",
-                fontWeight: 200,
-                lineHeight: "42px",
-                scrollbarColor: "white rgba(255, 255, 255, 0.1)",
-                overflowY: "hidden",
-              }}
+              multiline
+              error={error && !description.trim() ? error : undefined}
             />
-            <div
+
+            {/* Character count display */}
+            <div 
               className="absolute bottom-[-30px] right-0 text-white/50 text-sm"
               style={{ fontFamily: "Roboto Mono" }}
             >
@@ -130,26 +121,8 @@ const CreateSimulation = () => {
             </div>
           </div>
         </div>
-
-        {error && <div className="text-red-500 mt-2 mb-6">{error}</div>}
-
-        {/* Continue Button */}
-        <button
-          className={`mt-8 w-[400px] h-[104px] bg-white hover:bg-white/90 transition-all ${
-            !simulationName.trim() || !description.trim() ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={handleContinue}
-          disabled={!simulationName.trim() || !description.trim()}
-        >
-          <span
-            className="flex items-center justify-center h-full text-[28px] leading-[37px] text-black"
-            style={{ fontFamily: "Roboto Mono" }}
-          >
-            Continue
-          </span>
-        </button>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
