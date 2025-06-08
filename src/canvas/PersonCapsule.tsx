@@ -69,7 +69,7 @@ const PersonCapsule: React.FC<PersonCapsuleProps> = ({
   }, [targetPosition, id, onTargetReached]);
 
   // Effect 3: The movement loop (useFrame)
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (!meshRef.current || !activeMovementTarget) {
       return; // Not actively moving
     }
