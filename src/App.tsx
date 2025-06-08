@@ -1,7 +1,6 @@
 /* package imports */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import React, { useEffect, useState } from 'react';
-import { socket } from './socket';
+import { useSocket } from "./hooks/useSocket";
 
 /* styles import */
 import "./styles/fonts.css";
@@ -20,29 +19,10 @@ import SimulationCreation from "./pages/SimulationCreation";
 import SimulationLore from "./pages/SimulationLore";
 
 const App: React.FC = () => {
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const { isConnected, currentTick } = useSocket();
 
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-      console.log('connected to socket server');
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-      console.log('disconnected from socket server');
-    }
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.connect();
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.disconnect();
-    };
-  }, []);
+  console.log('Socket connection status:', isConnected);
+  console.log('Current tick data:', currentTick);
 
   return (
     <Router>
@@ -54,12 +34,12 @@ const App: React.FC = () => {
         <Route path="/candidate-settings" element={<CandidateSettings />} />
         <Route path="/simulation-settings" element={<SimulationSettingsPage />} />
         <Route path="/simulation-loading" element={<SimulationLoading />} />
-        <Route path="/simulation-result" element={<SimulationResult />} />
-        <Route path="/voter-details" element={<VoterDetails />} />
-        <Route path="/god-mode" element={<GodMode />} />
         <Route path="/simulation-creation" element={<SimulationCreation />} />
         <Route path="/simulation-lore/:simId" element={<SimulationLore />} />
         <Route path="/simulation/:simId" element={<SimulationResult />} />
+        {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
+        <Route path="/god-mode" element={<GodMode />} />
+        <Route path="/voter-details" element={<VoterDetails />} />
       </Routes>
     </Router>
   );

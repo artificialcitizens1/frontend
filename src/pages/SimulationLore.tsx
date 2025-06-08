@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSimulationLore, getSimulationStatus } from '../api/simulationService';
+import { useTickStore } from '../store/tickStore';
 
 const SimulationLore = () => {
   const { simId } = useParams<{ simId: string }>();
@@ -11,9 +12,10 @@ const SimulationLore = () => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [simulationData, setSimulationData] = useState<any | null>(null);
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
+  const [isbuttonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
+  const { setTickData, initializeCharacters } = useTickStore();
   // Fetch lore data
   useEffect(() => {
     const fetchLore = async () => {
@@ -41,8 +43,12 @@ const SimulationLore = () => {
       try {
         const status = await getSimulationStatus(1, simId!);
         console.log('Simulation status:', status);
-        if(status){
+        if(status.length > 0 && simulationData === null){
           setSimulationData(status);
+          console.log('setting tick data : ', status);
+          setTickData(status);
+          initializeCharacters(status[0].characters);
+          setIsButtonDisabled(false);
         }
       } catch (error) {
         console.error('Error fetching simulation status:', error);
@@ -87,7 +93,7 @@ const SimulationLore = () => {
   // Handle continue to simulation
   const handleContinue = () => {
     // Navigate to the simulation page
-    navigate(`/simulation/${simId}`);
+    navigate(`/simulation/${simId}`); // simulation result page.
   };
 
   return (
@@ -163,6 +169,7 @@ const SimulationLore = () => {
                 <button 
                   className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-md transition-colors animate-pulse shadow-lg shadow-yellow-500/20"
                   onClick={handleContinue}
+                  disabled={isbuttonDisabled}
                 >
                   Continue to Simulation
                 </button>
