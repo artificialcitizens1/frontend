@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Voter Political Standing Graph component
 const VoterPoliticalLeaningGraph = () => {
@@ -154,10 +155,10 @@ const SurveillanceScreen = () => {
 };
 
 const VoterDetails = () => {
+  const navigate = useNavigate();
   // For demo purposes, using a simple back function
   const handleBack = () => {
-    console.log("Navigate back");
-    // Replace with your actual navigation logic
+    navigate(-1);
   };
 
   return (
@@ -260,8 +261,8 @@ const VoterDetails = () => {
             </div>
 
             {/* Center column - Laptop mockup with surveillance screen */}
-            <div className="w-1/2 flex justify-center items-center">
-              <div className="absolute w-[50%] pr-5">
+            <div className="w-1/2 flex justify-center items-center relative">
+              <div className="absolute w-[100%] pr-5 top-0">
                 {/* Surveillance screen content */}
                 <SurveillanceScreen />
               </div>
