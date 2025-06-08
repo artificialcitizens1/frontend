@@ -39,6 +39,9 @@ const CreateSimulation = () => {
 
       {/* Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full">
+        <label htmlFor="simulationName" className="text-white text-sm roboto-mono text-[18px] mb-4">
+          Name your simulation
+        </label>
         {/* Input Field */}
         <input
           type="text"
@@ -47,10 +50,16 @@ const CreateSimulation = () => {
             setSimulationName(e.target.value);
             if (error) setError(null);
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleContinue();
+            }
+          }}
           placeholder="Name your simulation"
-          className="w-[961px] h-[97px] bg-transparent text-white text-center text-[80px] focus:outline-none placeholder:text-white/50 placeholder:text-[80px] placeholder:transition-opacity focus:placeholder:opacity-0"
+          autoFocus
+          className="w-[961px] h-[80px] bg-transparent text-white text-center text-[40px] focus:outline-none placeholder:text-white/50 placeholder:text-[40px] placeholder:transition-opacity focus:placeholder:opacity-0"
           style={{
-            fontFamily: "Inter Display",
+            fontFamily: "Roboto Mono",
             fontWeight: 200,
             lineHeight: "97px",
           }}
