@@ -11,6 +11,8 @@ interface SimulationState {
   currentTick: number;
 
   simulationData: any | null;
+  logs: string[];
+
   // Actions
   setSimulationName: (name: string) => void;
   setDescription: (desc: string) => void;
@@ -19,6 +21,10 @@ interface SimulationState {
   setSimulationId: (id: string) => void;
   setCurrentTick: (tick: number) => void;
   setSimulationData: (data: any) => void;
+  addLog: (log: string) => void;
+  setLogs: (logs: string[]) => void;
+  clearLogs: () => void;
+
   // Reset function
   reset: () => void;
 
@@ -42,6 +48,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   simulationId: null,
   currentTick: 1,
   simulationData: null,
+  logs: [],
   setSimulationName: (name) => set({ simulationName: name }),
   setDescription: (desc) => set({ description: desc }),
   setCandidates: (candidates) => set({ candidates }),
@@ -49,6 +56,9 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setSimulationId: (id) => set({ simulationId: id }),
   setCurrentTick: (tick) => set({ currentTick: tick }),
   setSimulationData: (data) => set({ simulationData: data }),
+  addLog: (log) => set((state) => ({ logs: [...state.logs, log] })),
+  setLogs: (logs) => set({ logs }),
+  clearLogs: () => set({ logs: [] }),
   reset: () =>
     set({
       simulationName: "",
@@ -57,6 +67,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       simulationSettings: null,
       currentTick: 1,
       simulationData: null,
+      logs: [],
     }),
 
   getAllData: () => ({

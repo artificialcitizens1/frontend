@@ -371,7 +371,7 @@ const SimulationLore = () => {
             {titleAnimationComplete && (
               <div className="w-full h-full flex flex-col items-center justify-center space-y-6 overflow-hidden">
                 {/* Candidate Headers - Fade in animation */}
-                <div className={`flex justify-between w-full max-w-[1728px] transition-all duration-1000 ease-in-out ${candidatesVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
+                {/* <div className={`flex justify-between w-full max-w-[1728px] transition-all duration-1000 ease-in-out ${candidatesVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
                   <div className="flex items-center bg-black py-2 px-4 rounded-sm w-[45%] border border-white/10">
                     <img src="/images/candidate_default.png" alt="Candidate" className="w-12 h-12 mr-3" />
                     <div className="text-left">
@@ -395,7 +395,7 @@ const SimulationLore = () => {
                     </div>
                     <img src="/images/candidate_default.png" alt="Candidate" className="w-12 h-12 ml-3" />
                   </div>
-                </div>
+                </div> */}
 
                 {/* Content Box - Appears with animation after candidates */}
                 <div className={`w-full max-w-[1728px] flex-grow flex flex-col bg-black border border-white/10 rounded-sm p-8 transition-all duration-1000 ease-in-out overflow-hidden ${contentBoxVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-12'}`}>

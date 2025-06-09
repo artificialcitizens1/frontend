@@ -5,7 +5,9 @@ import { Stage, Graphics, Text, Container, useApp } from "@pixi/react";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTickStore } from "../store/tickStore";
+import { useSimulationStore } from "../store/simulationStore";
 import SimulationControls from "../components/simulation/SimulationControls";
+import Logs from "../components/Logs";
 
 // --- Type Definitions (Refactored for Declarative State) ---
 interface Point { x: number; y: number; }
@@ -46,9 +48,10 @@ export const DISTRICT_DEFINITIONS: DistrictData[] = [
 export default function GodMode() {
   const navigate = useNavigate();
   const { charactersData, updateCharactersData } = useTickStore();
+  const { addLog } = useSimulationStore();
   console.log("charactersData in god mode: ", Array.from(charactersData?.values() || []));
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
-  // MODIFICATION: travelPlans state is removed
+  const [prompt, setPrompt] = useState("");
 
   // Convert store data to array for rendering
   const characters = Array.from(charactersData?.values() || []);
@@ -93,24 +96,135 @@ export default function GodMode() {
     }
   };
 
+  const handleLetsGo = () => {
+    console.log("Prompt submitted:", prompt);
+    // Add the prompt as a log for testing
+    if (prompt.trim()) {
+      const timestamp = new Date().toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      addLog(`${timestamp} >>>Divine Command: ${prompt}`);
+      setPrompt(""); // Clear the prompt after submission
+      
+      // Simulate additional system response for testing
+      setTimeout(() => {
+        addLog(`${timestamp} >>>System: Processing divine intervention...`);
+      }, 1000);
+      
+      setTimeout(() => {
+        addLog(`${timestamp} >>>World Event: Divine command executed successfully`);
+      }, 2000);
+    }
+    // Here you can add the logic to handle the prompt submission
+  };
+
+  // Test function to add multiple logs quickly (for demonstration)
+  const addTestLogs = () => {
+    const testMessages = [
+      "Charlie Singh announced new economic policies",
+      "Arman Patel held a press conference", 
+      "Citizens are responding positively to recent changes",
+      "Market fluctuations detected in the simulation",
+      "Breaking: Major announcement expected tomorrow"
+    ];
+    
+    testMessages.forEach((message, index) => {
+      setTimeout(() => {
+        const timestamp = new Date().toLocaleTimeString('en-US', { 
+          hour12: false, 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        addLog(`${timestamp} >>>${message}`);
+      }, index * 800);
+    });
+  };
+
   const selectedCharacter = characters.find((c) => c.characterId === selectedCharacterId);
 
   return (
-    <div className="bg-[#0f172a] min-h-screen flex flex-col font-mono text-gray-300">
-      <TopBar />
-      <main className="flex-grow grid grid-cols-1 lg:grid-cols-6 gap-4 p-4">
-        <div className="lg:col-span-1 order-2 lg:order-1">
-          <ActsOfGodPanel />
+    <div className="h-screen w-full bg-black text-white overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="bg-black py-4 px-8 border-b border-white/10 flex-shrink-0">
+        <div className="max-w-full mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <h1 
+              className="text-white text-4xl tracking-wider"
+              style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
+            >
+              God Mode
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-8">
+            <LeaderProfile name="CHARLIE SINGH" approval={67} />
+            <LeaderProfile name="ARMAN PATEL" approval={67} align="right" />
+          </div>
         </div>
-        <div className="lg:col-span-4 order-1 lg:order-2 flex flex-col relative">
-          <MapContainer
-            characters={characters}
-            selectedCharacterId={selectedCharacterId}
-            onCharacterClick={handleCharacterClick}
-            onTravelComplete={handleTravelComplete}
-            onNavigateToVoterDetails={handleNavigateToVoterDetails}
-          />
-          <SimulationControls />
+      </div>
+
+      <main className="flex-1 grid grid-cols-12 gap-6 p-6 overflow-hidden min-h-0">
+        {/* Acts of God Panel */}
+        <div className="col-span-2 flex flex-col gap-4 overflow-hidden min-h-0">
+          <ActsOfGodPanel />
+          
+          {/* Divine Intervention Section */}
+          <div className="bg-black border border-white/20 rounded-lg p-4 flex-shrink-0">
+            <h3 
+              className="text-white text-lg mb-3 tracking-wider"
+              style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
+            >
+              Divine Intervention
+            </h3>
+            <div className="flex flex-col gap-3">
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter your divine command..."
+                className="w-full h-24 bg-black border border-white/30 rounded-lg p-3 text-white placeholder-white/50 resize-none focus:outline-none focus:border-white/60 text-sm"
+                style={{ fontFamily: "Roboto Mono" }}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleLetsGo}
+                  className="flex-1 px-4 py-2 bg-white text-black hover:bg-white/90 transition-colors rounded-lg text-sm"
+                  style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
+                >
+                  Let's Go!
+                </button>
+                <button
+                  onClick={addTestLogs}
+                  className="px-3 py-2 bg-white/10 text-white hover:bg-white/20 border border-white/30 transition-colors rounded-lg text-xs"
+                  style={{ fontFamily: "Roboto Mono" }}
+                  title="Add test logs"
+                >
+                  Test
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="col-span-7 flex flex-col gap-4 overflow-hidden min-h-0">
+          {/* Map Container */}
+          <div className="flex-grow overflow-hidden min-h-0">
+            <MapContainer
+              characters={characters}
+              selectedCharacterId={selectedCharacterId}
+              onCharacterClick={handleCharacterClick}
+              onTravelComplete={handleTravelComplete}
+              onNavigateToVoterDetails={handleNavigateToVoterDetails}
+            />
+          </div>
+          
+          {/* Simulation Controls */}
+          <div className="flex-shrink-0">
+            <SimulationControls />
+          </div>
+
           {selectedCharacter && (
             <CharacterControlModal
               character={selectedCharacter}
@@ -119,22 +233,198 @@ export default function GodMode() {
             />
           )}
         </div>
-        <div className="lg:col-span-1 order-3 lg:order-3">
-          <LogsPanel />
+
+        {/* Logs Panel - Constrained height */}
+        <div className="col-span-3 overflow-hidden min-h-0">
+          <div className="h-full min-h-0">
+            <Logs />
+          </div>
         </div>
       </main>
+
       <NewsTicker />
     </div>
   );
 }
 
 // --- UI Components ---
-function TopBar() { return (<header className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-gray-700/50 gap-4"><LeaderProfile name="CHARLIE SINGH" approval={67} /><LeaderProfile name="ARMAN PATEL" approval={67} align="right" /></header>); }
-function LeaderProfile({ name, approval, align = 'left' }: { name: string, approval: number, align?: 'left' | 'right' }) { return (<div className={`flex w-full max-w-xs items-center gap-3 ${align === 'right' ? 'flex-row-reverse' : ''}`}><div className={`w-12 h-12 flex items-center justify-center bg-gray-800 rounded-full border-2 border-gray-600 shrink-0 ${align === 'right' ? 'bg-red-900/50 border-red-500' : 'bg-blue-900/50 border-blue-500'}`}><svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path></svg></div><div className={`w-full flex flex-col ${align === 'right' ? 'items-end' : 'items-start'}`}><div className="w-full flex justify-between items-center"><p className="text-xs tracking-widest text-gray-400">APPROVAL RATING</p><span className="text-sm font-bold">{approval}%</span></div><h2 className="font-bold tracking-wider mt-1 w-full">{name}</h2><div className="w-full bg-gray-700/50 h-2 rounded-full border border-gray-600/50 mt-1"><div className="bg-cyan-400 h-full rounded-full" style={{ width: `${approval}%` }}></div></div></div></div>); }
-function ActsOfGodPanel() { const actions = [ { icon: '▲', text: 'Earthquake' }, { icon: '♦', text: 'Scandal Expose' }, { icon: '→', text: 'Market Crash' }, { icon: '♦', text: 'Assassination Attempt' }]; return (<div className="h-full p-4 bg-black/20 rounded-lg"><h3 className="font-bold text-lg mb-4 tracking-wider">Acts Of God</h3><ul className="space-y-3">{actions.map((action, i) => (<li key={i} className="p-3 bg-gray-800/80 border border-gray-700 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-200"><span className="mr-3 text-cyan-400">{action.icon}</span>{action.text}</li>))}</ul></div>); }
-function LogsPanel() { const logEntries = ["Day 10", "Charlie Singh held a rally to please his voters.", "Acts of vandalism on Rahul's posters.", "Earthquake caused 1m casualties."]; return (<div className="h-full p-4 bg-black/20 rounded-lg"><h3 className="font-bold text-lg mb-4 tracking-wider">Logs</h3><ul className="space-y-3 text-sm text-gray-400">{logEntries.map((entry, i) => <li key={i} className="leading-relaxed">{`*** ${entry}`}</li>)}</ul><div className="mt-4 flex flex-col gap-2"><button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">News</button><button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">Social Media</button></div></div>); }
-function NewsTicker() { return (<footer className="w-full bg-black/30 p-2 overflow-hidden border-t border-gray-700/50"><div className="whitespace-nowrap animate-marquee"><span className="mx-8 text-gray-400">Local politician caught arguing with ChatGPT over vote count.</span><span className="mx-8 text-gray-400">New startup offers subscription-based fresh air; premium tier includes "pine forest" scent.</span><span className="mx-8 text-gray-400">Minister declares Earth is flat 'in some constituencies'.</span></div><style>{`@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } } .animate-marquee { display: inline-block; animation: marquee 30s linear infinite; }`}</style></footer>); }
-function CharacterControlModal({ character, onMove, onClose }: { character: CharacterData; onMove: (district: 'home' | 'office' | 'amphitheater' | 'others') => void; onClose: () => void; }) { return (<div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 p-4"><div className="bg-gray-900 border-2 border-cyan-500 rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full"><button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white font-bold text-lg">×</button><h3 className="font-bold text-lg capitalize">{character.type} <span className="text-yellow-400">#{character.characterId}</span></h3><p className="text-sm text-gray-400 mb-4">Current District: {DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === character.initialDistrict)?.name}</p><p className="text-sm mb-2">Move to:</p><div className="grid grid-cols-2 gap-2">{DISTRICT_DEFINITIONS.map(d => (<button key={d.id} onClick={() => { onMove(d.alias.toLowerCase() as CharacterData['district']); onClose(); }} className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded text-xs disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={d.alias.toLowerCase() === character.initialDistrict}>{d.name}</button>))}</div></div></div>); }
+function LeaderProfile({
+  name,
+  approval,
+  align = "left",
+}: {
+  name: string;
+  approval: number;
+  align?: "left" | "right";
+}) {
+  return (
+    <div
+      className={`flex w-full max-w-xs items-center gap-3 ${align === "right" ? "flex-row-reverse" : ""}`}
+    >
+      <div
+        className={`w-12 h-12 flex items-center justify-center bg-black rounded-full border-2 shrink-0 ${align === "right" ? "border-red-500" : "border-blue-500"}`}
+      >
+        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+            clipRule="evenodd"
+          ></path>
+        </svg>
+      </div>
+      <div className={`w-full flex flex-col ${align === "right" ? "items-end" : "items-start"}`}>
+        <div className="w-full flex justify-between items-center">
+          <p 
+            className="text-xs tracking-widest text-white/60"
+            style={{ fontFamily: "Roboto Mono" }}
+          >
+            APPROVAL RATING
+          </p>
+          <span 
+            className="text-sm font-bold text-white"
+            style={{ fontFamily: "Roboto Mono" }}
+          >
+            {approval}%
+          </span>
+        </div>
+        <h2 
+          className="font-bold tracking-wider mt-1 w-full text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          {name}
+        </h2>
+        <div className="w-full bg-white/20 h-2 rounded-full border border-white/30 mt-1">
+          <div className="bg-white h-full rounded-full" style={{ width: `${approval}%` }}></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActsOfGodPanel() {
+  const actions = [
+    { icon: "▲", text: "Earthquake" },
+    { icon: "♦", text: "Scandal Expose" },
+    { icon: "→", text: "Market Crash" },
+    { icon: "♦", text: "Assassination Attempt" },
+  ];
+  return (
+    <div className="bg-black border border-white/20 rounded-lg flex flex-col flex-shrink-0">
+      <div className="p-4 border-b border-white/20">
+        <h3 
+          className="font-bold text-lg tracking-wider text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          Acts Of God
+        </h3>
+      </div>
+      <div className="p-4">
+        <ul className="space-y-3">
+          {actions.map((action, i) => (
+            <li
+              key={i}
+              className="p-3 bg-black border border-white/30 rounded-lg cursor-pointer hover:bg-white/5 transition-colors duration-200"
+            >
+              <span className="mr-3 text-white">{action.icon}</span>
+              <span 
+                className="text-white text-sm"
+                style={{ fontFamily: "Roboto Mono" }}
+              >
+                {action.text}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function NewsTicker() {
+  return (
+    <footer className="w-full bg-black border-t border-white/20 p-3 overflow-hidden">
+      <div className="whitespace-nowrap animate-marquee">
+        <span 
+          className="mx-8 text-white/70"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          Local politician caught arguing with ChatGPT over vote count.
+        </span>
+        <span 
+          className="mx-8 text-white/70"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          New startup offers subscription-based fresh air; premium tier includes "pine forest" scent.
+        </span>
+        <span 
+          className="mx-8 text-white/70"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          Minister declares Earth is flat 'in some constituencies'.
+        </span>
+      </div>
+      <style>{`@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } } .animate-marquee { display: inline-block; animation: marquee 30s linear infinite; }`}</style>
+    </footer>
+  );
+}
+
+function CharacterControlModal({
+  character,
+  onMove,
+  onClose,
+}: {
+  character: CharacterData;
+  onMove: (district: "home" | "office" | "amphitheater" | "others") => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10 p-4">
+      <div className="bg-black border-2 border-white rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-white/60 hover:text-white font-bold text-lg"
+        >
+          ×
+        </button>
+        <h3 
+          className="font-bold text-lg capitalize text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          {character.type} <span className="text-yellow-400">#{character.characterId}</span>
+        </h3>
+        <p 
+          className="text-sm text-white/60 mb-4"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          Current District:{" "}
+          {DISTRICT_DEFINITIONS.find((d) => d.alias === character.initialDistrict)?.name}
+        </p>
+        <p 
+          className="text-sm mb-2 text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          Move to:
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {DISTRICT_DEFINITIONS.map((d) => (
+            <button
+              key={d.id}
+              onClick={() => {
+                onMove(d.alias);
+                onClose();
+              }}
+              className="bg-white hover:bg-white/90 text-black font-bold py-2 px-4 rounded text-xs disabled:bg-white/20 disabled:cursor-not-allowed disabled:text-white/40"
+              disabled={d.alias === character.initialDistrict}
+              style={{ fontFamily: "Roboto Mono" }}
+            >
+              {d.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface MapContainerProps {
     characters: CharacterData[];
@@ -144,53 +434,88 @@ interface MapContainerProps {
     onNavigateToVoterDetails: (type: 'citizen' | 'candidate' | 'reporter', characterId: string) => void;
 }
 
-function MapContainer({characters, selectedCharacterId, onCharacterClick, onTravelComplete, onNavigateToVoterDetails}: MapContainerProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isReady, setIsReady] = useState(false);
-    
-    useEffect(() => { 
-        if (containerRef.current) {
-          const timer = setTimeout(() => setIsReady(true), 100);
-          return () => clearTimeout(timer);
-        }
-    }, []);
-    
-    return (
-        <div className="bg-black/30 p-4 rounded-lg shadow-2xl border-4 border-gray-700/80 w-full flex-grow relative" ref={containerRef}>
-            <h2 className="text-center text-cyan-400 mb-2 tracking-widest absolute top-2 left-1/2 -translate-x-1/2 z-10">SIMPLOLIS POLITICAL MAP</h2>
-            {isReady && characters !== null && characters.length > 0 ? (
-                <Stage className="w-full h-full" options={{ backgroundColor: 0x080808, resizeTo: containerRef.current!, autoDensity: true }}>
-                    <Scene>
-                        <GridOverlay width={LOGICAL_WIDTH} height={LOGICAL_HEIGHT} />
-                        {DISTRICT_DEFINITIONS.map(district => <District key={district.id} {...district} /> )}
-                        {characters
-                            .filter((character: CharacterData) => DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === character.initialDistrict))
-                            .map((character: CharacterData) => {
-                                const district = DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === character.initialDistrict)!;
-                                return ( 
-                                    <Character 
-                                        key={character.characterId} 
-                                        {...character} 
-                                        bounds={district} 
-                                        isSelected={character.characterId === selectedCharacterId} 
-                                        onClick={onCharacterClick} 
-                                        onTravelComplete={onTravelComplete} 
-                                        onNavigateToVoterDetails={onNavigateToVoterDetails}
-                                    />
-                                );
-                            })}
-                    </Scene>
-                </Stage>
-            ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
-                </div>
-            )}
-        </div>
-    );
-}
+function MapContainer({
+  characters,
+  selectedCharacterId,
+  onCharacterClick,
+  onTravelComplete,
+  onNavigateToVoterDetails,
+}: MapContainerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 
-const Scene = ({ children }: { children: React.ReactNode }) => {
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setDimensions({
+          width: rect.width - 8, // Account for border
+          height: rect.height - 40, // Account for header
+        });
+        setIsReady(true);
+      }
+    };
+
+    if (containerRef.current) {
+      updateDimensions();
+      const resizeObserver = new ResizeObserver(updateDimensions);
+      resizeObserver.observe(containerRef.current);
+      return () => resizeObserver.disconnect();
+    }
+  }, []);
+
+  return (
+    <div
+      className="bg-black/30 rounded-lg shadow-2xl border-4 border-gray-700/80 flex-grow w-full h-full"
+      ref={containerRef}
+    >
+      {isReady && characters !== null && characters.length > 0 ? (
+        <Stage
+          width={dimensions.width}
+          height={dimensions.height}
+          options={{
+            backgroundColor: 0x080808,
+            autoDensity: true,
+          }}
+        >
+          <Scene containerWidth={dimensions.width} containerHeight={dimensions.height}>
+            <GridOverlay width={LOGICAL_WIDTH} height={LOGICAL_HEIGHT} />
+            {DISTRICT_DEFINITIONS.map((district) => (
+              <District key={district.id} {...district} />
+            ))}
+            {characters
+              .filter((character: CharacterData) =>
+                DISTRICT_DEFINITIONS.find((d) => d.alias === character.initialDistrict)
+              )
+              .map((character: CharacterData) => {
+                const district = DISTRICT_DEFINITIONS.find(
+                  (d) => d.alias === character.initialDistrict
+                )!;
+                return (
+                  <Character
+                    key={character.characterId}
+                    {...character}
+                    bounds={district}
+                    isSelected={character.characterId === selectedCharacterId}
+                    onClick={onCharacterClick}
+                    onTravelComplete={onTravelComplete}
+                    onNavigateToVoterDetails={onNavigateToVoterDetails}
+                  />
+                );
+              })}
+          </Scene>
+        </Stage>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+        </div>
+      )}
+    </div>
+  );
+} 
+
+const Scene = ({ children, containerWidth, containerHeight }: { children: React.ReactNode; containerWidth: number; containerHeight: number; }) => {
   const app = useApp();
   const [isReady, setIsReady] = useState(false);
 
@@ -199,7 +524,7 @@ const Scene = ({ children }: { children: React.ReactNode }) => {
       if (app && app.screen && app.screen.width > 0) {
         setIsReady(true);
       }
-    }, 500);
+    }, 100);
     return () => clearTimeout(timer);
   }, [app]);
 
@@ -207,9 +532,16 @@ const Scene = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
-  const scale = Math.min(app.screen.width / LOGICAL_WIDTH, app.screen.height / LOGICAL_HEIGHT) || 1;
-  const x = (app.screen.width - LOGICAL_WIDTH * scale) / 2;
-  const y = (app.screen.height - LOGICAL_HEIGHT * scale) / 2;
+  // Scale to fit the entire content within the container
+  const scaleX = containerWidth / LOGICAL_WIDTH;
+  const scaleY = containerHeight / LOGICAL_HEIGHT;
+  const scale = Math.min(scaleX, scaleY); // Use min to ensure everything fits
+
+  // Center the content within the container
+  const scaledWidth = LOGICAL_WIDTH * scale;
+  const scaledHeight = LOGICAL_HEIGHT * scale;
+  const x = (containerWidth - scaledWidth) / 2;
+  const y = (containerHeight - scaledHeight) / 2;
 
   return (
     <Container x={x} y={y} scale={scale}>
