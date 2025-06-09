@@ -19,9 +19,10 @@ function SimulationControls() {
 
   const handleNextSim = () => {
     console.log('current tick in sim controls : ', currentTick)
-    setCurrentTick(currentTick + 1);
-    console.log('sim tick ', currentTick);
-    fetchSimulationData(currentTick);
+    const nextTick = currentTick + 1;
+    setCurrentTick(nextTick);
+    console.log('sim tick ', nextTick);
+    fetchSimulationData(nextTick);
   }
 
   const fetchSimulationData = async (tickNumber : number) => {
