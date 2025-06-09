@@ -29,12 +29,12 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   }, []);
   
   return (
-    <div className={`min-h-screen w-full relative overflow-hidden ${className}`}>
+    <div className={`min-h-screen w-full relative overflow-hidden bg-black ${className}`}>
       {/* Fixed Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#131B39] to-[#0F1322]">
+      <div className="fixed inset-0 bg-black">
         {/* Top Grid Animation - Translated up with gradient fade */}
         <div className="absolute top-0 w-full h-1/2 overflow-hidden">
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-[#0F1322] opacity-100"></div>
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-black/50 to-black opacity-100"></div>
           {gridAnimationData && (
             <Lottie
               animationData={gridAnimationData}
@@ -42,7 +42,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
               autoplay={true}
               className="w-full h-full"
               style={{ 
-                opacity: 0.15, 
+                opacity: 1.0, 
                 transform: 'translateY(-25%)', 
                 position: 'absolute',
                 top: 0,
@@ -54,7 +54,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         </div>
         {/* Bottom Grid Animation - Rotated 180 degrees and translated down with gradient fade */}
         <div className="absolute bottom-0 w-full h-1/2 overflow-hidden">
-          <div className="absolute inset-0 z-10 bg-gradient-to-t from-transparent via-transparent to-[#0F1322] opacity-100"></div>
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-transparent via-black/50 to-black opacity-100"></div>
           {gridAnimationData && (
             <Lottie
               animationData={gridAnimationData}
@@ -62,7 +62,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
               autoplay={true}
               className="w-full h-full"
               style={{ 
-                opacity: 0.15, 
+                opacity: 1.0, 
                 transform: 'translateY(25%) rotate(180deg)', 
                 position: 'absolute',
                 bottom: 0,

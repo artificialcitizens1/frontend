@@ -29,8 +29,8 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
     const inputStyles: CSSProperties = {
       width: '100%',
       height: multiline ? '138px' : '67px',
-      background: '#12182F',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
+      background: 'rgba(0, 0, 0, 0.7)',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
       boxSizing: 'border-box',
       padding: '19px 26px',
       fontFamily: 'Roboto Mono',
@@ -41,6 +41,7 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
       color: '#FFFFFF',
       textAlign: 'left',
       maxWidth: '100%',
+      backdropFilter: 'blur(5px)',
     };
 
     const containerStyles: CSSProperties = {
@@ -62,14 +63,14 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
           <textarea
             ref={ref as React.RefObject<HTMLTextAreaElement>}
             style={inputStyles}
-            className="resize-none focus:outline-none w-full"
+            className="resize-none focus:outline-none w-full transition-all duration-200 hover:border-white/50 focus:border-white/70 focus:bg-black/80"
             {...(props as TextFieldTextareaProps)}
           />
         ) : (
           <input
             ref={ref as React.RefObject<HTMLInputElement>}
             style={inputStyles}
-            className="focus:outline-none w-full"
+            className="focus:outline-none w-full transition-all duration-200 hover:border-white/50 focus:border-white/70 focus:bg-black/80"
             {...(props as TextFieldInputProps)}
           />
         )}

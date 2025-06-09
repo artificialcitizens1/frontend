@@ -222,7 +222,7 @@ const CandidateSettings = () => {
       <div className="w-full px-4 py-10 overflow-hidden relative flex justify-center">
         {/* Main Content - Much wider boxes with significant spacing */}
         <div className="flex flex-row justify-between relative w-full max-w-[1600px]">
-          <div className="w-[45%] bg-[#0F1322] border border-white/20 backdrop-blur-lg rounded-sm p-6">
+          <div className="w-[45%] bg-black/70 border border-white/30 backdrop-blur-lg rounded-sm p-6">
             {/* Left Candidate */}
             <div className="flex flex-col items-center">
               <img
@@ -238,7 +238,7 @@ const CandidateSettings = () => {
                   type="text"
                   value={candidates[0].name}
                   onChange={(e) => updateCandidate(0, { name: e.target.value })}
-                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  className="w-full mt-2 bg-transparent border-b border-white/60 text-white pb-2 focus:border-white transition-colors"
                   style={{ fontFamily: "Roboto Mono" }}
                   placeholder="Enter name"
                 />
@@ -251,7 +251,7 @@ const CandidateSettings = () => {
                   type="text"
                   value={candidates[0].description}
                   onChange={(e) => updateCandidate(0, { description: e.target.value })}
-                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  className="w-full mt-2 bg-transparent border-b border-white/60 text-white pb-2 focus:border-white transition-colors"
                   style={{ fontFamily: "Roboto Mono" }}
                   placeholder="Enter description"
                 />
@@ -365,7 +365,7 @@ const CandidateSettings = () => {
             <span className="text-white/40 text-[32px] font-light" style={{ fontFamily: "Roboto Mono" }}>VS</span>
           </div>
 
-          <div className="w-[45%] bg-[#0F1322] border border-white/20 backdrop-blur-lg rounded-sm p-6">
+          <div className="w-[45%] bg-black/70 border border-white/30 backdrop-blur-lg rounded-sm p-6">
             {/* Right Candidate */}
             <div className="flex flex-col items-center">
               <img
@@ -381,7 +381,7 @@ const CandidateSettings = () => {
                   type="text"
                   value={candidates[1].name}
                   onChange={(e) => updateCandidate(1, { name: e.target.value })}
-                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  className="w-full mt-2 bg-transparent border-b border-white/60 text-white pb-2 focus:border-white transition-colors"
                   style={{ fontFamily: "Roboto Mono" }}
                   placeholder="Enter name"
                 />
@@ -394,7 +394,7 @@ const CandidateSettings = () => {
                   type="text"
                   value={candidates[1].description}
                   onChange={(e) => updateCandidate(1, { description: e.target.value })}
-                  className="w-full mt-2 bg-transparent border-b border-white/40 text-white pb-2"
+                  className="w-full mt-2 bg-transparent border-b border-white/60 text-white pb-2 focus:border-white transition-colors"
                   style={{ fontFamily: "Roboto Mono" }}
                   placeholder="Enter description"
                 />
