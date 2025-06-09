@@ -1,6 +1,6 @@
 /* package imports */
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import React from 'react';
+import React from "react";
 import { useSocket } from "./hooks/useSocket";
 
 /* styles import */
@@ -17,12 +17,13 @@ import GodMode from "./pages/GodMode";
 import SimulationCreation from "./pages/SimulationCreation";
 import SimulationLore from "./pages/SimulationLore";
 import CandidateDetails from "./pages/CandidateDetails";
+import ElectionResult from "./pages/ElectionResult";
 
 const App: React.FC = () => {
   const { isConnected, currentTick } = useSocket();
 
-  console.log('Socket connection status:', isConnected);
-  console.log('Current tick data:', currentTick);
+  console.log("Socket connection status:", isConnected);
+  console.log("Current tick data:", currentTick);
 
   return (
     <Router>
@@ -41,6 +42,7 @@ const App: React.FC = () => {
         <Route path="/simulation/:simId" element={<SimulationResult />} />
         <Route path="/simulation/:simId/voter-details" element={<VoterDetails />} />
         <Route path="/simulation/:simId/candidate-details" element={<CandidateDetails />} />
+        <Route path="/simulation/:simId/election-result" element={<ElectionResult />} />
         {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
         {/* <Route path="/god-mode" element={<GodMode />} /> */}
         {/* <Route path="/voter-details" element={<VoterDetails />} /> */}

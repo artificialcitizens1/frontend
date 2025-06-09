@@ -59,7 +59,12 @@ const NewsArticle = ({ title, summary, image, readTime }: NewsArticleProps) => (
 // ==========================================
 // MAIN NEWS CHANNEL COMPONENT
 // ==========================================
-const NewsChannel: React.FC<NewsChannelProps> = ({ onClose, simId, currentTick, totalTicks }) => {
+const NewsChannel: React.FC<NewsChannelProps> = ({
+  onClose,
+  simId: _simId,
+  currentTick: _currentTick,
+  totalTicks: _totalTicks,
+}) => {
   // ==========================================
   // STATE MANAGEMENT
   // ==========================================
