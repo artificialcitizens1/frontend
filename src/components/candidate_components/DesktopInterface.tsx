@@ -4,9 +4,10 @@ import { Chart } from "react-google-charts";
 interface DesktopInterfaceProps {
   onSocialMediaClick: () => void;
   onNewsClick: () => void;
+  onTrashClick: () => void;
 }
 
-const DesktopInterface: React.FC<DesktopInterfaceProps> = ({ onSocialMediaClick, onNewsClick }) => {
+const DesktopInterface: React.FC<DesktopInterfaceProps> = ({ onSocialMediaClick, onNewsClick, onTrashClick }) => {
   const [showWarning, setShowWarning] = useState(false);
 
   // Sample data for the graphs matching the image values
@@ -213,7 +214,7 @@ const DesktopInterface: React.FC<DesktopInterfaceProps> = ({ onSocialMediaClick,
         {/* Trash Icon */}
         <div
           className="flex flex-col items-center cursor-pointer hover:opacity-80 p-1"
-          onClick={onNewsClick}
+          onClick={onTrashClick}
         >
           <div className="w-12 h-12 flex items-center justify-center">
             <img src="/icons/ic_trash.svg" alt="trash" className="w-12 h-12" />

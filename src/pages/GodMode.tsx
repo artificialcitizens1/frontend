@@ -156,11 +156,16 @@ export default function GodMode() {
     updateCharactersData(updatedCharacters);
   };
 
-  const handleNavigateToVoterDetails = (type: "citizen" | "candidate" | "reporter") => {
-    if (type === "candidate") {
-      navigate("candidate-details");
+//   const handleNavigateToVoterDetails = (type: "citizen" | "candidate" | "reporter") => {
+//     if (type === "candidate") {
+//       navigate("candidate-details");
+//     } else {
+//       navigate("voter-details");
+  const handleNavigateToVoterDetails = (type: 'citizen' | 'candidate' | 'reporter', characterId: string) => {
+    if(type === 'candidate') {
+      navigate(`candidate-details/${characterId}`);
     } else {
-      navigate("voter-details");
+      navigate(`voter-details/${characterId}`);
     }
   };
 
@@ -361,14 +366,11 @@ function CharacterControlModal({
 }
 
 interface MapContainerProps {
-  characters: CharacterData[];
-  selectedCharacterId: string | null;
-  onCharacterClick: (id: string) => void;
-  onTravelComplete: (
-    id: string,
-    finalDistrict: "home" | "office" | "amphitheatre" | "outside"
-  ) => void;
-  onNavigateToVoterDetails: (type: "citizen" | "candidate" | "reporter") => void;
+    characters: CharacterData[];
+    selectedCharacterId: string | null;
+    onCharacterClick: (id: string) => void;
+    onTravelComplete: (id: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => void;
+    onNavigateToVoterDetails: (type: 'citizen' | 'candidate' | 'reporter', characterId: string) => void;
 }
 
 function MapContainer({
