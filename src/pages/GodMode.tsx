@@ -107,26 +107,6 @@ export default function GodMode() {
       <div className="bg-black py-4 px-8 border-b border-white/10 flex-shrink-0">
         <div className="max-w-full mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <button
-              className="text-white hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center p-2"
-              onClick={() => navigate(-1)}
-            >
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M15 18L9 12L15 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
             <h1 
               className="text-white text-4xl tracking-wider"
               style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
@@ -135,7 +115,7 @@ export default function GodMode() {
             </h1>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-8">
             <LeaderProfile name="CHARLIE SINGH" approval={67} />
             <LeaderProfile name="ARMAN PATEL" approval={67} align="right" />
           </div>
@@ -437,9 +417,6 @@ function MapContainer({
       className="bg-black/30 rounded-lg shadow-2xl border-4 border-gray-700/80 flex-grow w-full h-full"
       ref={containerRef}
     >
-      <h2 className="absolute top-2 left-1/2 transform -translate-x-1/2 text-cyan-400 tracking-widest z-10">
-        SIMPLOLIS POLITICAL MAP
-      </h2>
       {isReady && characters !== null && characters.length > 0 ? (
         <Stage
           width={dimensions.width}
