@@ -3,51 +3,82 @@ import { useNavigate } from 'react-router-dom';
 import { startSimulationFlow } from '../api/simulationService';
 import { useSimulationStore } from '../store';
 import Lottie from 'lottie-react';
+import { useTickStore } from '../store/tickStore';
 
 const SimulationCreation = () => {
   const navigate = useNavigate();
   const { candidates, simulationName, description, setSimulationId } = useSimulationStore();
+  const { setTotalSimulationTicks } = useTickStore();
   const [error, setError] = useState<string | null>(null);
   const [gridAnimationData, setGridAnimationData] = useState<any>(null);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [animationProgress, setAnimationProgress] = useState(0);
-  
-  // Load animation data from public folder
-  useEffect(() => {
-    const loadAnimationData = async () => {
-      try {
-        // Fetch grid animation
-        const response = await fetch('/animations/grid_animation.json');
-        const data = await response.json();
-        setGridAnimationData(data);
-      } catch (error) {
-        console.error('Error loading animation data:', error);
-      }
-    };
-    
-    loadAnimationData();
-  }, []);
 
-  // Animation progress effect
-  useEffect(() => {
-    const startTime = Date.now();
+  const loadAnimationData = async () => {
+    try {
+      // Fetch grid animation
+      const response = await fetch('/animations/grid_animation.json');
+      const data = await response.json();
+      setGridAnimationData(data);
+    } catch (error) {
+      console.error('Error loading animation data:', error);
+    }
+  };
+
+  const animationFrame = (startTime: number) => {
     const duration = 3000; // 3 seconds for full animation
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    setAnimationProgress(progress);
     
-    const animationFrame = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      setAnimationProgress(progress);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animationFrame);
-      }
-    };
-    
-    requestAnimationFrame(animationFrame);
-  }, []);
+    if (progress < 1) {
+      requestAnimationFrame(() => animationFrame(startTime));
+    }
+  };
 
-  // Load and play GTA IV theme sound
+  const createSimulation = async () => {
+    try {
+      // Make API call to start simulation with name and description from store
+      const response = await startSimulationFlow(
+        candidates || [],
+        simulationName || "2025 General Election", 
+        description || "A simulation of the 2025 general election with two major candidates."
+      );
+      
+      console.log('Simulation created:', response);
+      
+      // Navigate to the lore page with the simulation ID
+      if (response && response.simulation && response.simulation.simId) {
+        setSimulationId(response.simulation.simId);
+        setTotalSimulationTicks(response.simulation.totalTicks);
+        
+        // Stop the audio before navigation
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+          console.log('🔇 GTA IV theme stopped before navigation');
+        }
+        
+        // Add a slight delay before navigation for better UX
+        setTimeout(() => {
+          navigate(`/simulation-lore/${response.simulation.simId}`);
+        }, 2000);
+      } else {
+        setError('Invalid response from server. Missing simulation ID.');
+      }
+    } catch (err) {
+      console.error('Error creating simulation:', err);
+      setError('Failed to create simulation. Please try again.');
+    }
+  };
+  
+  // Load animation data from public folder and Animation progress effect
   useEffect(() => {
+    loadAnimationData();
+    const startTime = Date.now();
+    requestAnimationFrame(() => animationFrame(startTime));
+
+    // Load and play GTA IV theme sound
     const gtaAudio = new Audio('/sounds/gta_iv_theme.mp3');
     gtaAudio.loop = false; // Don't loop the audio
     gtaAudio.volume = 0.8; // Set volume to 80%
@@ -79,45 +110,12 @@ const SimulationCreation = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const createSimulation = async () => {
-      try {
-        // Make API call to start simulation with name and description from store
-        const response = await startSimulationFlow(
-          candidates || [],
-          simulationName || "2025 General Election", 
-          description || "A simulation of the 2025 general election with two major candidates."
-        );
-        
-        console.log('Simulation created:', response);
-        
-        // Navigate to the lore page with the simulation ID
-        if (response && response.simulation && response.simulation.simId) {
-          setSimulationId(response.simulation.simId);
-          
-          // Stop the audio before navigation
-          if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
-            console.log('🔇 GTA IV theme stopped before navigation');
-          }
-          
-          // Add a slight delay before navigation for better UX
-          setTimeout(() => {
-            navigate(`/simulation-lore/${response.simulation.simId}`);
-          }, 2000);
-        } else {
-          setError('Invalid response from server. Missing simulation ID.');
-        }
-      } catch (err) {
-        console.error('Error creating simulation:', err);
-        setError('Failed to create simulation. Please try again.');
-      }
-    };
 
+  useEffect(() => {
     // Start creating the simulation
     createSimulation();
-  }, [candidates, simulationName, description, navigate, setSimulationId, audio]);
+  // }, [candidates, simulationName, description, navigate, setSimulationId, audio]);
+  }, []);
 
   return (
     <div className="min-h-screen w-full relative">

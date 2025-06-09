@@ -26,6 +26,7 @@ interface SimulationResponse {
     simId: string;
     currentTick: number;
     tickStatus: string;
+    totalTicks: number;
     description: string;
     tickSize: number;
     totalSubTicks: number;
@@ -151,3 +152,13 @@ export const getSimulationStatus = async (tick=0, simId: string): Promise<any> =
     throw error;
   }
 };
+
+export const getWinnerDetails = async(simId: string) => {
+  try {
+    const response = await baseInstance.get(`/api/simulations/results/${simId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching winner details:', error);
+    throw error;
+  }
+}

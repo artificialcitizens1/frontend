@@ -4,13 +4,14 @@ import Logs from "../components/Logs";
 import { useSimulationStore } from "../store";
 import { useTickStore } from "../store/tickStore";
 import AnimatedText from "../components/AnimatedText";
+import { getWinnerDetails } from "../api/simulationService";
 
 const ElectionResult = () => {
   const navigate = useNavigate();
   const { simId } = useParams();
-  const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
   const { currentTick: _currentTick, totalTicks } = useTickStore();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [winnerDetails, setWinnerDetails] = useState<any>(null);
 
   // Enhanced breaking news data
   const breakingNewsItems = [
@@ -25,12 +26,19 @@ const ElectionResult = () => {
 
   // Set up demo simulation data if not already set
   useEffect(() => {
-    if (!simulationId) {
-      setSimulationId("demo-simulation-election-result");
-      setCurrentTick(totalTicks); // Set to final tick for results
-      console.log("🏆 ElectionResult - Setting up demo simulation data");
+    fetchWinnerDetails()
+  },[])
+
+  const fetchWinnerDetails = async() => {
+    try {
+      const winnerDetails = await getWinnerDetails(simId!);
+      console.log('winner details : ', winnerDetails);
+      setWinnerDetails(winnerDetails);
+    } catch (error) {
+      console.error('Error fetching winner details:', error);
     }
-  }, [simulationId, setSimulationId, setCurrentTick, totalTicks]);
+  }
+  
 
   const handleBack = () => {
     navigate(-1);
@@ -77,8 +85,10 @@ const ElectionResult = () => {
           </div>
         </div>
 
+        
+
         {/* Content */}
-        <div className="max-w-[1728px] mx-auto px-4 py-6 h-[calc(100vh-60px)] overflow-hidden">
+        {winnerDetails ? (<div className="max-w-[1728px] mx-auto px-4 py-6 h-[calc(100vh-60px)] overflow-hidden">
           <div className="flex h-full">
             {/* Left column - Winner Announcement */}
             <div className="w-2/3 flex flex-col items-center justify-center relative">
@@ -221,7 +231,12 @@ const ElectionResult = () => {
               <Logs />
             </div>
           </div>
-        </div>
+        </div>)
+        : <div className="flex items-center justify-center h-full">
+          <div className="text-white text-2xl font-bold">
+            Loading winner details...
+          </div>
+        </div>}
       </div>
 
       {/* Enhanced CSS for animations */}

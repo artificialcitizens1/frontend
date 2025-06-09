@@ -23,6 +23,8 @@ interface tickData {
 interface tickState {
   currentTick: number;
   totalTicks: number;
+  totalSimulationTicks: number;
+  showWinnerDetails: boolean;
   subTick: 0 | 1 ;
   tickData: tickData[] | null;
   charactersData: Map<string, charactersData> | null;
@@ -30,6 +32,8 @@ interface tickState {
   // Actions
   setCurrentTick: (tick: number) => void;
   setTotalTicks: (ticks: number) => void;
+  setTotalSimulationTicks: (ticks: number) => void;
+  setShowWinnerDetails: (show: boolean) => void;
   setSubTick: (subTick: 0 | 1) => void;
   setTickData: (tickData: tickData) => void;
   setCharactersData: (charactersData: Character[]) => void;
@@ -47,6 +51,8 @@ export const useTickStore = create<tickState>()(
     (set, _get) => ({
       currentTick: 1,
       totalTicks: 1,
+      totalSimulationTicks: 1,
+      showWinnerDetails: false,
       subTick: 0,
       tickData: null,
       charactersData: null,
@@ -55,6 +61,8 @@ export const useTickStore = create<tickState>()(
         set({ subTick: 0 })
       },
       setTotalTicks: (ticks) => set({ totalTicks: ticks }),
+      setTotalSimulationTicks: (ticks) => set({ totalSimulationTicks: ticks }),
+      setShowWinnerDetails: (show) => set({ showWinnerDetails: show }),
       setSubTick: (subTick) => set({ subTick: subTick }),
       setTickData: (tickData) => {
         console.log('tickData set : ', tickData);

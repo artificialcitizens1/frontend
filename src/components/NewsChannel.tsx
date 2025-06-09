@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getNewsArticles, type NewsEpisode } from "../api/newsService";
+import { getNewsArticles, type NewsEpisode, getNewsChannels, type NewsChannelData } from "../api/newsService";
 
 // ==========================================
 // ICON COMPONENTS
@@ -69,9 +69,42 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
   // STATE MANAGEMENT
   // ==========================================
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("54359c07-c741-495b-92ca-e9e62da6f900");
+  const [isLoadingChannels, setIsLoadingChannels] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>("");
   const [newsData, setNewsData] = useState<NewsEpisode[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [newsChannels, setNewsChannels] = useState<NewsChannelData[]>([]);
+
+  // ==========================================
+  // FETCH NEWS CHANNELS FIRST
+  // ==========================================
+  useEffect(() => {
+    fetchNewsChannels();
+  }, [simId]);
+
+  const fetchNewsChannels = async () => {
+    try {
+      setIsLoadingChannels(true);
+      setError(null);
+      
+      console.log('🔍 NewsChannel - Fetching channels for simId:', simId);
+      const response = await getNewsChannels(simId);
+      
+      if (response && Array.isArray(response) && response.length > 0) {
+        console.log('✅ NewsChannel - Channels received:', response);
+        setNewsChannels(response);
+        // Set the first channel as the default active tab
+        setActiveTab(response[0].channelId);
+      } else {
+        setError("No news channels available");
+      }
+    } catch (error) {
+      console.error('❌ Error fetching news channels:', error);
+      setError("Failed to load news channels");
+    } finally {
+      setIsLoadingChannels(false);
+    }
+  };
 
   // ==========================================
   // HELPER FUNCTIONS
@@ -124,57 +157,73 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
   };
 
   // ==========================================
-  // API DATA FETCHING
+  // API DATA FETCHING (ONLY AFTER CHANNELS ARE LOADED)
   // ==========================================
   useEffect(() => {
-    const fetchNewsData = async () => {
-      console.log('🚀 NewsChannel - Fetching news data');
+    // Only fetch news data if channels are loaded and we have an active tab
+    if (!isLoadingChannels && activeTab && newsChannels.length > 0) {
+      const fetchNewsData = async () => {
+        console.log('🚀 NewsChannel - Fetching news data');
 
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        console.log('🔍 NewsChannel - Fetching data for simId:', simId, 'currentTick:', currentTick, 'channelId:', activeTab);
-        const response = await getNewsArticles(simId, currentTick, activeTab);
-        
-        if (response.success && response.data && response.data.episodes) {
-          console.log('✅ NewsChannel - News episodes:', response.data);
-          setNewsData(response.data.episodes);
-        } else {
-          setError("No news data available");
+        try {
+          setIsLoading(true);
+          setError(null);
+          
+          console.log('🔍 NewsChannel - Fetching data for simId:', simId, 'currentTick:', currentTick, 'channelId:', activeTab);
+          const response = await getNewsArticles(simId, currentTick, activeTab);
+          
+          if (response.success && response.data && response.data.episodes) {
+            console.log('✅ NewsChannel - News episodes:', response.data);
+            setNewsData(response.data.episodes);
+          } else {
+            setError("No news data available");
+          }
+        } catch (err) {
+          console.error('❌ Error fetching news episodes:', err);
+          setError("Failed to load news episodes");
+        } finally {
+          setIsLoading(false);
         }
-      } catch (err) {
-        console.error('Error fetching news episodes:', err);
-        setError("Failed to load news episodes");
-      } finally {
-        setIsLoading(false);
-      }
+      };
+
+      fetchNewsData();
+    }
+  }, [simId, currentTick, activeTab, isLoadingChannels, newsChannels.length]); // Dependencies include channel loading state
+
+  // ==========================================
+  // DYNAMIC NEWS SOURCE TABS FROM API
+  // ==========================================
+  const getChannelLogo = (channelName: string): string => {
+    // Map channel names to logos - you can customize this mapping
+    const logoMap: { [key: string]: string } = {
+      'Biased Broadcasting Corp': '🎭',
+      'Al Exaggera': '🌪️',
+      'Fake News Network': '📺',
+      'Faux News': '🦊',
+      'CNN': '📺',
+      'BBC': '🎭',
+      'Fox News': '🦊',
+      'Al Jazeera': '🌪️'
     };
+    
+    // Try exact match first, then partial match, default to news icon
+    return logoMap[channelName] || 
+           Object.entries(logoMap).find(([key]) => 
+             channelName.toLowerCase().includes(key.toLowerCase())
+           )?.[1] || 
+           '📰';
+  };
 
-    // Fetch data when simId, currentTick, or activeTab changes
-    fetchNewsData();
-  }, [simId, currentTick, activeTab]); // Dependencies: simId, currentTick, and activeTab
-
-  // ==========================================
-  // NEWS SOURCE TABS
-  // ==========================================
-  const newsSources: NewsSourceTab[] = [
-    { 
-      id: "66948d25-60d6-48d0-8dad-6ad949c1e07f", 
-      name: "Biased Broadcasting Corp", 
-      logo: "🎭" 
-    },
-    { 
-      id: "79eb9170-7ec2-415a-b0a7-5b81b57a9f6e", 
-      name: "Al Exaggera", 
-      logo: "🌪️" 
-    },
-  ];
+  const newsSources: NewsSourceTab[] = newsChannels.map(channel => ({
+    id: channel.channelId,
+    name: channel.name,
+    logo: getChannelLogo(channel.name)
+  }));
 
   // ==========================================
   // FILTER NEWS DATA BY CHANNEL
   // ==========================================
-  const filteredNews = newsData.filter(episode => getChannelFromEpisode(episode) === activeTab);
+  const filteredNews = newsData.filter(episode => episode.channelId === activeTab);
 
   const breakingNews = filteredNews
     .filter(episode => isBreakingNews(episode))
@@ -191,12 +240,12 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
   // ==========================================
   // COMPONENT RENDER
   // ==========================================
-  if (isLoading) {
+  if (isLoadingChannels) {
     return (
       <div className="flex flex-col max-w-6xl mx-auto bg-white text-black h-screen border border-gray-300 rounded-lg">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-300">
-          <h1 className="text-3xl font-bold tracking-wide text-black">NEWS</h1>
+          <h1 className="text-xl font-bold tracking-wide text-black font-['ManifoldExtendedCF']">NEWS</h1>
           <XIcon
             className="w-6 h-6 cursor-pointer hover:text-gray-600 transition-colors text-black"
             onClick={onClose}
@@ -207,7 +256,36 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center space-y-6">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-400"></div>
-            <p className="text-xl text-gray-600">Loading news...</p>
+            <p className="text-xl text-gray-600">Loading news channels...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if channels failed to load
+  if (error && newsChannels.length === 0) {
+    return (
+      <div className="flex flex-col max-w-6xl mx-auto bg-white text-black h-screen border border-gray-300 rounded-lg">
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-300">
+          <h1 className="text-xl font-bold tracking-wide text-black font-['ManifoldExtendedCF']">NEWS</h1>
+          <XIcon
+            className="w-6 h-6 cursor-pointer hover:text-gray-600 transition-colors text-black"
+            onClick={onClose}
+          />
+        </div>
+
+        {/* Error State */}
+        <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-col items-center space-y-6">
+            <div className="text-red-500 text-center">
+              <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <h3 className="text-xl font-semibold mb-2">Failed to Load News Channels</h3>
+              <p className="text-gray-600">{error}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -261,7 +339,12 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
             Breaking News
           </h2>
           <div className="flex-1 overflow-y-auto">
-            {error ? (
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-gray-400"></div>
+                <p className="text-lg text-gray-600">Loading news...</p>
+              </div>
+            ) : error ? (
               <div className="flex flex-col items-center justify-center h-64 space-y-4">
                 <div className="text-red-500 text-center">
                   <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,7 +361,7 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                   </svg>
                   <h3 className="text-lg font-semibold mb-2">No Breaking News</h3>
-                  <p className="text-gray-600 text-sm">No breaking news or election updates available for {activeTab}.</p>
+                  <p className="text-gray-600 text-sm">No breaking news or election updates available for {newsSources.find(s => s.id === activeTab)?.name || 'this channel'}.</p>
                 </div>
               </div>
             ) : (
@@ -310,7 +393,12 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
             Other News
           </h2>
           <div className="flex-1 overflow-y-auto">
-            {error ? (
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-gray-400"></div>
+                <p className="text-lg text-gray-600">Loading news...</p>
+              </div>
+            ) : error ? (
               <div className="flex flex-col items-center justify-center h-64 space-y-4">
                 <div className="text-gray-500 text-center">
                   <p className="text-sm">Unable to load other news</p>
@@ -323,7 +411,7 @@ const NewsChannel: React.FC<NewsChannelProps> = ({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <h3 className="text-lg font-semibold mb-2">No Other News</h3>
-                  <p className="text-gray-600 text-sm">No other news articles available for {activeTab}.</p>
+                  <p className="text-gray-600 text-sm">No other news articles available for {newsSources.find(s => s.id === activeTab)?.name || 'this channel'}.</p>
                 </div>
               </div>
             ) : (

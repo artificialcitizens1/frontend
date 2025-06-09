@@ -1,12 +1,22 @@
 import { useParams } from "react-router-dom";
-import { getSimulationStatus } from "../../api/simulationService";
+import { getSimulationStatus, getWinnerDetails } from "../../api/simulationService";
 import { useTickStore } from "../../store/tickStore";
 
 function SimulationControls() {
 
   const { simId } = useParams<{ simId: string }>();
   
-  const { currentTick, setCurrentTick, totalTicks, setCharactersData, setSubTick, tickData, updateSystemTick } = useTickStore();
+  const { 
+    currentTick, 
+    setCurrentTick, 
+    totalTicks, 
+    setCharactersData, 
+    setSubTick, 
+    tickData, 
+    updateSystemTick,
+    totalSimulationTicks,
+    setShowWinnerDetails
+  } = useTickStore();
 
   const subTickTime = tickData?.map((subTickData) => subTickData.time) || ['Day 1'];
   // console.log('tickData : ', tickData);
@@ -31,6 +41,9 @@ function SimulationControls() {
     if(response.length > 0){
       updateSystemTick(tickNumber, response);
       setCharactersData(response[0].characters);
+    }
+    if(tickNumber === totalSimulationTicks){
+      setShowWinnerDetails(true);
     }
   }
 

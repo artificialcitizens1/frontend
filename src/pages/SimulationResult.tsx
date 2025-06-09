@@ -2,8 +2,21 @@
 // import { getSimulationStatus } from "../api/simulationService";
 // import { useParams } from "react-router-dom";
 import GodMode from "./GodMode";
+import { useTickStore } from "../store/tickStore";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const SimulationResult = () => {
+
+  const {showWinnerDetails} = useTickStore();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(showWinnerDetails){
+      navigate('election-result');
+    }
+  },[showWinnerDetails])
 
   // const { simId } = useParams<{ simId: string }>();
   // const [tick, setTick] = useState<number>(2);
