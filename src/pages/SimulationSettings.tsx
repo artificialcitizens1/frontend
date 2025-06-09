@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   SimulationSettings,
@@ -9,6 +9,7 @@ import type {
 } from "../types/simulation";
 import { PoliticalStandingGraph } from "../components/simulation/PoliticalStandingGraph";
 import { useSimulationStore } from "../store/simulationStore";
+import Lottie from "lottie-react";
 
 const defaultMediaOutlets: MediaOutlet[] = [
   { name: "NNC", bias: "Left Leaning", isSelected: true },
@@ -43,8 +44,25 @@ export const SimulationSettingsPage: React.FC = () => {
   const [showTopicModal, setShowTopicModal] = useState(false);
   const [newTopic, setNewTopic] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [gridAnimationData, setGridAnimationData] = useState<any>(null);
   const navigate = useNavigate();
   const { setSimulationSettings, getAllData } = useSimulationStore();
+
+  // Load animation data from public folder
+  useEffect(() => {
+    const loadAnimationData = async () => {
+      try {
+        // Fetch grid animation
+        const response = await fetch('/animations/grid_animation.json');
+        const data = await response.json();
+        setGridAnimationData(data);
+      } catch (error) {
+        console.error('Error loading animation data:', error);
+      }
+    };
+    
+    loadAnimationData();
+  }, []);
 
   const handleAddTopic = () => {
     setShowTopicModal(true);
@@ -215,16 +233,48 @@ export const SimulationSettingsPage: React.FC = () => {
     <div className="min-h-screen w-full relative">
       {/* Fixed Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-[#131B39] to-[#0F1322]">
-        <img
-          src="/images/top_grid.png"
-          alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-top"
-        />
-        <img
-          src="/images/bottom_grid.png"
-          alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 scale-75 origin-bottom"
-        />
+        {/* Top Grid Animation - Translated up with scaling and gradient fade */}
+        <div className="absolute top-0 w-full h-1/2 overflow-hidden">
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-[#0F1322] opacity-100"></div>
+          {gridAnimationData && (
+            <Lottie
+              animationData={gridAnimationData}
+              loop={true}
+              autoplay={true}
+              className="w-full h-full"
+              style={{ 
+                opacity: 0.15, 
+                transform: 'translateY(-25%) scale(0.75)', 
+                transformOrigin: 'top',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%'
+              }}
+            />
+          )}
+        </div>
+        {/* Bottom Grid Animation - Rotated 180 degrees, translated down with scaling and gradient fade */}
+        <div className="absolute bottom-0 w-full h-1/2 overflow-hidden">
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-transparent via-transparent to-[#0F1322] opacity-100"></div>
+          {gridAnimationData && (
+            <Lottie
+              animationData={gridAnimationData}
+              loop={true}
+              autoplay={true}
+              className="w-full h-full"
+              style={{ 
+                opacity: 0.15, 
+                transform: 'translateY(25%) scale(0.75) rotate(180deg)', 
+                transformOrigin: 'bottom',
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%'
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Main Content Container */}

@@ -1,13 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSimulationStore } from '../store';
 import { startSimulationFlow } from '../api/simulationService';
+import { useSimulationStore } from '../store';
+import Lottie from 'lottie-react';
 
 const SimulationCreation = () => {
+  const navigate = useNavigate();
+  const { candidates, simulationName, description, setSimulationId } = useSimulationStore();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { candidates, simulationName, description, setSimulationId } = useSimulationStore();
-  const navigate = useNavigate();
+  const [gridAnimationData, setGridAnimationData] = useState<any>(null);
+  
+  // Load animation data from public folder
+  useEffect(() => {
+    const loadAnimationData = async () => {
+      try {
+        // Fetch grid animation
+        const response = await fetch('/animations/grid_animation.json');
+        const data = await response.json();
+        setGridAnimationData(data);
+      } catch (error) {
+        console.error('Error loading animation data:', error);
+      }
+    };
+    
+    loadAnimationData();
+  }, []);
 
   useEffect(() => {
     const createSimulation = async () => {
@@ -18,41 +36,76 @@ const SimulationCreation = () => {
           simulationName || "2025 General Election", 
           description || "A simulation of the 2025 general election with two major candidates."
         );
+        
         console.log('Simulation created:', response);
         
         // Navigate to the lore page with the simulation ID
         if (response && response.simulation && response.simulation.simId) {
           setSimulationId(response.simulation.simId);
-          navigate(`/simulation-lore/${response.simulation.simId}`);
+          
+          // Add a slight delay before navigation for better UX
+          setTimeout(() => {
+            navigate(`/simulation-lore/${response.simulation.simId}`);
+          }, 2000);
         } else {
           setError('Invalid response from server. Missing simulation ID.');
+          setIsLoading(false);
         }
       } catch (err) {
         console.error('Error creating simulation:', err);
         setError('Failed to create simulation. Please try again.');
-      } finally {
         setIsLoading(false);
       }
     };
 
     // Start creating the simulation
     createSimulation();
-  }, [candidates, navigate]);
+  }, [candidates, simulationName, description, navigate, setSimulationId]);
 
   return (
     <div className="min-h-screen w-full relative">
       {/* Fixed Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-[#131B39] to-[#0F1322]">
-        <img 
-          src="/images/top_grid.png"
-          alt="Top grid"
-          className="absolute top-0 w-full h-1/2 object-cover opacity-30 origin-top"
-        />
-        <img 
-          src="/images/bottom_grid.png"
-          alt="Bottom grid"
-          className="absolute bottom-0 w-full h-1/2 object-cover opacity-30 origin-bottom"
-        />
+        {/* Top Grid Animation - Translated up with gradient fade */}
+        <div className="absolute top-0 w-full h-1/2 overflow-hidden">
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-[#0F1322] opacity-100"></div>
+          {gridAnimationData && (
+            <Lottie
+              animationData={gridAnimationData}
+              loop={true}
+              autoplay={true}
+              className="w-full h-full"
+              style={{ 
+                opacity: 0.15, 
+                transform: 'translateY(-25%)', 
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%'
+              }}
+            />
+          )}
+        </div>
+        {/* Bottom Grid Animation - Rotated 180 degrees and translated down with gradient fade */}
+        <div className="absolute bottom-0 w-full h-1/2 overflow-hidden">
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-transparent via-transparent to-[#0F1322] opacity-100"></div>
+          {gridAnimationData && (
+            <Lottie
+              animationData={gridAnimationData}
+              loop={true}
+              autoplay={true}
+              className="w-full h-full"
+              style={{ 
+                opacity: 0.15, 
+                transform: 'translateY(25%) rotate(180deg)', 
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%'
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Main Content Container */}
