@@ -32,24 +32,24 @@ interface AnimationPath {
 }
 
 interface CharacterProps {
-  characterId: string;
-  color: number;
-  type: "citizen" | "candidate" | "reporter";
-  initialDistrict: "home" | "office" | "amphitheatre" | "outside";
-  targetDistrict: "home" | "office" | "amphitheatre" | "outside";
-  // currentDistrictId: number;
+  characterId: string; 
+  color: number; 
+  type: 'citizen' | 'candidate' | 'reporter';
+  initialDistrict: 'home' | 'office' | 'amphitheater' | 'others';
+  targetDistrict: 'home' | 'office' | 'amphitheater' | 'others';
+  // currentDistrictId: number; 
   // targetDistrictId: number;
   bounds: DistrictData;
   isSelected: boolean;
   onClick: (id: string) => void;
-  onTravelComplete: (id: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => void;
+  onTravelComplete: (id: string, finalDistrict: 'home' | 'office' | 'amphitheater' | 'others') => void;
   onNavigateToVoterDetails: (type: 'citizen' | 'candidate' | 'reporter', characterId: string) => void;
   name: string;
 }
 
 const getTravelPath = (initialDistrict: string, targetDistrict: string): Point[] => {
-  const startDistrict = DISTRICT_DEFINITIONS.find((d) => d.alias === initialDistrict);
-  const endDistrict = DISTRICT_DEFINITIONS.find((d) => d.alias === targetDistrict);
+  const startDistrict = DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === initialDistrict);
+  const endDistrict = DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === targetDistrict);
   if (!startDistrict || !endDistrict || initialDistrict === targetDistrict) return [];
   const path: Point[] = [];
   const startRoadNode: Point = { x: CENTRAL_ROAD_X, y: startDistrict.gateway.y };

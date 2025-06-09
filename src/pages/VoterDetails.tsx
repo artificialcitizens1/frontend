@@ -99,7 +99,7 @@ const SurveillanceScreen = ({simId, currentTick, totalTicks}: {simId: string, cu
 const VoterDetails = () => {
   const navigate = useNavigate();
   const {simId, characterId} = useParams();
-  const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
+  // const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
   const { currentTick, totalTicks } = useTickStore();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,14 +108,14 @@ const VoterDetails = () => {
   console.log('characterId:', characterId);
   
   // Set up demo simulation data if not already set
-  useEffect(() => {
-    if (!simulationId) {
-      // Use a demo simulation ID for the voter details page
-      setSimulationId('demo-simulation-voter-details');
-      setCurrentTick(1);
-      console.log('🎭 VoterDetails - Setting up demo simulation data');
-    }
-  }, [simulationId, setSimulationId, setCurrentTick]);
+  // useEffect(() => {
+  //   if (!simulationId) {
+  //     // Use a demo simulation ID for the voter details page
+  //     setSimulationId('demo-simulation-voter-details');
+  //     setCurrentTick(1);
+  //     console.log('🎭 VoterDetails - Setting up demo simulation data');
+  //   }
+  // }, [simulationId, setSimulationId, setCurrentTick]);
 
   // Fetch persona details
   useEffect(() => {
@@ -273,7 +273,7 @@ const VoterDetails = () => {
 
             {/* Right column - Logs */}
             <div className="w-[45%]">
-                <Logs />
+              <Logs />
             </div>
 
 

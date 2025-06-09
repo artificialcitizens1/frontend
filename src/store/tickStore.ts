@@ -6,12 +6,12 @@ interface Character {
   name: string;
   type: 'citizen' | 'candidate' | 'reporter';
   log: string;
-  district: 'home' | 'office' | 'amphitheatre' | 'outside';
+  district: 'home' | 'office' | 'amphitheater' | 'others';
 }
 
 interface charactersData extends Character {
-  initialDistrict: 'home' | 'office' | 'amphitheatre' | 'outside';
-  targetDistrict: 'home' | 'office' | 'amphitheatre' | 'outside';
+  initialDistrict: 'home' | 'office' | 'amphitheater' | 'others';
+  targetDistrict: 'home' | 'office' | 'amphitheater' | 'others';
   color: number;
 }
   

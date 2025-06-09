@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-interface LogsProps {
-  logs?: string[];
-}
-
-const Logs: React.FC<LogsProps> = ({ logs = [] }) => {
+const Logs: React.FC<any> = () => {
   // Default logs from the screenshot
   const defaultLogs = [
     "12:15 >>>Charlie Singh held a rally to please his voters",
@@ -19,7 +15,7 @@ const Logs: React.FC<LogsProps> = ({ logs = [] }) => {
     "12:24 >>>Final campaign events conclude across districts",
   ];
 
-  const displayLogs = logs.length > 0 ? logs : defaultLogs;
+  const displayLogs = defaultLogs;
 
   const [visibleLogs, setVisibleLogs] = useState<
     Array<{ time: string; message: string; isVisible: boolean; isAnimating: boolean }>
