@@ -96,13 +96,13 @@ export default function GodMode() {
   const selectedCharacter = characters.find((c) => c.characterId === selectedCharacterId);
 
   return (
-    <div className="bg-[#0f172a] min-h-screen flex flex-col font-mono text-gray-300">
+    <div className="bg-[#0f172a] h-screen flex flex-col font-mono text-gray-300">
       <TopBar />
-      <main className="flex-grow grid grid-cols-1 lg:grid-cols-6 gap-4 p-4">
-        <div className="lg:col-span-1 order-2 lg:order-1">
+      <main className="flex-grow grid grid-cols-1 lg:grid-cols-6 gap-4 p-4 h-full">
+        <div className="lg:col-span-1 order-2 lg:order-1 h-full">
           <ActsOfGodPanel />
         </div>
-        <div className="lg:col-span-4 order-1 lg:order-2 flex flex-col relative">
+        <div className="lg:col-span-4 order-1 lg:order-2 flex flex-col h-full">
           <MapContainer
             characters={characters}
             selectedCharacterId={selectedCharacterId}
@@ -119,7 +119,7 @@ export default function GodMode() {
             />
           )}
         </div>
-        <div className="lg:col-span-1 order-3 lg:order-3">
+        <div className="lg:col-span-1 order-3 lg:order-3 h-full">
           <LogsPanel />
         </div>
       </main>
@@ -129,12 +129,165 @@ export default function GodMode() {
 }
 
 // --- UI Components ---
-function TopBar() { return (<header className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-gray-700/50 gap-4"><LeaderProfile name="CHARLIE SINGH" approval={67} /><LeaderProfile name="ARMAN PATEL" approval={67} align="right" /></header>); }
-function LeaderProfile({ name, approval, align = 'left' }: { name: string, approval: number, align?: 'left' | 'right' }) { return (<div className={`flex w-full max-w-xs items-center gap-3 ${align === 'right' ? 'flex-row-reverse' : ''}`}><div className={`w-12 h-12 flex items-center justify-center bg-gray-800 rounded-full border-2 border-gray-600 shrink-0 ${align === 'right' ? 'bg-red-900/50 border-red-500' : 'bg-blue-900/50 border-blue-500'}`}><svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path></svg></div><div className={`w-full flex flex-col ${align === 'right' ? 'items-end' : 'items-start'}`}><div className="w-full flex justify-between items-center"><p className="text-xs tracking-widest text-gray-400">APPROVAL RATING</p><span className="text-sm font-bold">{approval}%</span></div><h2 className="font-bold tracking-wider mt-1 w-full">{name}</h2><div className="w-full bg-gray-700/50 h-2 rounded-full border border-gray-600/50 mt-1"><div className="bg-cyan-400 h-full rounded-full" style={{ width: `${approval}%` }}></div></div></div></div>); }
-function ActsOfGodPanel() { const actions = [ { icon: '▲', text: 'Earthquake' }, { icon: '♦', text: 'Scandal Expose' }, { icon: '→', text: 'Market Crash' }, { icon: '♦', text: 'Assassination Attempt' }]; return (<div className="h-full p-4 bg-black/20 rounded-lg"><h3 className="font-bold text-lg mb-4 tracking-wider">Acts Of God</h3><ul className="space-y-3">{actions.map((action, i) => (<li key={i} className="p-3 bg-gray-800/80 border border-gray-700 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-200"><span className="mr-3 text-cyan-400">{action.icon}</span>{action.text}</li>))}</ul></div>); }
-function LogsPanel() { const logEntries = ["Day 10", "Charlie Singh held a rally to please his voters.", "Acts of vandalism on Rahul's posters.", "Earthquake caused 1m casualties."]; return (<div className="h-full p-4 bg-black/20 rounded-lg"><h3 className="font-bold text-lg mb-4 tracking-wider">Logs</h3><ul className="space-y-3 text-sm text-gray-400">{logEntries.map((entry, i) => <li key={i} className="leading-relaxed">{`*** ${entry}`}</li>)}</ul><div className="mt-4 flex flex-col gap-2"><button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">News</button><button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">Social Media</button></div></div>); }
-function NewsTicker() { return (<footer className="w-full bg-black/30 p-2 overflow-hidden border-t border-gray-700/50"><div className="whitespace-nowrap animate-marquee"><span className="mx-8 text-gray-400">Local politician caught arguing with ChatGPT over vote count.</span><span className="mx-8 text-gray-400">New startup offers subscription-based fresh air; premium tier includes "pine forest" scent.</span><span className="mx-8 text-gray-400">Minister declares Earth is flat 'in some constituencies'.</span></div><style>{`@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } } .animate-marquee { display: inline-block; animation: marquee 30s linear infinite; }`}</style></footer>); }
-function CharacterControlModal({ character, onMove, onClose }: { character: CharacterData; onMove: (district: 'home' | 'office' | 'amphitheater' | 'others') => void; onClose: () => void; }) { return (<div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 p-4"><div className="bg-gray-900 border-2 border-cyan-500 rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full"><button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white font-bold text-lg">×</button><h3 className="font-bold text-lg capitalize">{character.type} <span className="text-yellow-400">#{character.characterId}</span></h3><p className="text-sm text-gray-400 mb-4">Current District: {DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === character.initialDistrict)?.name}</p><p className="text-sm mb-2">Move to:</p><div className="grid grid-cols-2 gap-2">{DISTRICT_DEFINITIONS.map(d => (<button key={d.id} onClick={() => { onMove(d.alias.toLowerCase() as CharacterData['district']); onClose(); }} className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded text-xs disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={d.alias.toLowerCase() === character.initialDistrict}>{d.name}</button>))}</div></div></div>); }
+function TopBar() {
+  return (
+    <header className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-gray-700/50 gap-4">
+      <LeaderProfile name="CHARLIE SINGH" approval={67} />
+      <LeaderProfile name="ARMAN PATEL" approval={67} align="right" />
+    </header>
+  );
+}
+function LeaderProfile({
+  name,
+  approval,
+  align = "left",
+}: {
+  name: string;
+  approval: number;
+  align?: "left" | "right";
+}) {
+  return (
+    <div
+      className={`flex w-full max-w-xs items-center gap-3 ${align === "right" ? "flex-row-reverse" : ""}`}
+    >
+      <div
+        className={`w-12 h-12 flex items-center justify-center bg-gray-800 rounded-full border-2 border-gray-600 shrink-0 ${align === "right" ? "bg-red-900/50 border-red-500" : "bg-blue-900/50 border-blue-500"}`}
+      >
+        <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+            clipRule="evenodd"
+          ></path>
+        </svg>
+      </div>
+      <div className={`w-full flex flex-col ${align === "right" ? "items-end" : "items-start"}`}>
+        <div className="w-full flex justify-between items-center">
+          <p className="text-xs tracking-widest text-gray-400">APPROVAL RATING</p>
+          <span className="text-sm font-bold">{approval}%</span>
+        </div>
+        <h2 className="font-bold tracking-wider mt-1 w-full">{name}</h2>
+        <div className="w-full bg-gray-700/50 h-2 rounded-full border border-gray-600/50 mt-1">
+          <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${approval}%` }}></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+function ActsOfGodPanel() {
+  const actions = [
+    { icon: "▲", text: "Earthquake" },
+    { icon: "♦", text: "Scandal Expose" },
+    { icon: "→", text: "Market Crash" },
+    { icon: "♦", text: "Assassination Attempt" },
+  ];
+  return (
+    <div className="h-full p-4 bg-black/20 rounded-lg flex flex-col">
+      <h3 className="font-bold text-lg mb-4 tracking-wider">Acts Of God</h3>
+      <ul className="space-y-3 flex-grow">
+        {actions.map((action, i) => (
+          <li
+            key={i}
+            className="p-3 bg-gray-800/80 border border-gray-700 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-200"
+          >
+            <span className="mr-3 text-cyan-400">{action.icon}</span>
+            {action.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+function LogsPanel() {
+  const logEntries = [
+    "Day 10",
+    "Charlie Singh held a rally to please his voters.",
+    "Acts of vandalism on Rahul's posters.",
+    "Earthquake caused 1m casualties.",
+  ];
+  return (
+    <div className="h-full p-4 bg-black/20 rounded-lg flex flex-col">
+      <h3 className="font-bold text-lg mb-4 tracking-wider">Logs</h3>
+      <ul className="space-y-3 text-sm text-gray-400 flex-grow">
+        {logEntries.map((entry, i) => (
+          <li key={i} className="leading-relaxed">{`*** ${entry}`}</li>
+        ))}
+      </ul>
+      <div className="mt-4 flex flex-col gap-2">
+        <button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">
+          News
+        </button>
+        <button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">
+          Social Media
+        </button>
+      </div>
+    </div>
+  );
+}
+function NewsTicker() {
+  return (
+    <footer className="w-full bg-black/30 p-2 overflow-hidden border-t border-gray-700/50">
+      <div className="whitespace-nowrap animate-marquee">
+        <span className="mx-8 text-gray-400">
+          Local politician caught arguing with ChatGPT over vote count.
+        </span>
+        <span className="mx-8 text-gray-400">
+          New startup offers subscription-based fresh air; premium tier includes "pine forest"
+          scent.
+        </span>
+        <span className="mx-8 text-gray-400">
+          Minister declares Earth is flat 'in some constituencies'.
+        </span>
+      </div>
+      <style>{`@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } } .animate-marquee { display: inline-block; animation: marquee 30s linear infinite; }`}</style>
+    </footer>
+  );
+}
+function CharacterControlModal({
+  character,
+  onMove,
+  onClose,
+}: {
+  character: CharacterData;
+  onMove: (district: "home" | "office" | "amphitheater" | "others") => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 p-4">
+      <div className="bg-gray-900 border-2 border-cyan-500 rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-400 hover:text-white font-bold text-lg"
+        >
+          ×
+        </button>
+        <h3 className="font-bold text-lg capitalize">
+          {character.type} <span className="text-yellow-400">#{character.characterId}</span>
+        </h3>
+        <p className="text-sm text-gray-400 mb-4">
+          Current District:{" "}
+          {DISTRICT_DEFINITIONS.find((d) => d.alias === character.initialDistrict)?.name}
+        </p>
+        <p className="text-sm mb-2">Move to:</p>
+        <div className="grid grid-cols-2 gap-2">
+          {DISTRICT_DEFINITIONS.map((d) => (
+            <button
+              key={d.id}
+              onClick={() => {
+                onMove(d.alias);
+                onClose();
+              }}
+              className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded text-xs disabled:bg-gray-500 disabled:cursor-not-allowed"
+              disabled={d.alias === character.initialDistrict}
+            >
+              {d.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface MapContainerProps {
     characters: CharacterData[];
@@ -144,53 +297,91 @@ interface MapContainerProps {
     onNavigateToVoterDetails: (type: 'citizen' | 'candidate' | 'reporter', characterId: string) => void;
 }
 
-function MapContainer({characters, selectedCharacterId, onCharacterClick, onTravelComplete, onNavigateToVoterDetails}: MapContainerProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isReady, setIsReady] = useState(false);
-    
-    useEffect(() => { 
-        if (containerRef.current) {
-          const timer = setTimeout(() => setIsReady(true), 100);
-          return () => clearTimeout(timer);
-        }
-    }, []);
-    
-    return (
-        <div className="bg-black/30 p-4 rounded-lg shadow-2xl border-4 border-gray-700/80 w-full flex-grow relative" ref={containerRef}>
-            <h2 className="text-center text-cyan-400 mb-2 tracking-widest absolute top-2 left-1/2 -translate-x-1/2 z-10">SIMPLOLIS POLITICAL MAP</h2>
-            {isReady && characters !== null && characters.length > 0 ? (
-                <Stage className="w-full h-full" options={{ backgroundColor: 0x080808, resizeTo: containerRef.current!, autoDensity: true }}>
-                    <Scene>
-                        <GridOverlay width={LOGICAL_WIDTH} height={LOGICAL_HEIGHT} />
-                        {DISTRICT_DEFINITIONS.map(district => <District key={district.id} {...district} /> )}
-                        {characters
-                            .filter((character: CharacterData) => DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === character.initialDistrict))
-                            .map((character: CharacterData) => {
-                                const district = DISTRICT_DEFINITIONS.find(d => d.alias.toLowerCase() === character.initialDistrict)!;
-                                return ( 
-                                    <Character 
-                                        key={character.characterId} 
-                                        {...character} 
-                                        bounds={district} 
-                                        isSelected={character.characterId === selectedCharacterId} 
-                                        onClick={onCharacterClick} 
-                                        onTravelComplete={onTravelComplete} 
-                                        onNavigateToVoterDetails={onNavigateToVoterDetails}
-                                    />
-                                );
-                            })}
-                    </Scene>
-                </Stage>
-            ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
-                </div>
-            )}
-        </div>
-    );
-}
+function MapContainer({
+  characters,
+  selectedCharacterId,
+  onCharacterClick,
+  onTravelComplete,
+  onNavigateToVoterDetails,
+}: MapContainerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 
-const Scene = ({ children }: { children: React.ReactNode }) => {
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setDimensions({
+          width: rect.width - 8, // Account for border
+          height: rect.height - 40, // Account for header
+        });
+        setIsReady(true);
+      }
+    };
+
+    if (containerRef.current) {
+      updateDimensions();
+      const resizeObserver = new ResizeObserver(updateDimensions);
+      resizeObserver.observe(containerRef.current);
+      return () => resizeObserver.disconnect();
+    }
+  }, []);
+
+  return (
+    <div
+      className="bg-black/30 rounded-lg shadow-2xl border-4 border-gray-700/80 flex-grow w-full h-full"
+      ref={containerRef}
+    >
+      <h2 className="absolute top-2 left-1/2 transform -translate-x-1/2 text-cyan-400 tracking-widest z-10">
+        SIMPLOLIS POLITICAL MAP
+      </h2>
+      {isReady && characters !== null && characters.length > 0 ? (
+        <Stage
+          width={dimensions.width}
+          height={dimensions.height}
+          options={{
+            backgroundColor: 0x080808,
+            autoDensity: true,
+          }}
+        >
+          <Scene containerWidth={dimensions.width} containerHeight={dimensions.height}>
+            <GridOverlay width={LOGICAL_WIDTH} height={LOGICAL_HEIGHT} />
+            {DISTRICT_DEFINITIONS.map((district) => (
+              <District key={district.id} {...district} />
+            ))}
+            {characters
+              .filter((character: CharacterData) =>
+                DISTRICT_DEFINITIONS.find((d) => d.alias === character.initialDistrict)
+              )
+              .map((character: CharacterData) => {
+                const district = DISTRICT_DEFINITIONS.find(
+                  (d) => d.alias === character.initialDistrict
+                )!;
+                return (
+                  <Character
+                    key={character.characterId}
+                    {...character}
+                    bounds={district}
+                    isSelected={character.characterId === selectedCharacterId}
+                    onClick={onCharacterClick}
+                    onTravelComplete={onTravelComplete}
+                    onNavigateToVoterDetails={onNavigateToVoterDetails}
+                  />
+                );
+              })}
+          </Scene>
+        </Stage>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+        </div>
+      )}
+    </div>
+  );
+} 
+
+const Scene = ({ children, containerWidth, containerHeight }: { children: React.ReactNode; containerWidth: number; containerHeight: number; }) => {
   const app = useApp();
   const [isReady, setIsReady] = useState(false);
 
@@ -199,7 +390,7 @@ const Scene = ({ children }: { children: React.ReactNode }) => {
       if (app && app.screen && app.screen.width > 0) {
         setIsReady(true);
       }
-    }, 500);
+    }, 100);
     return () => clearTimeout(timer);
   }, [app]);
 
@@ -207,9 +398,16 @@ const Scene = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
-  const scale = Math.min(app.screen.width / LOGICAL_WIDTH, app.screen.height / LOGICAL_HEIGHT) || 1;
-  const x = (app.screen.width - LOGICAL_WIDTH * scale) / 2;
-  const y = (app.screen.height - LOGICAL_HEIGHT * scale) / 2;
+  // Scale to fit the entire content within the container
+  const scaleX = containerWidth / LOGICAL_WIDTH;
+  const scaleY = containerHeight / LOGICAL_HEIGHT;
+  const scale = Math.min(scaleX, scaleY); // Use min to ensure everything fits
+
+  // Center the content within the container
+  const scaledWidth = LOGICAL_WIDTH * scale;
+  const scaledHeight = LOGICAL_HEIGHT * scale;
+  const x = (containerWidth - scaledWidth) / 2;
+  const y = (containerHeight - scaledHeight) / 2;
 
   return (
     <Container x={x} y={y} scale={scale}>
