@@ -182,55 +182,6 @@ const VoterDetails = () => {
         </div>
 
         {/* Content */}
-<<<<<<< HEAD
-        <div className="max-w-[1728px] mx-auto px-4 py-6">
-          <div className="flex">
-            {/* Left column - Voter Profile */}
-            <div className="w-1/4 rounded-sm mr-6">
-              <div className="border border-white/10 rounded-sm">
-                {/* Civilian status and name */}
-                <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
-                  <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CIVILIAN</div>
-                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">
-                    {isLoading ? 'LOADING...' : error ? 'VOTER DATA' : personaData?.persona.name || 'JACK FLANNAGAN'}
-                  </div>
-                </div>
-
-                {/* Voter image and details */}
-                <div className="flex">
-                  <div className="w-40 h-49 overflow-hidden">
-                    {/* Using a placeholder since we don't have the actual image */}
-                    <div className="w-full h-full flex items-center justify-center">
-                      <img
-                        src="/images/civilian_profile.png"
-                        alt={personaData?.persona.name || "Voter"}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    {/* Age */}
-                    <div className="border-b border-white/10 py-5 ml-4">
-                      <div className="text-white/60 text-xs uppercase roboto-mono">AGE</div>
-                      <div className="text-white text-xl roboto-mono">32</div>
-                    </div>
-
-                    {/* Occupation */}
-                    <div className="border-b border-white/10 py-5 ml-4">
-                      <div className="text-white/60 text-xs uppercase roboto-mono">OCCUPATION</div>
-                      <div className="text-white text-xl roboto-mono">
-                        {isLoading ? 'LOADING...' : error ? 'UNKNOWN' : personaData?.persona.role.toUpperCase() || 'OCCUPATION'}
-                      </div>
-                    </div>
-
-                    {/* Type */}
-                    <div className="py-4 ml-4">
-                      <div className="text-white/60 text-xs uppercase roboto-mono">TYPE</div>
-                      <div className="text-white text-xl roboto-mono">
-                        {isLoading ? 'LOADING...' : error ? 'UNKNOWN' : personaData?.persona.personaType.toUpperCase() || 'INFLUENCER'}
-                      </div>
-                    </div>
-=======
         <div className="flex-1 overflow-hidden">
           <div className="h-full max-w-[1728px] mx-auto px-4 py-6">
             <div className="flex h-full gap-6">
@@ -295,66 +246,22 @@ const VoterDetails = () => {
                   <h3 className="text-white text-xl pb-4 roboto-mono">Political Leaning</h3>
                   <div className="border border-white/30 p-4">
                     <VoterPoliticalLeaningGraph />
->>>>>>> f2d54e2 (feat: map and stuff logs added)
                   </div>
                 </div>
               </div>
 
-<<<<<<< HEAD
-              {/* Description */}
-              <div className="mt-6">
-                {/* <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
-                <p className="text-white/80 text-sm leading-relaxed roboto-mono">
-                  {isLoading ? 'Loading voter description...' : 
-                   error ? 'Failed to load voter description.' : 
-                   personaData?.persona.intro || 
-                   'Jack Flanagan is a quirky, soft-spoken oddball with a knack for fixing broken gadgets using tape and blind optimism. He wears cargo shorts year-round, talks to his plants like coworkers, and once tried to start a detective agency with a stray cat.'}
-                </p> */}
-                
-                {/* Long Term Goal */}
-                {!isLoading && !error && personaData?.persona.longTermGoal && (
-                  <div className="mt-4">
-                    <h4 className="text-white text-lg mb-2 roboto-mono">Goal</h4>
-                    <p className="text-white/80 text-sm leading-relaxed roboto-mono">
-                      {personaData.persona.longTermGoal}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Political Leaning */}
-              <div className="mt-6">
-                <h3 className="text-white text-xl pb-4 roboto-mono">Political Leaning</h3>
-                <div className="border border-white/30 p-4">
-                  <VoterPoliticalLeaningGraph />
-=======
               {/* Center column - Laptop mockup with surveillance screen */}
               <div className="flex-1 flex justify-center items-center relative">
                 <div className="absolute w-full h-full">
                   {/* Surveillance screen content */}
                   <SurveillanceScreen simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
->>>>>>> f2d54e2 (feat: map and stuff logs added)
                 </div>
               </div>
 
-<<<<<<< HEAD
-            {/* Center column - Laptop mockup with surveillance screen */}
-            <div className="w-full flex justify-center items-center relative">
-              <div className="absolute w-[100%] pr-5 top-0">
-                {/* Surveillance screen content */}
-                <SurveillanceScreen simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
-              </div>
-            </div>
-
-            {/* Right column - Logs */}
-            <div className="w-[45%]">
-              <Logs />
-=======
               {/* Right column - Logs */}
               <div className="w-[25%] h-full">
                 <Logs />
               </div>
->>>>>>> f2d54e2 (feat: map and stuff logs added)
             </div>
           </div>
         </div>
