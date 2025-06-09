@@ -76,7 +76,6 @@ const CreateSimulation = () => {
         title="Create Your World" 
         actions={
           <Button 
-            variant="gray"
             onClick={handleContinue} 
             disabled={!simulationName.trim() || !description.trim()}
             isLoading={isLoading}

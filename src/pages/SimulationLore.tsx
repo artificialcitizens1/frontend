@@ -256,12 +256,12 @@ const SimulationLore = () => {
     if (candidates && candidates.length >= 2) {
       return [
         { name: candidates[0].name || 'RAHUL SINGH', party: 'BLUE PARTY' },
-        { name: candidates[1].name || 'ARMAN PATEL', party: 'RED PARTY' }
+        { name: candidates[1].name || 'ARMAN PATEL', party: 'ORANGE PARTY' }
       ];
     }
     return [
       { name: 'RAHUL SINGH', party: 'BLUE PARTY' },
-      { name: 'ARMAN PATEL', party: 'RED PARTY' }
+      { name: 'ARMAN PATEL', party: 'ORANGE PARTY' }
     ];
   };
 
@@ -274,7 +274,7 @@ const SimulationLore = () => {
       disabled={!isAnimationComplete}
       variant="primary"
     >
-      {isAnimationComplete ? 'Launch Simulation' : 'Continue'}
+      Launch Simulation
     </Button>
   );
 
@@ -317,8 +317,8 @@ const SimulationLore = () => {
 
       {/* Main Content Container - No overflow, fixed height */}
       <div 
-        className="w-full px-4 flex flex-col items-center justify-center overflow-hidden"
-        style={{ height: 'calc(100vh - 100px)' }}
+        className="w-full px-4 flex flex-col items-center justify-center overflow-hidden mt-12"
+        style={{ height: 'calc(100vh - 140px)' }}
       >
         {isLoading ? (
           <div className="flex flex-col items-center py-8">
@@ -358,7 +358,7 @@ const SimulationLore = () => {
             {titleAnimationComplete && (
               <div className="w-full h-full flex flex-col items-center justify-center space-y-6 overflow-hidden">
                 {/* Candidate Headers - Fade in animation */}
-                <div className={`flex justify-between w-full max-w-[1200px] transition-all duration-1000 ease-in-out ${candidatesVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
+                <div className={`flex justify-between w-full max-w-[1728px] transition-all duration-1000 ease-in-out ${candidatesVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
                   <div className="flex items-center bg-[#0F1322] py-2 px-4 rounded-sm w-[45%]">
                     <img src="/images/candidate_default.png" alt="Candidate" className="w-12 h-12 mr-3" />
                     <div className="text-left">
@@ -385,7 +385,7 @@ const SimulationLore = () => {
                 </div>
 
                 {/* Content Box - Appears with animation after candidates */}
-                <div className={`w-full max-w-[1200px] flex-grow flex flex-col bg-[#0F1322]/80 border border-white/10 rounded-sm p-8 transition-all duration-1000 ease-in-out overflow-hidden ${contentBoxVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-12'}`}>
+                <div className={`w-full max-w-[1728px] flex-grow flex flex-col bg-[#0F1322]/80 border border-white/10 rounded-sm p-8 transition-all duration-1000 ease-in-out overflow-hidden ${contentBoxVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-12'}`}>
                   {/* First line is a heading */}
                   {loreContent.length > 0 && contentBoxVisible && (
                     <h2 
