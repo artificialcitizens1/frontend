@@ -115,7 +115,7 @@ const SimulationLore = () => {
             
             // Prepare audio for typing after content box appears
             if (!typingAudioRef.current) {
-              typingAudioRef.current = new window.Audio('/sounds/keyboard_sound.mp3');
+              typingAudioRef.current = new window.Audio('/sounds/typing_beep.mp3');
               typingAudioRef.current.loop = true;
               typingAudioRef.current.volume = 0.5;
               // Preload audio
@@ -136,7 +136,7 @@ const SimulationLore = () => {
   useEffect(() => {
     // Start audio when content box is visible and lore content is being typed
     if (contentBoxVisible && currentLineIndex < loreContent.length && !isAnimationComplete) {
-      if (typingAudioRef.current) {
+      if (typingAudioRef.current && isTypingLore) {
         // Make sure we restart from the beginning
         typingAudioRef.current.currentTime = 0;
         
@@ -155,17 +155,20 @@ const SimulationLore = () => {
             document.addEventListener('keydown', resumeAudio, { once: true });
           });
         }
+      } else if (typingAudioRef.current && !isTypingLore) {
+        // Pause audio when typing is paused
+        typingAudioRef.current.pause();
       }
     }
     
     // Stop audio when typing is complete or component unmounts
     return () => {
-      if (isAnimationComplete && typingAudioRef.current) {
+      if ((isAnimationComplete || !isTypingLore) && typingAudioRef.current) {
         typingAudioRef.current.pause();
         typingAudioRef.current.currentTime = 0;
       }
     };
-  }, [contentBoxVisible, currentLineIndex, loreContent.length, isAnimationComplete]);
+  }, [contentBoxVisible, currentLineIndex, loreContent.length, isAnimationComplete, isTypingLore]);
 
   // Handle word-by-word animation with adaptive speed and auto-scrolling
   useEffect(() => {
@@ -192,12 +195,15 @@ const SimulationLore = () => {
           if (wordInterval) clearInterval(wordInterval);
           // Pause after paragraph
           const pauseDuration = Math.min(2000, Math.max(1000, words.length * 50));
+          
+          // Pause typing sound during the paragraph pause
+          setIsTypingLore(false);
+          
           paragraphTimer = setTimeout(() => {
             const nextIndex = currentLineIndex + 1;
             if (nextIndex >= loreContent.length) {
               setIsAnimationComplete(true);
               setIsFinalTyping(true);
-              setIsTypingLore(false);
               
               // Stop the typing sound when all lore content is typed
               if (typingAudioRef.current) {
@@ -215,6 +221,8 @@ const SimulationLore = () => {
               }, 500);
             } else {
               setCurrentLineIndex(nextIndex);
+              // Resume typing sound for the next paragraph
+              setIsTypingLore(true);
             }
           }, pauseDuration);
         }
@@ -233,12 +241,17 @@ const SimulationLore = () => {
     if (isFinalTyping) {
       setFinalTextTyped('');
       let charIndex = 0;
+      
+      // Start typing sound for final text
+      setIsTypingLore(true);
+      
       const typeInterval = setInterval(() => {
         setFinalTextTyped(finalText.slice(0, charIndex + 1));
         charIndex++;
         if (charIndex >= finalText.length) {
           clearInterval(typeInterval);
           setIsFinalTyping(false);
+          setIsTypingLore(false);
         }
       }, 60);
       return () => clearInterval(typeInterval);
