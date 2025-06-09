@@ -151,11 +151,11 @@ const VoterDetails = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-black">
+    <div className="h-screen w-full bg-black flex flex-col overflow-hidden">
       {/* Main Content Container */}
-      <div className="relative">
+      <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="sticky top-0 z-50 bg-black py-2 px-8">
+        <div className="flex-shrink-0 bg-black py-2 px-8 border-b border-white/10">
           <div className="max-w-full mx-auto flex items-center gap-6">
             <button
               className="text-white hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center"
@@ -182,6 +182,7 @@ const VoterDetails = () => {
         </div>
 
         {/* Content */}
+<<<<<<< HEAD
         <div className="max-w-[1728px] mx-auto px-4 py-6">
           <div className="flex">
             {/* Left column - Voter Profile */}
@@ -229,10 +230,77 @@ const VoterDetails = () => {
                         {isLoading ? 'LOADING...' : error ? 'UNKNOWN' : personaData?.persona.personaType.toUpperCase() || 'INFLUENCER'}
                       </div>
                     </div>
+=======
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full max-w-[1728px] mx-auto px-4 py-6">
+            <div className="flex h-full gap-6">
+              {/* Left column - Voter Profile */}
+              <div className="w-1/4 overflow-y-auto">
+                <div className="border border-white/10 rounded-sm">
+                  {/* Civilian status and name */}
+                  <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
+                    <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CIVILIAN</div>
+                    <div className="text-white text-2xl font-['ManifoldExtendedCF']">
+                      JACK FLANNAGAN
+                    </div>
+                  </div>
+
+                  {/* Voter image and details */}
+                  <div className="flex">
+                    <div className="w-40 h-49 overflow-hidden">
+                      {/* Using a placeholder since we don't have the actual image */}
+                      <div className="w-full h-full flex items-center justify-center">
+                        <img
+                          src="/images/civilian_profile.png"
+                          alt="Jack Flannagan"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      {/* Age */}
+                      <div className="border-b border-white/10 py-5 ml-4">
+                        <div className="text-white/60 text-xs uppercase roboto-mono">AGE</div>
+                        <div className="text-white text-xl roboto-mono">32</div>
+                      </div>
+
+                      {/* Occupation */}
+                      <div className="border-b border-white/10 py-5 ml-4">
+                        <div className="text-white/60 text-xs uppercase roboto-mono">OCCUPATION</div>
+                        <div className="text-white text-xl roboto-mono">OCCUPATION</div>
+                      </div>
+
+                      {/* Type */}
+                      <div className="py-4 ml-4">
+                        <div className="text-white/60 text-xs uppercase roboto-mono">TYPE</div>
+                        <div className="text-white text-xl roboto-mono">INFLUENCER</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="mt-6">
+                  <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
+                  <p className="text-white/80 text-sm leading-relaxed roboto-mono">
+                    Jack Flanagan is a quirky, soft-spoken oddball with a knack for fixing broken
+                    gadgets using tape and blind optimism. He wears cargo shorts year-round, talks to
+                    his plants like coworkers, and once tried to start a detective agency with a stray
+                    cat.
+                  </p>
+                </div>
+
+                {/* Political Leaning */}
+                <div className="mt-6">
+                  <h3 className="text-white text-xl pb-4 roboto-mono">Political Leaning</h3>
+                  <div className="border border-white/30 p-4">
+                    <VoterPoliticalLeaningGraph />
+>>>>>>> f2d54e2 (feat: map and stuff logs added)
                   </div>
                 </div>
               </div>
 
+<<<<<<< HEAD
               {/* Description */}
               <div className="mt-6">
                 {/* <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
@@ -259,10 +327,17 @@ const VoterDetails = () => {
                 <h3 className="text-white text-xl pb-4 roboto-mono">Political Leaning</h3>
                 <div className="border border-white/30 p-4">
                   <VoterPoliticalLeaningGraph />
+=======
+              {/* Center column - Laptop mockup with surveillance screen */}
+              <div className="flex-1 flex justify-center items-center relative">
+                <div className="absolute w-full h-full">
+                  {/* Surveillance screen content */}
+                  <SurveillanceScreen simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
+>>>>>>> f2d54e2 (feat: map and stuff logs added)
                 </div>
               </div>
-            </div>
 
+<<<<<<< HEAD
             {/* Center column - Laptop mockup with surveillance screen */}
             <div className="w-full flex justify-center items-center relative">
               <div className="absolute w-[100%] pr-5 top-0">
@@ -274,9 +349,13 @@ const VoterDetails = () => {
             {/* Right column - Logs */}
             <div className="w-[45%]">
               <Logs />
+=======
+              {/* Right column - Logs */}
+              <div className="w-[25%] h-full">
+                <Logs />
+              </div>
+>>>>>>> f2d54e2 (feat: map and stuff logs added)
             </div>
-
-
           </div>
         </div>
       </div>

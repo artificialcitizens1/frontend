@@ -5,6 +5,7 @@ import { Stage, Graphics, Text, Container, useApp } from "@pixi/react";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTickStore } from "../store/tickStore";
+import { useSimulationStore } from "../store/simulationStore";
 import SimulationControls from "../components/simulation/SimulationControls";
 import Logs from "../components/Logs";
 
@@ -47,6 +48,7 @@ export const DISTRICT_DEFINITIONS: DistrictData[] = [
 export default function GodMode() {
   const navigate = useNavigate();
   const { charactersData, updateCharactersData } = useTickStore();
+  const { addLog } = useSimulationStore();
   console.log("charactersData in god mode: ", Array.from(charactersData?.values() || []));
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
@@ -96,13 +98,54 @@ export default function GodMode() {
 
   const handleLetsGo = () => {
     console.log("Prompt submitted:", prompt);
+    // Add the prompt as a log for testing
+    if (prompt.trim()) {
+      const timestamp = new Date().toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      addLog(`${timestamp} >>>Divine Command: ${prompt}`);
+      setPrompt(""); // Clear the prompt after submission
+      
+      // Simulate additional system response for testing
+      setTimeout(() => {
+        addLog(`${timestamp} >>>System: Processing divine intervention...`);
+      }, 1000);
+      
+      setTimeout(() => {
+        addLog(`${timestamp} >>>World Event: Divine command executed successfully`);
+      }, 2000);
+    }
     // Here you can add the logic to handle the prompt submission
+  };
+
+  // Test function to add multiple logs quickly (for demonstration)
+  const addTestLogs = () => {
+    const testMessages = [
+      "Charlie Singh announced new economic policies",
+      "Arman Patel held a press conference", 
+      "Citizens are responding positively to recent changes",
+      "Market fluctuations detected in the simulation",
+      "Breaking: Major announcement expected tomorrow"
+    ];
+    
+    testMessages.forEach((message, index) => {
+      setTimeout(() => {
+        const timestamp = new Date().toLocaleTimeString('en-US', { 
+          hour12: false, 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        addLog(`${timestamp} >>>${message}`);
+      }, index * 800);
+    });
   };
 
   const selectedCharacter = characters.find((c) => c.characterId === selectedCharacterId);
 
   return (
-    <div className="h-screen w-full bg-black text-white overflow-hidden">
+    <div className="h-screen w-full bg-black text-white overflow-hidden flex flex-col">
       {/* Header */}
       <div className="bg-black py-4 px-8 border-b border-white/10 flex-shrink-0">
         <div className="max-w-full mx-auto flex items-center justify-between">
@@ -122,9 +165,9 @@ export default function GodMode() {
         </div>
       </div>
 
-      <main className="flex-grow grid grid-cols-6 gap-6 p-6 overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
+      <main className="flex-1 grid grid-cols-12 gap-6 p-6 overflow-hidden min-h-0">
         {/* Acts of God Panel */}
-        <div className="col-span-1 flex flex-col gap-4 overflow-hidden">
+        <div className="col-span-2 flex flex-col gap-4 overflow-hidden min-h-0">
           <ActsOfGodPanel />
           
           {/* Divine Intervention Section */}
@@ -143,21 +186,31 @@ export default function GodMode() {
                 className="w-full h-24 bg-black border border-white/30 rounded-lg p-3 text-white placeholder-white/50 resize-none focus:outline-none focus:border-white/60 text-sm"
                 style={{ fontFamily: "Roboto Mono" }}
               />
-              <button
-                onClick={handleLetsGo}
-                className="w-full px-4 py-2 bg-white text-black hover:bg-white/90 transition-colors rounded-lg text-sm"
-                style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
-              >
-                Let's Go!
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleLetsGo}
+                  className="flex-1 px-4 py-2 bg-white text-black hover:bg-white/90 transition-colors rounded-lg text-sm"
+                  style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
+                >
+                  Let's Go!
+                </button>
+                <button
+                  onClick={addTestLogs}
+                  className="px-3 py-2 bg-white/10 text-white hover:bg-white/20 border border-white/30 transition-colors rounded-lg text-xs"
+                  style={{ fontFamily: "Roboto Mono" }}
+                  title="Add test logs"
+                >
+                  Test
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Main Content Area */}
-        <div className="col-span-4 flex flex-col gap-4 overflow-hidden">
+        <div className="col-span-7 flex flex-col gap-4 overflow-hidden min-h-0">
           {/* Map Container */}
-          <div className="flex-grow overflow-hidden">
+          <div className="flex-grow overflow-hidden min-h-0">
             <MapContainer
               characters={characters}
               selectedCharacterId={selectedCharacterId}
@@ -181,9 +234,9 @@ export default function GodMode() {
           )}
         </div>
 
-        {/* Logs Panel */}
-        <div className="col-span-1 overflow-hidden">
-          <div className="h-full border border-white/20 rounded-lg overflow-hidden">
+        {/* Logs Panel - Constrained height */}
+        <div className="col-span-3 overflow-hidden min-h-0">
+          <div className="h-full min-h-0">
             <Logs />
           </div>
         </div>
