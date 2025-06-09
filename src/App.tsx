@@ -32,16 +32,18 @@ const App: React.FC = () => {
         <Route path="/create-simulation" element={<CreateSimulation />} />
         <Route path="/candidate-settings" element={<CandidateSettings />} />
         <Route path="/simulation-settings" element={<SimulationSettingsPage />} />
-        <Route path="/simulation-result" element={<SimulationResult />} />
-        <Route path="/voter-details" element={<VoterDetails />} />
-        <Route path="/candidate-details" element={<CandidateDetails />} />
+        {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
+        {/* <Route path="/voter-details" element={<VoterDetails />} /> */}
+        {/* <Route path="/candidate-details" element={<CandidateDetails />} /> */}
         <Route path="/god-mode" element={<GodMode />} />
         <Route path="/simulation-creation" element={<SimulationCreation />} />
         <Route path="/simulation-lore/:simId" element={<SimulationLore />} />
         <Route path="/simulation/:simId" element={<SimulationResult />} />
+        <Route path="/simulation/:simId/voter-details" element={<VoterDetails />} />
+        <Route path="/simulation/:simId/candidate-details" element={<CandidateDetails />} />
         {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
         {/* <Route path="/god-mode" element={<GodMode />} /> */}
-        <Route path="/voter-details" element={<VoterDetails />} />
+        {/* <Route path="/voter-details" element={<VoterDetails />} /> */}
       </Routes>
     </Router>
   );

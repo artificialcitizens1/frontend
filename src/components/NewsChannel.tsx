@@ -14,6 +14,9 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // ==========================================
 interface NewsChannelProps {
   onClose?: () => void;
+  simId: string;
+  currentTick: number;
+  totalTicks: number;
 }
 
 interface NewsArticleProps {
@@ -56,7 +59,7 @@ const NewsArticle = ({ title, summary, image, readTime }: NewsArticleProps) => (
 // ==========================================
 // MAIN NEWS CHANNEL COMPONENT
 // ==========================================
-const NewsChannel: React.FC<NewsChannelProps> = ({ onClose }) => {
+const NewsChannel: React.FC<NewsChannelProps> = ({ onClose, simId, currentTick, totalTicks }) => {
   // ==========================================
   // STATE MANAGEMENT
   // ==========================================

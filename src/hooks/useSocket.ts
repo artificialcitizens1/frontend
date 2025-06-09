@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 export const useSocket = () => {
   const [isConnected, setIsConnected] = useState(socket.connected);
 
-  const {currentTick, totalTicks, setCurrentTick, setTotalTicks} = useTickStore();
+  const {currentTick, totalTicks, setTotalTicks} = useTickStore();
 
   const onConnect = useCallback(() => {
     setIsConnected(true);
@@ -18,10 +18,14 @@ export const useSocket = () => {
   }, []);
 
   const onCurrentTick = useCallback((data: any) => {
-    // console.log('currentTick event received:', data);
-    // if(totalTicks !== data.currentTick && data.currentTick > totalTicks){
+    console.log('currentTick event received:', data.data.currentTick);
+    // if((totalTicks !== data.currentTick || (totalTicks === 1 && currentTick === 1)) && data.currentTick > totalTicks){
     //   setTotalTicks(data.totalTicks);
     // }
+    if(data.data.currentTick > totalTicks){
+      console.log('inside the socket if', data.data.currentTick, totalTicks);
+      setTotalTicks(data.data.currentTick);
+    }
   }, []);
 
   useEffect(() => {

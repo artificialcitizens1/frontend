@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Graphics } from "@pixi/react";
+import { Graphics, Text, Container } from "@pixi/react";
 import { CANDIDATE_RADIUS, CENTRAL_ROAD_X, CITIZEN_RADIUS, CITIZEN_SPEED, TRAVEL_SPEED, DISTRICT_DEFINITIONS } from "../../pages/GodMode";
 import { useTick } from "@pixi/react";
 import * as PIXI from 'pixi.js';
@@ -33,6 +33,8 @@ interface CharacterProps {
   isSelected: boolean;
   onClick: (id: string) => void;
   onTravelComplete: (id: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => void;
+  onNavigateToVoterDetails: (type: 'citizen' | 'candidate' | 'reporter') => void;
+  name: string;
 }
 
 const getTravelPath = (initialDistrict: string, targetDistrict: string): Point[] => {
@@ -62,7 +64,9 @@ function Character({
   onTravelComplete, 
   type, 
   initialDistrict,
-  targetDistrict }: CharacterProps) {
+  targetDistrict,
+  onNavigateToVoterDetails,
+  name }: CharacterProps) {
 
   const radius = type === 'candidate' ? CANDIDATE_RADIUS : CITIZEN_RADIUS;
   const [position, setPosition] = useState<Point>(() => ({ 
@@ -143,16 +147,58 @@ function Character({
       g.endFill();
   }, [color, isHovered, isSelected, radius]);
 
+  const drawTooltipBackground = useCallback((g: PIXI.Graphics) => {
+      g.clear();
+      g.beginFill(0x111827, 0.95); // Dark background with slight transparency
+      g.lineStyle(1, 0x06B6D4, 1); // Cyan border to match theme
+      g.drawRoundedRect(-35, -25, 70, 20, 4);
+      g.endFill();
+  }, []);
+
+  const tooltipTextStyle = new PIXI.TextStyle({
+      fontFamily: 'monospace',
+      fontSize: 8,
+      fill: '#FFFFFF',
+      align: 'center',
+  });
+
+  const tooltipTypeStyle = new PIXI.TextStyle({
+      fontFamily: 'monospace', 
+      fontSize: 6,
+      fill: '#06B6D4',
+      align: 'center',
+  });
+
   return (
-      <Graphics 
-          x={position.x} 
-          y={position.y} 
-          eventMode={'static'} 
-          draw={draw} 
-          pointerover={() => setIsHovered(true)} 
-          pointerout={() => setIsHovered(false)} 
-          pointerdown={() => onClick(characterId)}
-      />
+      <Container x={position.x} y={position.y}>
+          <Graphics 
+              eventMode={'static'} 
+              draw={draw} 
+              pointerover={() => setIsHovered(true)} 
+              pointerout={() => setIsHovered(false)} 
+              // pointerdown={() => onClick(characterId)}
+              pointerdown={() => onNavigateToVoterDetails(type)}
+          />
+          {isHovered && (
+              <Container y={-radius - 15}>
+                  <Graphics draw={drawTooltipBackground} />
+                  <Text 
+                      text={name.toUpperCase()} 
+                      anchor={0.5} 
+                      x={0} 
+                      y={-20} 
+                      style={tooltipTextStyle} 
+                  />
+                  <Text 
+                      text={type.toUpperCase()} 
+                      anchor={0.5} 
+                      x={0} 
+                      y={-10} 
+                      style={tooltipTypeStyle} 
+                  />
+              </Container>
+          )}
+      </Container>
   );
 }
 

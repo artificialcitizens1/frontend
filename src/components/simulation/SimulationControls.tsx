@@ -1,17 +1,15 @@
 import { useParams } from "react-router-dom";
 import { getSimulationStatus } from "../../api/simulationService";
 import { useTickStore } from "../../store/tickStore";
-import { useState } from "react";
 
 function SimulationControls() {
 
   const { simId } = useParams<{ simId: string }>();
-  const [localTick, setLocalTick] = useState(2);
-  // const days = ['DAY 1', 'DAY 2', 'DAY 3', 'DAY 4'];
-  const { currentTick, totalTicks, setCharactersData, setSubTick, setTickData, tickData, updateSystemTick } = useTickStore();
+  
+  const { currentTick, setCurrentTick, totalTicks, setCharactersData, setSubTick, tickData, updateSystemTick } = useTickStore();
 
   const subTickTime = tickData?.map((subTickData) => subTickData.time) || ['Day 1'];
-  console.log('tickData : ', tickData);
+  // console.log('tickData : ', tickData);
   console.log('subTickTime : ', subTickTime);
 
   const handleSubTickChange = (index : number) => {
@@ -20,8 +18,10 @@ function SimulationControls() {
   }
 
   const handleNextSim = () => {
-    console.log('sim tick ', localTick);
-    fetchSimulationData(localTick);
+    console.log('current tick in sim controls : ', currentTick)
+    setCurrentTick(currentTick + 1);
+    console.log('sim tick ', currentTick);
+    fetchSimulationData(currentTick);
   }
 
   const fetchSimulationData = async (tickNumber : number) => {
@@ -30,12 +30,7 @@ function SimulationControls() {
     if(response.length > 0){
       updateSystemTick(tickNumber, response);
       setCharactersData(response[0].characters);
-      setLocalTick(localTick + 1);
     }
-  }
-
-  const isDisabled = () => {
-    return currentTick < totalTicks;
   }
 
   const handleExpandMap = () => {
@@ -66,9 +61,9 @@ function SimulationControls() {
           Tick 3
         </button>
         <button 
-          className="px-4 py-1 border-2 border-gray-600 rounded-md hover:bg-gray-700"
+          className="px-4 py-1 border-2 border-gray-600 rounded-md hover:bg-gray-700 disabled:cursor-not-allowed"
           onClick={handleNextSim}
-          // disabled={isDisabled()}
+          disabled={!(currentTick < totalTicks)}
         >
           Next Tick
         </button>

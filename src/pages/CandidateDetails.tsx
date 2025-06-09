@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SocialMediaFeed from "../components/SocialMediaFeed";
 import NewsChannel from "../components/NewsChannel";
 import DesktopInterface from "../components/candidate_components/DesktopInterface";
 import { useSimulationStore } from "../store";
 import Logs from "../components/Logs";
+import { useTickStore } from "../store/tickStore";
 
 // Surveillance Screen Component
-const SurveillanceScreen = () => {
+const SurveillanceScreen = ({simId, currentTick, totalTicks}: {simId: string, currentTick: number, totalTicks: number}) => {
   const [currentView, setCurrentView] = useState<"desktop" | "social" | "news">("desktop");
 
   const handleSocialMediaClick = () => {
@@ -28,7 +29,7 @@ const SurveillanceScreen = () => {
       <div className="relative w-full max-w-4xl">
         {/* Replace 'laptop-mockup.png' with your actual laptop PNG file */}
         <img
-          src="images/monitor_mockup.png"
+          src="/images/monitor_mockup.png"
           alt="Laptop"
           className="w-full h-auto object-contain"
         />
@@ -48,9 +49,9 @@ const SurveillanceScreen = () => {
               onNewsClick={handleNewsClick}
             />
           ) : currentView === "social" ? (
-            <SocialMediaFeed onClose={handleBackToDesktop} />
+            <SocialMediaFeed onClose={handleBackToDesktop} simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
           ) : (
-            <NewsChannel onClose={handleBackToDesktop} />
+            <NewsChannel onClose={handleBackToDesktop} simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
           )}
         </div>
       </div>
@@ -60,7 +61,9 @@ const SurveillanceScreen = () => {
 
 const CandidateDetails = () => {
   const navigate = useNavigate();
+  const {simId} = useParams();
   const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
+  const { currentTick, totalTicks } = useTickStore();
   
   // Set up demo simulation data if not already set
   useEffect(() => {
@@ -128,7 +131,7 @@ const CandidateDetails = () => {
                     {/* Using a placeholder since we don't have the actual image */}
                     <div className="w-full h-full flex items-center justify-center">
                       <img
-                        src="images/candidate_photo.png"
+                        src="/images/candidate_photo.png"
                         alt="Rahul Singh"
                         className="w-full h-full object-cover"
                       />
@@ -222,7 +225,7 @@ const CandidateDetails = () => {
             <div className="w-full flex justify-center items-start relative h-[100vh] pt-2">
               <div className="w-full h-full flex items-center justify-center">
                 {/* Surveillance screen content */}
-                <SurveillanceScreen />
+                <SurveillanceScreen simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
               </div>
             </div>
 

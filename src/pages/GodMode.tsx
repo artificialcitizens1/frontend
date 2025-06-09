@@ -3,6 +3,7 @@ import Character from '../components/simulation/Character';
 import GridOverlay from '../components/simulation/GridOverlay';
 import { Stage, Graphics, Text, Container, useApp } from '@pixi/react';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTickStore } from '../store/tickStore';
 import SimulationControls from '../components/simulation/SimulationControls';
 
@@ -62,12 +63,14 @@ export const DISTRICT_DEFINITIONS: DistrictData[] = [
 
 // --- Main App Component ---
 export default function GodMode() {
-
-  const { charactersData } = useTickStore();
+  const navigate = useNavigate();
+  const { charactersData, updateCharactersData } = useTickStore();
   console.log('charactersData in god mode: ', Array.from(charactersData?.values() || []) );
-  const [characters, setCharacters] = useState(Array.from(charactersData?.values() || []));
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
   // MODIFICATION: travelPlans state is removed
+  
+  // Convert store data to array for rendering
+  const characters = Array.from(charactersData?.values() || []);
 
   const handleCharacterClick = (characterId: string) => {
       const char = characters.find(c => c.characterId === characterId);
@@ -77,21 +80,32 @@ export default function GodMode() {
   
   // MODIFICATION: Logic simplified to only update the target district
   const handleMoveCharacter = (targetDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => {
-    if (selectedCharacterId === null) return;
-    setCharacters(prevChars => 
-        prevChars.map(c => 
-            c.characterId === selectedCharacterId ? { ...c, targetDistrict: targetDistrict } : c
-        )
+    if (selectedCharacterId === null || !charactersData) return;
+    
+    const updatedCharacters = Array.from(charactersData.values()).map(c => 
+        c.characterId === selectedCharacterId ? { ...c, targetDistrict: targetDistrict } : c
     );
+    updateCharactersData(updatedCharacters);
     setSelectedCharacterId(null);
   };
   
   // MODIFICATION: Logic simplified to set the current district to the target
   const handleTravelComplete = (characterId: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => {
-      setCharacters(prev => prev.map(c => 
+      if (!charactersData) return;
+      
+      const updatedCharacters = Array.from(charactersData.values()).map(c => 
           c.characterId === characterId ? { ...c, initialDistrict: finalDistrict } : c
-      ));
+      );
+      updateCharactersData(updatedCharacters);
   }
+
+  const handleNavigateToVoterDetails = (type: 'citizen' | 'candidate' | 'reporter') => {
+    if(type === 'candidate') {
+      navigate('candidate-details')
+    } else {
+      navigate('voter-details');
+    }
+  };
 
   const selectedCharacter = characters.find(c => c.characterId === selectedCharacterId);
 
@@ -106,6 +120,7 @@ export default function GodMode() {
             selectedCharacterId={selectedCharacterId}
             onCharacterClick={handleCharacterClick}
             onTravelComplete={handleTravelComplete}
+            onNavigateToVoterDetails={handleNavigateToVoterDetails}
           />
           <SimulationControls />
           {selectedCharacter && (
@@ -132,9 +147,10 @@ interface MapContainerProps {
     selectedCharacterId: string | null;
     onCharacterClick: (id: string) => void;
     onTravelComplete: (id: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => void;
+    onNavigateToVoterDetails: (type: 'citizen' | 'candidate' | 'reporter') => void;
 }
 
-function MapContainer({characters, selectedCharacterId, onCharacterClick, onTravelComplete}: MapContainerProps) {
+function MapContainer({characters, selectedCharacterId, onCharacterClick, onTravelComplete, onNavigateToVoterDetails}: MapContainerProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isReady, setIsReady] = useState(false);
     
@@ -165,6 +181,7 @@ function MapContainer({characters, selectedCharacterId, onCharacterClick, onTrav
                                         isSelected={character.characterId === selectedCharacterId} 
                                         onClick={onCharacterClick} 
                                         onTravelComplete={onTravelComplete} 
+                                        onNavigateToVoterDetails={onNavigateToVoterDetails}
                                     />
                                 );
                             })}

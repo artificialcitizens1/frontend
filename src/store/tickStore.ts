@@ -33,6 +33,7 @@ interface tickState {
   setSubTick: (subTick: 0 | 1) => void;
   setTickData: (tickData: tickData) => void;
   setCharactersData: (charactersData: Character[]) => void;
+  updateCharactersData: (charactersData: charactersData[]) => void;
   initializeCharacters: (characters: Character[]) => void;
   updateSystemTick: (tickNumber: number, tickData: tickData[]) => void;
 
@@ -85,6 +86,12 @@ export const useTickStore = create<tickState>()(
           }
         ])) 
       }))},
+      updateCharactersData: (charactersData) => {
+        console.log('updateCharactersData : ', charactersData);
+        set({ 
+          charactersData: new Map(charactersData.map(character => [character.characterId, character])) 
+        });
+      },
       updateSystemTick: (tickNumber : number, tickData : tickData[]) => {
         set({ currentTick: tickNumber })
         set({ tickData: tickData })

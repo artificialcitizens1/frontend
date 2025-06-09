@@ -16,12 +16,15 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // ==========================================
 interface SocialMediaFeedProps {
   onClose?: () => void;
+  simId: string;
+  currentTick: number;
+  totalTicks: number;
 }
 
 // ==========================================
 // MAIN SOCIAL MEDIA FEED COMPONENT
 // ==========================================
-const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
+const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose, simId, currentTick, totalTicks }) => {
   // ==========================================
   // STATE MANAGEMENT
   // ==========================================
@@ -114,7 +117,8 @@ const SocialMediaFeed: React.FC<SocialMediaFeedProps> = ({ onClose }) => {
         setError(null);
         
         console.log('🔍 SocialMediaFeed - Fetching data with hardcoded values');
-        const response = await getSocialMediaPosts('baba9c30-f7d7-4f3e-933c-eeb9bd7cc547', 5);
+        // const response = await getSocialMediaPosts('baba9c30-f7d7-4f3e-933c-eeb9bd7cc547', 5);
+        const response = await getSocialMediaPosts(simId, currentTick);
         
         if (response.success && response.data) {
           const tweetData = response.data.map(convertApiPostToTweet);
