@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom";
 import { useTickStore } from "../store/tickStore";
 import SimulationControls from "../components/simulation/SimulationControls";
+import Logs from "../components/Logs";
 
 // --- Type Definitions (Refactored for Declarative State) ---
 interface Point { x: number; y: number; }
@@ -48,7 +49,7 @@ export default function GodMode() {
   const { charactersData, updateCharactersData } = useTickStore();
   console.log("charactersData in god mode: ", Array.from(charactersData?.values() || []));
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
-  // MODIFICATION: travelPlans state is removed
+  const [prompt, setPrompt] = useState("");
 
   // Convert store data to array for rendering
   const characters = Array.from(charactersData?.values() || []);
@@ -93,24 +94,104 @@ export default function GodMode() {
     }
   };
 
+  const handleLetsGo = () => {
+    console.log("Prompt submitted:", prompt);
+    // Here you can add the logic to handle the prompt submission
+  };
+
   const selectedCharacter = characters.find((c) => c.characterId === selectedCharacterId);
 
   return (
-    <div className="bg-[#0f172a] h-screen flex flex-col font-mono text-gray-300">
-      <TopBar />
-      <main className="flex-grow grid grid-cols-1 lg:grid-cols-6 gap-4 p-4 h-full">
-        <div className="lg:col-span-1 order-2 lg:order-1 h-full">
-          <ActsOfGodPanel />
+    <div className="h-screen w-full bg-black text-white overflow-hidden">
+      {/* Header */}
+      <div className="bg-black py-4 px-8 border-b border-white/10 flex-shrink-0">
+        <div className="max-w-full mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <button
+              className="text-white hover:bg-white/5 rounded-2xl transition-colors flex items-center justify-center p-2"
+              onClick={() => navigate(-1)}
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 18L9 12L15 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <h1 
+              className="text-white text-4xl tracking-wider"
+              style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
+            >
+              God Mode
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <LeaderProfile name="CHARLIE SINGH" approval={67} />
+            <LeaderProfile name="ARMAN PATEL" approval={67} align="right" />
+          </div>
         </div>
-        <div className="lg:col-span-4 order-1 lg:order-2 flex flex-col h-full">
-          <MapContainer
-            characters={characters}
-            selectedCharacterId={selectedCharacterId}
-            onCharacterClick={handleCharacterClick}
-            onTravelComplete={handleTravelComplete}
-            onNavigateToVoterDetails={handleNavigateToVoterDetails}
-          />
-          <SimulationControls />
+      </div>
+
+      <main className="flex-grow grid grid-cols-6 gap-6 p-6 overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
+        {/* Acts of God Panel */}
+        <div className="col-span-1 flex flex-col gap-4 overflow-hidden">
+          <ActsOfGodPanel />
+          
+          {/* Divine Intervention Section */}
+          <div className="bg-black border border-white/20 rounded-lg p-4 flex-shrink-0">
+            <h3 
+              className="text-white text-lg mb-3 tracking-wider"
+              style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
+            >
+              Divine Intervention
+            </h3>
+            <div className="flex flex-col gap-3">
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter your divine command..."
+                className="w-full h-24 bg-black border border-white/30 rounded-lg p-3 text-white placeholder-white/50 resize-none focus:outline-none focus:border-white/60 text-sm"
+                style={{ fontFamily: "Roboto Mono" }}
+              />
+              <button
+                onClick={handleLetsGo}
+                className="w-full px-4 py-2 bg-white text-black hover:bg-white/90 transition-colors rounded-lg text-sm"
+                style={{ fontFamily: "Roboto Mono", fontWeight: 500 }}
+              >
+                Let's Go!
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="col-span-4 flex flex-col gap-4 overflow-hidden">
+          {/* Map Container */}
+          <div className="flex-grow overflow-hidden">
+            <MapContainer
+              characters={characters}
+              selectedCharacterId={selectedCharacterId}
+              onCharacterClick={handleCharacterClick}
+              onTravelComplete={handleTravelComplete}
+              onNavigateToVoterDetails={handleNavigateToVoterDetails}
+            />
+          </div>
+          
+          {/* Simulation Controls */}
+          <div className="flex-shrink-0">
+            <SimulationControls />
+          </div>
+
           {selectedCharacter && (
             <CharacterControlModal
               character={selectedCharacter}
@@ -119,24 +200,21 @@ export default function GodMode() {
             />
           )}
         </div>
-        <div className="lg:col-span-1 order-3 lg:order-3 h-full">
-          <LogsPanel />
+
+        {/* Logs Panel */}
+        <div className="col-span-1 overflow-hidden">
+          <div className="h-full border border-white/20 rounded-lg overflow-hidden">
+            <Logs />
+          </div>
         </div>
       </main>
+
       <NewsTicker />
     </div>
   );
 }
 
 // --- UI Components ---
-function TopBar() {
-  return (
-    <header className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-gray-700/50 gap-4">
-      <LeaderProfile name="CHARLIE SINGH" approval={67} />
-      <LeaderProfile name="ARMAN PATEL" approval={67} align="right" />
-    </header>
-  );
-}
 function LeaderProfile({
   name,
   approval,
@@ -151,9 +229,9 @@ function LeaderProfile({
       className={`flex w-full max-w-xs items-center gap-3 ${align === "right" ? "flex-row-reverse" : ""}`}
     >
       <div
-        className={`w-12 h-12 flex items-center justify-center bg-gray-800 rounded-full border-2 border-gray-600 shrink-0 ${align === "right" ? "bg-red-900/50 border-red-500" : "bg-blue-900/50 border-blue-500"}`}
+        className={`w-12 h-12 flex items-center justify-center bg-black rounded-full border-2 shrink-0 ${align === "right" ? "border-red-500" : "border-blue-500"}`}
       >
-        <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
             d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -163,17 +241,33 @@ function LeaderProfile({
       </div>
       <div className={`w-full flex flex-col ${align === "right" ? "items-end" : "items-start"}`}>
         <div className="w-full flex justify-between items-center">
-          <p className="text-xs tracking-widest text-gray-400">APPROVAL RATING</p>
-          <span className="text-sm font-bold">{approval}%</span>
+          <p 
+            className="text-xs tracking-widest text-white/60"
+            style={{ fontFamily: "Roboto Mono" }}
+          >
+            APPROVAL RATING
+          </p>
+          <span 
+            className="text-sm font-bold text-white"
+            style={{ fontFamily: "Roboto Mono" }}
+          >
+            {approval}%
+          </span>
         </div>
-        <h2 className="font-bold tracking-wider mt-1 w-full">{name}</h2>
-        <div className="w-full bg-gray-700/50 h-2 rounded-full border border-gray-600/50 mt-1">
-          <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${approval}%` }}></div>
+        <h2 
+          className="font-bold tracking-wider mt-1 w-full text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          {name}
+        </h2>
+        <div className="w-full bg-white/20 h-2 rounded-full border border-white/30 mt-1">
+          <div className="bg-white h-full rounded-full" style={{ width: `${approval}%` }}></div>
         </div>
       </div>
     </div>
   );
 }
+
 function ActsOfGodPanel() {
   const actions = [
     { icon: "▲", text: "Earthquake" },
@@ -182,60 +276,57 @@ function ActsOfGodPanel() {
     { icon: "♦", text: "Assassination Attempt" },
   ];
   return (
-    <div className="h-full p-4 bg-black/20 rounded-lg flex flex-col">
-      <h3 className="font-bold text-lg mb-4 tracking-wider">Acts Of God</h3>
-      <ul className="space-y-3 flex-grow">
-        {actions.map((action, i) => (
-          <li
-            key={i}
-            className="p-3 bg-gray-800/80 border border-gray-700 rounded-md cursor-pointer hover:bg-gray-700 transition-colors duration-200"
-          >
-            <span className="mr-3 text-cyan-400">{action.icon}</span>
-            {action.text}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-function LogsPanel() {
-  const logEntries = [
-    "Day 10",
-    "Charlie Singh held a rally to please his voters.",
-    "Acts of vandalism on Rahul's posters.",
-    "Earthquake caused 1m casualties.",
-  ];
-  return (
-    <div className="h-full p-4 bg-black/20 rounded-lg flex flex-col">
-      <h3 className="font-bold text-lg mb-4 tracking-wider">Logs</h3>
-      <ul className="space-y-3 text-sm text-gray-400 flex-grow">
-        {logEntries.map((entry, i) => (
-          <li key={i} className="leading-relaxed">{`*** ${entry}`}</li>
-        ))}
-      </ul>
-      <div className="mt-4 flex flex-col gap-2">
-        <button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">
-          News
-        </button>
-        <button className="w-full py-2 bg-gray-800/80 border border-gray-700 rounded-md text-sm">
-          Social Media
-        </button>
+    <div className="bg-black border border-white/20 rounded-lg flex flex-col flex-shrink-0">
+      <div className="p-4 border-b border-white/20">
+        <h3 
+          className="font-bold text-lg tracking-wider text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          Acts Of God
+        </h3>
+      </div>
+      <div className="p-4">
+        <ul className="space-y-3">
+          {actions.map((action, i) => (
+            <li
+              key={i}
+              className="p-3 bg-black border border-white/30 rounded-lg cursor-pointer hover:bg-white/5 transition-colors duration-200"
+            >
+              <span className="mr-3 text-white">{action.icon}</span>
+              <span 
+                className="text-white text-sm"
+                style={{ fontFamily: "Roboto Mono" }}
+              >
+                {action.text}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
 }
+
 function NewsTicker() {
   return (
-    <footer className="w-full bg-black/30 p-2 overflow-hidden border-t border-gray-700/50">
+    <footer className="w-full bg-black border-t border-white/20 p-3 overflow-hidden">
       <div className="whitespace-nowrap animate-marquee">
-        <span className="mx-8 text-gray-400">
+        <span 
+          className="mx-8 text-white/70"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
           Local politician caught arguing with ChatGPT over vote count.
         </span>
-        <span className="mx-8 text-gray-400">
-          New startup offers subscription-based fresh air; premium tier includes "pine forest"
-          scent.
+        <span 
+          className="mx-8 text-white/70"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          New startup offers subscription-based fresh air; premium tier includes "pine forest" scent.
         </span>
-        <span className="mx-8 text-gray-400">
+        <span 
+          className="mx-8 text-white/70"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
           Minister declares Earth is flat 'in some constituencies'.
         </span>
       </div>
@@ -243,6 +334,7 @@ function NewsTicker() {
     </footer>
   );
 }
+
 function CharacterControlModal({
   character,
   onMove,
@@ -253,22 +345,33 @@ function CharacterControlModal({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 p-4">
-      <div className="bg-gray-900 border-2 border-cyan-500 rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full">
+    <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10 p-4">
+      <div className="bg-black border-2 border-white rounded-lg p-6 text-center shadow-lg relative max-w-sm w-full">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-400 hover:text-white font-bold text-lg"
+          className="absolute top-2 right-2 text-white/60 hover:text-white font-bold text-lg"
         >
           ×
         </button>
-        <h3 className="font-bold text-lg capitalize">
+        <h3 
+          className="font-bold text-lg capitalize text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
           {character.type} <span className="text-yellow-400">#{character.characterId}</span>
         </h3>
-        <p className="text-sm text-gray-400 mb-4">
+        <p 
+          className="text-sm text-white/60 mb-4"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
           Current District:{" "}
           {DISTRICT_DEFINITIONS.find((d) => d.alias === character.initialDistrict)?.name}
         </p>
-        <p className="text-sm mb-2">Move to:</p>
+        <p 
+          className="text-sm mb-2 text-white"
+          style={{ fontFamily: "Roboto Mono" }}
+        >
+          Move to:
+        </p>
         <div className="grid grid-cols-2 gap-2">
           {DISTRICT_DEFINITIONS.map((d) => (
             <button
@@ -277,8 +380,9 @@ function CharacterControlModal({
                 onMove(d.alias);
                 onClose();
               }}
-              className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded text-xs disabled:bg-gray-500 disabled:cursor-not-allowed"
+              className="bg-white hover:bg-white/90 text-black font-bold py-2 px-4 rounded text-xs disabled:bg-white/20 disabled:cursor-not-allowed disabled:text-white/40"
               disabled={d.alias === character.initialDistrict}
+              style={{ fontFamily: "Roboto Mono" }}
             >
               {d.name}
             </button>
