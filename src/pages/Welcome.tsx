@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import "../styles/fonts.css"; // Import fonts
 import { useEffect, useRef } from "react";
 import { TextAnimator } from "../utils/textAnimator";
 import gsap from "gsap";
@@ -68,18 +67,6 @@ const Welcome = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        
-        {/* Blue overlay */}
-        <div className="absolute right-0 top-0 w-[50%] h-full bg-[rgba(38,51,170,0.33)]" />
-        
-        {/* Gradient overlay */}
-        <div
-          className="absolute right-0 top-0 w-[50%] h-full"
-          style={{
-            background: "linear-gradient(90deg, #121934 0%, rgba(18, 25, 52, 0) 30%, rgba(18, 25, 52, 0) 100%)",
-          }}
-        />
-      </div>
 
         {/* Content */}
         <div className="relative z-20 pt-[104px] pl-[72px]">
@@ -123,33 +110,7 @@ const Welcome = () => {
                 allSims
               </span>
             </button>
-
-            {/* Settings Button */}
-            <button
-              ref={(el) => (buttonRefs.current[2] = el)}
-              className="w-full h-[104px] bg-transparent border border-white/30 hover:bg-transparent transition-all backdrop-blur-sm"
-            >
-              <span
-                className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
-                style={{ fontFamily: "Roboto Mono" }}
-              >
-                setting
-              </span>
-            </button>
-
-            {/* Voter Details Button */}
-            <button
-              ref={(el) => (buttonRefs.current[3] = el)}
-              className="w-full h-[104px] bg-transparent border border-white/30 hover:bg-transparent transition-all backdrop-blur-sm"
-              onClick={() => navigate("/voter-details")}
-            >
-<span
-                className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
-                style={{ fontFamily: "Roboto Mono" }}
-              >
-              All Simulations
-            </span>
-          </button>
+          </div>
         </div>
       </div>
     </div>
