@@ -5,6 +5,7 @@ import { useSocket } from "./hooks/useSocket";
 
 /* styles import */
 import "./styles/fonts.css";
+import "./styles/glitch.css";
 
 /* page/component imports */
 import Welcome from "./pages/Welcome";
@@ -18,6 +19,7 @@ import SimulationCreation from "./pages/SimulationCreation";
 import SimulationLore from "./pages/SimulationLore";
 import CandidateDetails from "./pages/CandidateDetails";
 import ElectionResult from "./pages/ElectionResult";
+import GlitchWrapper from "./components/GlitchWrapper";
 
 const App: React.FC = () => {
   const { isConnected, currentTick } = useSocket();
@@ -27,26 +29,28 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      {/* Routes */}
-      <Routes>
-        <Route path="/" element={<Welcome />} />
-        <Route path="/create-simulation" element={<CreateSimulation />} />
-        <Route path="/candidate-settings" element={<CandidateSettings />} />
-        <Route path="/simulation-settings" element={<SimulationSettingsPage />} />
-        {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
-        {/* <Route path="/voter-details" element={<VoterDetails />} /> */}
-        {/* <Route path="/candidate-details" element={<CandidateDetails />} /> */}
-        <Route path="/god-mode" element={<GodMode />} />
-        <Route path="/simulation-creation" element={<SimulationCreation />} />
-        <Route path="/simulation-lore/:simId" element={<SimulationLore />} />
-        <Route path="/simulation/:simId" element={<SimulationResult />} />
-        <Route path="/simulation/:simId/election-result" element={<ElectionResult />} />
-        <Route path="/simulation/:simId/voter-details/:characterId" element={<VoterDetails />} />
-        <Route path="/simulation/:simId/candidate-details/:characterId" element={<CandidateDetails />} />
-        {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
-        {/* <Route path="/god-mode" element={<GodMode />} /> */}
-        {/* <Route path="/voter-details" element={<VoterDetails />} /> */}
-      </Routes>
+      <GlitchWrapper>
+        {/* Routes */}
+        <Routes>
+          <Route path="/" element={<Welcome />} />
+          <Route path="/create-simulation" element={<CreateSimulation />} />
+          <Route path="/candidate-settings" element={<CandidateSettings />} />
+          <Route path="/simulation-settings" element={<SimulationSettingsPage />} />
+          {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
+          {/* <Route path="/voter-details" element={<VoterDetails />} /> */}
+          {/* <Route path="/candidate-details" element={<CandidateDetails />} /> */}
+          <Route path="/god-mode" element={<GodMode />} />
+          <Route path="/simulation-creation" element={<SimulationCreation />} />
+          <Route path="/simulation-lore/:simId" element={<SimulationLore />} />
+          <Route path="/simulation/:simId" element={<SimulationResult />} />
+          <Route path="/simulation/:simId/election-result" element={<ElectionResult />} />
+          <Route path="/simulation/:simId/voter-details/:characterId" element={<VoterDetails />} />
+          <Route path="/simulation/:simId/candidate-details/:characterId" element={<CandidateDetails />} />
+          {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
+          {/* <Route path="/god-mode" element={<GodMode />} /> */}
+          {/* <Route path="/voter-details" element={<VoterDetails />} /> */}
+        </Routes>
+      </GlitchWrapper>
     </Router>
   );
 };

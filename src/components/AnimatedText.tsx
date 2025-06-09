@@ -61,12 +61,15 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({
       ? "h1"
       : "span";
 
+  const textContent = typeof children === 'string' ? children : '';
+
   return React.createElement(
     ElementType,
     {
       ref: textRef,
       className,
       style,
+      "data-text": textContent,
     },
     children
   );
