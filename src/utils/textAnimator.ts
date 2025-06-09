@@ -6,7 +6,7 @@ const lettersAndSymbols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'
 export class TextAnimator {
   private textElement: HTMLElement;
   private originalChars: string[];
-  private splitter: TextSplitter;
+  private splitter!: TextSplitter;
 
   constructor(textElement: HTMLElement) {
     if (!textElement || !(textElement instanceof HTMLElement)) {
@@ -38,7 +38,9 @@ export class TextAnimator {
         { opacity: 0 },
         {
           duration: 0.03,
-          onComplete: () => gsap.set(char, { innerHTML: initialHTML, delay: 0.1 }),
+          onComplete: () => {
+            gsap.set(char, { innerHTML: initialHTML, delay: 0.1 });
+          },
           repeat: 2,
           repeatRefresh: true,
           repeatDelay: 0.05,
@@ -78,4 +80,4 @@ export class TextAnimator {
     gsap.killTweensOf(this.textElement);
     gsap.set(this.textElement, { '--anim': 0 });
   }
-} 
+}

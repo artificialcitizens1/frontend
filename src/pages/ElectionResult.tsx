@@ -9,7 +9,7 @@ const ElectionResult = () => {
   const navigate = useNavigate();
   const { simId } = useParams();
   const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
-  const { currentTick, totalTicks } = useTickStore();
+  const { currentTick: _currentTick, totalTicks } = useTickStore();
   const [isPlaying, setIsPlaying] = useState(false);
 
   // Enhanced breaking news data

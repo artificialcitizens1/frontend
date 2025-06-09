@@ -11,7 +11,7 @@ interface feedState {
 
 }
 
-export const useFeedStore = create<feedState>((set, get) => ({
+export const useFeedStore = create<feedState>((set, _get) => ({
   feeds: [],
   setFeeds: (feeds) => set({ feeds: feeds }),
   reset: () => set({ feeds: [] }),

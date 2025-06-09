@@ -44,7 +44,7 @@ interface tickState {
 
 export const useTickStore = create<tickState>()(
   devtools(
-    (set, get) => ({
+    (set, _get) => ({
       currentTick: 1,
       totalTicks: 1,
       subTick: 0,

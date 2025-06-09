@@ -1,10 +1,9 @@
 export class TextSplitter {
   private element: HTMLElement;
-  private options: { splitTypeTypes: string };
 
-  constructor(element: HTMLElement, options: { splitTypeTypes: string }) {
+  constructor(element: HTMLElement, _options: { splitTypeTypes: string }) {
     this.element = element;
-    this.options = options;
+    // options parameter is kept for future extensibility but not currently used
   }
 
   getChars(): HTMLElement[] {
@@ -40,4 +39,4 @@ export class TextSplitter {
       return span;
     });
   }
-} 
+}
