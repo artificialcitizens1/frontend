@@ -2,57 +2,45 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { TextAnimator } from "../utils/textAnimator";
 import gsap from "gsap";
+import AnimatedText from "../components/AnimatedText";
 
 const Welcome = () => {
   const navigate = useNavigate();
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     // Initialize text animations for all buttons
     buttonRefs.current.forEach((button) => {
       if (button) {
-        const textElement = button.querySelector('span');
+        const textElement = button.querySelector("span");
         if (textElement) {
           const animator = new TextAnimator(textElement);
-          
-          button.addEventListener('mouseenter', () => {
+
+          button.addEventListener("mouseenter", () => {
             animator.animate();
             // Add glow effect and translate up on hover
             gsap.to(button, {
-              boxShadow: '0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.1)',
+              boxShadow:
+                "0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.1)",
               y: -2,
               duration: 0.15,
-              ease: 'power2.inOut'
+              ease: "power2.inOut",
             });
           });
-          
-          button.addEventListener('mouseleave', () => {
+
+          button.addEventListener("mouseleave", () => {
             animator.animateBack();
             // Remove glow effect and reset position
             gsap.to(button, {
-              boxShadow: 'none',
+              boxShadow: "none",
               y: 0,
               duration: 0.15,
-              ease: 'power2.inOut'
+              ease: "power2.inOut",
             });
           });
         }
       }
     });
-
-    // Initialize animation for the title
-    if (titleRef.current) {
-      const animator = new TextAnimator(titleRef.current);
-      
-      titleRef.current.addEventListener('mouseenter', () => {
-        animator.animate();
-      });
-      
-      titleRef.current.addEventListener('mouseleave', () => {
-        animator.animateBack();
-      });
-    }
   }, []);
 
   return (
@@ -71,16 +59,17 @@ const Welcome = () => {
         {/* Content */}
         <div className="relative z-20 pt-[104px] pl-[72px]">
           {/* Logo/Title */}
-          <h1
-            ref={titleRef}
-            className="text-[52px] leading-[65px] text-white mb-[53px] cursor-pointer"
+          <AnimatedText
+            className="text-[52px] leading-[65px] text-white mb-[53px]"
             style={{
               fontFamily: "Arcade Interlaced",
               letterSpacing: "0.02em",
             }}
+            interval={7000}
+            glowEffect={true}
           >
             Pol IO
-          </h1>
+          </AnimatedText>
 
           {/* Navigation Buttons */}
           <div className="flex flex-col space-y-6 w-[555px]">
@@ -108,6 +97,20 @@ const Welcome = () => {
                 style={{ fontFamily: "Roboto Mono" }}
               >
                 allSims
+              </span>
+            </button>
+
+            {/* Election Result Demo Button */}
+            <button
+              ref={(el) => (buttonRefs.current[2] = el)}
+              className="w-full h-[104px] bg-transparent border border-white/30 hover:bg-transparent transition-all backdrop-blur-sm"
+              onClick={() => navigate("/simulation/demo/election-result")}
+            >
+              <span
+                className="flex items-center justify-center h-full text-[28px] leading-[37px] text-white"
+                style={{ fontFamily: "Roboto Mono" }}
+              >
+                electionResult
               </span>
             </button>
           </div>
