@@ -6,10 +6,12 @@ import DesktopInterface from "../components/candidate_components/DesktopInterfac
 import { useSimulationStore } from "../store";
 import Logs from "../components/Logs";
 import { useTickStore } from "../store/tickStore";
+import { getPersonaDetails, type PersonaResponse } from "../api/personaService";
 
 // Surveillance Screen Component
-const SurveillanceScreen = ({simId, currentTick, totalTicks}: {simId: string, currentTick: number, totalTicks: number}) => {
+const SurveillanceScreen = ({simId, currentTick, totalTicks, opponentId}: {simId: string, currentTick: number, totalTicks: number, opponentId?: string}) => {
   const [currentView, setCurrentView] = useState<"desktop" | "social" | "news">("desktop");
+  const navigate = useNavigate();
 
   const handleSocialMediaClick = () => {
     setCurrentView("social");
@@ -17,6 +19,14 @@ const SurveillanceScreen = ({simId, currentTick, totalTicks}: {simId: string, cu
 
   const handleNewsClick = () => {
     setCurrentView("news");
+  };
+
+  const handleTrashClick = () => {
+    if (opponentId) {
+      navigate(`/simulation/${simId}/candidate-details/${opponentId}`);
+    } else {
+      console.error("No opponent ID available for navigation");
+    }
   };
 
   const handleBackToDesktop = () => {
@@ -47,6 +57,7 @@ const SurveillanceScreen = ({simId, currentTick, totalTicks}: {simId: string, cu
             <DesktopInterface
               onSocialMediaClick={handleSocialMediaClick}
               onNewsClick={handleNewsClick}
+              onTrashClick={handleTrashClick}
             />
           ) : currentView === "social" ? (
             <SocialMediaFeed onClose={handleBackToDesktop} simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
@@ -61,9 +72,14 @@ const SurveillanceScreen = ({simId, currentTick, totalTicks}: {simId: string, cu
 
 const CandidateDetails = () => {
   const navigate = useNavigate();
-  const {simId} = useParams();
+  const {simId, characterId} = useParams();
   const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
   const { currentTick, totalTicks } = useTickStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [personaData, setPersonaData] = useState<PersonaResponse["data"] | null>(null);
+
+console.log('characterId:', characterId);
   
   // Set up demo simulation data if not already set
   useEffect(() => {
@@ -74,6 +90,32 @@ const CandidateDetails = () => {
       console.log('🎭 CandidateDetails - Setting up demo simulation data');
     }
   }, [simulationId, setSimulationId, setCurrentTick]);
+
+  // Fetch persona details
+  useEffect(() => {
+    const fetchPersonaData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);      
+        console.log('🔍 CandidateDetails - Fetching persona data');
+        const response = await getPersonaDetails(characterId!);
+        
+        if (response.success && response.data) {
+          console.log('✅ CandidateDetails - Fetched persona data:', response.data);
+          setPersonaData(response.data);
+        } else {
+          setError("Failed to load persona details");
+        }
+      } catch (err) {
+        console.error('Error fetching persona details:', err);
+        setError("Failed to load persona details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPersonaData();
+  }, [characterId]);
 
   // For demo purposes, using a simple back function
   const handleBack = () => {
@@ -115,47 +157,61 @@ const CandidateDetails = () => {
         <div className="max-w-[1728px] mx-auto px-4 py-6 h-[calc(100vh-60px)] overflow-hidden">
           <div className="flex h-full">
             {/* Left column - Candidate Profile */}
-            <div className="w-1/4 rounded-sm mr-6 overflow-y-auto h-full scrollbar-hide">
+            <div className="w-1/5 rounded-sm mr-6 overflow-y-auto h-full scrollbar-hide">
               <div className="border border-white/10 rounded-sm">
                 {/* Candidate status and name */}
                 <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
                   <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">
-                    CANDIDATE|BLUE PARTY
+                    CANDIDATE|{personaData?.persona.ideologyPosition === 'center-left' ? 'BLUE PARTY' : 'RED PARTY'}
                   </div>
-                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">RAHUL SINGH</div>
+                  <div className="text-white text-2xl font-['ManifoldExtendedCF']">
+                    {isLoading ? 'LOADING...' : error ? 'CANDIDATE DATA' : personaData?.persona.name || 'RAHUL SINGH'}
+                  </div>
                 </div>
 
                 {/* Candidate image and details */}
                 <div className="flex">
-                  <div className="w-40 h-49 overflow-hidden">
+                  <div className="w-60 h-49 overflow-hidden">
                     {/* Using a placeholder since we don't have the actual image */}
                     <div className="w-full h-full flex items-center justify-center">
                       <img
                         src="/images/candidate_photo.png"
-                        alt="Rahul Singh"
+                        alt={personaData?.persona.name || "Candidate"}
                         className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
-                  <div className="flex-1">
-                    {/* Age */}
+                  <div className="flex-1 w-[50%]">
+                    {/* Ideology Position */}
                     <div className="border-b border-white/10 py-5 ml-4">
-                      <div className="text-white/60 text-xs uppercase roboto-mono">AGE</div>
-                      <div className="text-white text-xl roboto-mono">50</div>
+                      <div className="text-white/60 text-xs uppercase roboto-mono">IDEOLOGY</div>
+                      <div className="text-white text-xl roboto-mono">
+                        {isLoading ? 'LOADING...' : 
+                         error ? 'UNKNOWN' : 
+                         personaData?.persona.ideologyPosition.toUpperCase() || 'CENTER-LEFT'}
+                      </div>
                     </div>
 
-                    {/* Occupation */}
+                    {/* Persona Type */}
                     <div className="border-b border-white/10 py-5 ml-4">
-                      <div className="text-white/60 text-xs uppercase roboto-mono">OCCUPATION</div>
-                      <div className="text-white text-xl roboto-mono">SENATOR</div>
+                      <div className="text-white/60 text-xs uppercase roboto-mono">PERSONA TYPE</div>
+                      <div className="text-white text-xl roboto-mono">
+                        {isLoading ? 'LOADING...' : 
+                         error ? 'UNKNOWN' : 
+                         personaData?.persona.personaType.toUpperCase() || 'CHARISMATIC'}
+                      </div>
                     </div>
 
-                    {/* Cases and Scandals */}
+                    {/* Communication Style */}
                     <div className="py-4 ml-4">
                       <div className="text-white/60 text-xs uppercase roboto-mono">
-                        CASES AND SCANDALS
+                        COMMUNICATION STYLE
                       </div>
-                      <div className="text-white text-xl roboto-mono">24</div>
+                      <div className="text-white text-xl roboto-mono">
+                        {isLoading ? 'LOADING...' : 
+                         error ? 'UNKNOWN' : 
+                         personaData?.persona.communicationStyle.toUpperCase() || 'EMPATHETIC'}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -165,17 +221,30 @@ const CandidateDetails = () => {
               <div className="mt-6">
                 <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
                 <p className="text-white/80 text-sm leading-relaxed roboto-mono">
-                  Once a railway clerk who fixed trains with duct tape and hope, Rahul shot to fame
-                  during the "Great Mango Subsidy Revolt," where he demanded two mangoes per citizen
-                  — and got them. Now he's running on a platform of "common sense and uncommon
-                  snacks." His fans call him The People's Patchwork. His critics call him unserious.
-                  Rahul just hands them a samosa and moves on.
+                  {isLoading ? 'Loading candidate description...' : 
+                   error ? 'Failed to load candidate description.' : 
+                   personaData?.persona.intro || 
+                   'Once a railway clerk who fixed trains with duct tape and hope, Rahul shot to fame during the "Great Mango Subsidy Revolt," where he demanded two mangoes per citizen — and got them. Now he\'s running on a platform of "common sense and uncommon snacks." His fans call him The People\'s Patchwork. His critics call him unserious. Rahul just hands them a samosa and moves on.'}
                 </p>
               </div>
 
               {/* Traits */}
               <div className="mt-6">
                 <h3 className="text-white text-xl mb-4 roboto-mono">Traits</h3>
+
+                {/* Authenticity */}
+                <div className="mb-4">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-white roboto-mono">Authenticity</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-white/60 text-xs roboto-mono mr-2">Low</span>
+                    <div className="flex-1 bg-gray-700 h-2 relative">
+                      <div className="bg-white h-full" style={{ width: `${((personaData?.persona.authenticityLevel || 7) / 10) * 100}%` }}></div>
+                    </div>
+                    <span className="text-white/60 text-xs roboto-mono ml-2">High</span>
+                  </div>
+                </div>
 
                 {/* Charisma */}
                 <div className="mb-4">
@@ -185,35 +254,21 @@ const CandidateDetails = () => {
                   <div className="flex items-center">
                     <span className="text-white/60 text-xs roboto-mono mr-2">Low</span>
                     <div className="flex-1 bg-gray-700 h-2 relative">
-                      <div className="bg-white h-full" style={{ width: "60%" }}></div>
-                    </div>
-                    <span className="text-white/60 text-xs roboto-mono ml-2">High</span>
-                  </div>
-                </div>
-
-                {/* Temper */}
-                <div className="mb-4">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-white roboto-mono">Temper</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-white/60 text-xs roboto-mono mr-2">Low</span>
-                    <div className="flex-1 bg-gray-700 h-2 relative">
-                      <div className="bg-white h-full" style={{ width: "30%" }}></div>
+                      <div className="bg-white h-full" style={{ width: `${((personaData?.persona.charismaLevel || 8) / 10) * 100}%` }}></div>
                     </div>
                     <span className="text-white/60 text-xs roboto-mono ml-2">High</span>
                   </div>
                 </div>
 
                 {/* Integrity */}
-                <div className="mb-4">
+                <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-white roboto-mono">Integrity</span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-white/60 text-xs roboto-mono mr-2">Low</span>
                     <div className="flex-1 bg-gray-700 h-2 relative">
-                      <div className="bg-white h-full" style={{ width: "20%" }}></div>
+                      <div className="bg-white h-full" style={{ width: `${((personaData?.persona.integrityLevel || 6) / 10) * 100}%` }}></div>
                     </div>
                     <span className="text-white/60 text-xs roboto-mono ml-2">High</span>
                   </div>
@@ -221,16 +276,18 @@ const CandidateDetails = () => {
               </div>
             </div>
 
-            {/* Center column - Laptop mockup with surveillance screen */}
-            <div className="w-full flex justify-center items-start relative h-[100vh] pt-2">
-              <div className="w-full h-full flex items-center justify-center">
-                {/* Surveillance screen content */}
-                <SurveillanceScreen simId={simId!} currentTick={currentTick} totalTicks={totalTicks} />
-              </div>
+            {/* Center column - Surveillance Screen */}
+            <div className="w-1/2 flex-grow h-[vh]">
+              <SurveillanceScreen 
+                simId={simId || 'demo-simulation'} 
+                currentTick={currentTick} 
+                totalTicks={totalTicks} 
+                opponentId={personaData?.opponent?.personaId}
+              />
             </div>
 
-            {/* Right column - Logs and Timeline */}
-            <div className="w-1/3 flex flex-col gap-6 overflow-y-auto h-full scrollbar-hide">
+            {/* Right column - Logs */}
+            <div className="w-1/5 flex flex-col gap-6 overflow-y-auto h-full scrollbar-hide">
               {/* Logs section */}
               <Logs />
             </div>

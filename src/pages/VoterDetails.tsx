@@ -6,6 +6,7 @@ import DesktopInterface from "../components/voter_components/DesktopInterface";
 import Logs from "../components/Logs";
 import { useSimulationStore } from "../store";
 import { useTickStore } from "../store/tickStore";
+import { getPersonaDetails, type PersonaResponse } from "../api/personaService";
 
 // Voter Political Standing Graph component
 const VoterPoliticalLeaningGraph = () => {
@@ -96,11 +97,15 @@ const SurveillanceScreen = ({simId, currentTick, totalTicks}: {simId: string, cu
 };
 
 const VoterDetails = () => {
-
   const navigate = useNavigate();
-  const {simId} = useParams();
+  const {simId, characterId} = useParams();
   const { simulationId, setSimulationId, setCurrentTick } = useSimulationStore();
   const { currentTick, totalTicks } = useTickStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [personaData, setPersonaData] = useState<PersonaResponse["data"] | null>(null);
+
+  console.log('characterId:', characterId);
   
   // Set up demo simulation data if not already set
   useEffect(() => {
@@ -111,6 +116,34 @@ const VoterDetails = () => {
       console.log('🎭 VoterDetails - Setting up demo simulation data');
     }
   }, [simulationId, setSimulationId, setCurrentTick]);
+
+  // Fetch persona details
+  useEffect(() => {
+    const fetchPersonaData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);      
+        console.log('🔍 VoterDetails - Fetching persona data');
+        const response = await getPersonaDetails(characterId!);
+        
+        if (response.success && response.data) {
+          console.log('✅ VoterDetails - Fetched persona data:', response.data);
+          setPersonaData(response.data);
+        } else {
+          setError("Failed to load persona details");
+        }
+      } catch (err) {
+        console.error('Error fetching persona details:', err);
+        setError("Failed to load persona details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (characterId) {
+      fetchPersonaData();
+    }
+  }, [characterId]);
 
   // For demo purposes, using a simple back function
   const handleBack = () => {
@@ -158,7 +191,7 @@ const VoterDetails = () => {
                 <div className="border-b bg-[#101528] border-white/10 pl-4 py-4">
                   <div className="text-white/60 text-sm uppercase mb-1 roboto-mono">CIVILIAN</div>
                   <div className="text-white text-2xl font-['ManifoldExtendedCF']">
-                    JACK FLANNAGAN
+                    {isLoading ? 'LOADING...' : error ? 'VOTER DATA' : personaData?.persona.name || 'JACK FLANNAGAN'}
                   </div>
                 </div>
 
@@ -169,7 +202,7 @@ const VoterDetails = () => {
                     <div className="w-full h-full flex items-center justify-center">
                       <img
                         src="/images/civilian_profile.png"
-                        alt="Jack Flannagan"
+                        alt={personaData?.persona.name || "Voter"}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -184,13 +217,17 @@ const VoterDetails = () => {
                     {/* Occupation */}
                     <div className="border-b border-white/10 py-5 ml-4">
                       <div className="text-white/60 text-xs uppercase roboto-mono">OCCUPATION</div>
-                      <div className="text-white text-xl roboto-mono">OCCUPATION</div>
+                      <div className="text-white text-xl roboto-mono">
+                        {isLoading ? 'LOADING...' : error ? 'UNKNOWN' : personaData?.persona.role.toUpperCase() || 'OCCUPATION'}
+                      </div>
                     </div>
 
                     {/* Type */}
                     <div className="py-4 ml-4">
                       <div className="text-white/60 text-xs uppercase roboto-mono">TYPE</div>
-                      <div className="text-white text-xl roboto-mono">INFLUENCER</div>
+                      <div className="text-white text-xl roboto-mono">
+                        {isLoading ? 'LOADING...' : error ? 'UNKNOWN' : personaData?.persona.personaType.toUpperCase() || 'INFLUENCER'}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -198,13 +235,23 @@ const VoterDetails = () => {
 
               {/* Description */}
               <div className="mt-6">
-                <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
+                {/* <h3 className="text-white text-xl mb-2 roboto-mono">Description</h3>
                 <p className="text-white/80 text-sm leading-relaxed roboto-mono">
-                  Jack Flanagan is a quirky, soft-spoken oddball with a knack for fixing broken
-                  gadgets using tape and blind optimism. He wears cargo shorts year-round, talks to
-                  his plants like coworkers, and once tried to start a detective agency with a stray
-                  cat.
-                </p>
+                  {isLoading ? 'Loading voter description...' : 
+                   error ? 'Failed to load voter description.' : 
+                   personaData?.persona.intro || 
+                   'Jack Flanagan is a quirky, soft-spoken oddball with a knack for fixing broken gadgets using tape and blind optimism. He wears cargo shorts year-round, talks to his plants like coworkers, and once tried to start a detective agency with a stray cat.'}
+                </p> */}
+                
+                {/* Long Term Goal */}
+                {!isLoading && !error && personaData?.persona.longTermGoal && (
+                  <div className="mt-4">
+                    <h4 className="text-white text-lg mb-2 roboto-mono">Goal</h4>
+                    <p className="text-white/80 text-sm leading-relaxed roboto-mono">
+                      {personaData.persona.longTermGoal}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Political Leaning */}

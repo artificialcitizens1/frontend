@@ -40,9 +40,9 @@ const App: React.FC = () => {
         <Route path="/simulation-creation" element={<SimulationCreation />} />
         <Route path="/simulation-lore/:simId" element={<SimulationLore />} />
         <Route path="/simulation/:simId" element={<SimulationResult />} />
-        <Route path="/simulation/:simId/voter-details" element={<VoterDetails />} />
-        <Route path="/simulation/:simId/candidate-details" element={<CandidateDetails />} />
         <Route path="/simulation/:simId/election-result" element={<ElectionResult />} />
+        <Route path="/simulation/:simId/voter-details/:characterId" element={<VoterDetails />} />
+        <Route path="/simulation/:simId/candidate-details/:characterId" element={<CandidateDetails />} />
         {/* <Route path="/simulation-result" element={<SimulationResult />} /> */}
         {/* <Route path="/god-mode" element={<GodMode />} /> */}
         {/* <Route path="/voter-details" element={<VoterDetails />} /> */}

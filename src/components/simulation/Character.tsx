@@ -42,11 +42,8 @@ interface CharacterProps {
   bounds: DistrictData;
   isSelected: boolean;
   onClick: (id: string) => void;
-  onTravelComplete: (
-    id: string,
-    finalDistrict: "home" | "office" | "amphitheatre" | "outside"
-  ) => void;
-  onNavigateToVoterDetails: (type: "citizen" | "candidate" | "reporter") => void;
+  onTravelComplete: (id: string, finalDistrict: 'home' | 'office' | 'amphitheatre' | 'outside') => void;
+  onNavigateToVoterDetails: (type: 'citizen' | 'candidate' | 'reporter', characterId: string) => void;
   name: string;
 }
 
@@ -200,23 +197,35 @@ function Character({
   });
 
   return (
-    <Container x={position.x} y={position.y}>
-      <Graphics
-        eventMode={"static"}
-        draw={draw}
-        pointerover={() => setIsHovered(true)}
-        pointerout={() => setIsHovered(false)}
-        // pointerdown={() => onClick(characterId)}
-        pointerdown={() => onNavigateToVoterDetails(type)}
-      />
-      {isHovered && (
-        <Container y={-radius - 15}>
-          <Graphics draw={drawTooltipBackground} />
-          <Text text={name.toUpperCase()} anchor={0.5} x={0} y={-20} style={tooltipTextStyle} />
-          <Text text={type.toUpperCase()} anchor={0.5} x={0} y={-10} style={tooltipTypeStyle} />
-        </Container>
-      )}
-    </Container>
+      <Container x={position.x} y={position.y}>
+          <Graphics 
+              eventMode={'static'} 
+              draw={draw} 
+              pointerover={() => setIsHovered(true)} 
+              pointerout={() => setIsHovered(false)} 
+              // pointerdown={() => onClick(characterId)}
+              pointerdown={() => onNavigateToVoterDetails(type, characterId)}
+          />
+          {isHovered && (
+              <Container y={-radius - 15}>
+                  <Graphics draw={drawTooltipBackground} />
+                  <Text 
+                      text={name.toUpperCase()} 
+                      anchor={0.5} 
+                      x={0} 
+                      y={-20} 
+                      style={tooltipTextStyle} 
+                  />
+                  <Text 
+                      text={type.toUpperCase()} 
+                      anchor={0.5} 
+                      x={0} 
+                      y={-10} 
+                      style={tooltipTypeStyle} 
+                  />
+              </Container>
+          )}
+      </Container>
   );
 }
 
