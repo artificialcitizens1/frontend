@@ -3,28 +3,41 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getSimulationLore, getSimulationStatus } from '../api/simulationService';
 import '../styles/fonts.css'; // Import fonts
 import { useTickStore } from '../store/tickStore';
+import { useSimulationStore } from '../store';
+import PageLayout from "../components/layout/PageLayout";
+import Button from "../components/layout/Button";
 
 const SimulationLore = () => {
   const { simId } = useParams<{ simId: string }>();
-  const [loreTitle, setLoreTitle] = useState('');
-  const [loreContent, setLoreContent] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const { candidates } = useSimulationStore();
+  
+  const [loreTitle, setLoreTitle] = useState('The Lore');
+  const [loreContent, setLoreContent] = useState<string[]>([
+    'Once upon a time...',
+    'Once a peaceful place fueled by waffles and weird traditions, Siminipolis spiraled into chaos after the government replaced traffic lights with interpretive dancers. Gridlock. Panic. Mime protests.',
+    'The council resigned. An election was called.',
+    'Now it\'s Candidate A, a sharp-talking reformer with big plans to modernize the state, vs Candidate B, a nostalgic hardliner promising to "bring Siminipolis back."',
+    'The streets are buzzing. The voters are fired up. And everything\'s on the line.',
+    'Let\'s see how the election goes...'
+  ]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
-  // We're keeping simulationData for future expansion but not currently displaying it
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [titleAnimationComplete, setTitleAnimationComplete] = useState(false);
   const [displayedWords, setDisplayedWords] = useState<string[]>([]);
   const [simulationData, setSimulationData] = useState<any | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   const finalText = 'The choice now rests with the citizens…';
   const [finalTextTyped, setFinalTextTyped] = useState('');
   const [isFinalTyping, setIsFinalTyping] = useState(false);
   const typingAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isTypingLore, setIsTypingLore] = useState(false);
+  const [candidatesVisible, setCandidatesVisible] = useState(false);
+  const [contentBoxVisible, setContentBoxVisible] = useState(false);
 
-  const [isbuttonDisabled, setIsButtonDisabled] = useState<boolean>(true);
+  const [_isbuttonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const { setTickData, initializeCharacters } = useTickStore();
   
   // Fetch lore data
@@ -38,12 +51,28 @@ const SimulationLore = () => {
 
       try {
         const loreData = await getSimulationLore(simId);
-        setLoreTitle(loreData.title);
-        setLoreContent(loreData.content);
+        setLoreTitle(loreData.title || 'The Lore');
+        setLoreContent(loreData.content || [
+          'Once upon a time...',
+          'Once a peaceful place fueled by waffles and weird traditions, Siminipolis spiraled into chaos after the government replaced traffic lights with interpretive dancers. Gridlock. Panic. Mime protests.',
+          'The council resigned. An election was called.',
+          'Now it\'s Candidate A, a sharp-talking reformer with big plans to modernize the state, vs Candidate B, a nostalgic hardliner promising to "bring Siminipolis back."',
+          'The streets are buzzing. The voters are fired up. And everything\'s on the line.',
+          'Let\'s see how the election goes...'
+        ]);
         setIsLoading(false);
       } catch (err) {
         console.error('Error fetching lore:', err);
-        setError('Failed to fetch simulation lore. Please try again.');
+        // Use fallback content
+        setLoreTitle('The Lore');
+        setLoreContent([
+          'Once upon a time...',
+          'Once a peaceful place fueled by waffles and weird traditions, Siminipolis spiraled into chaos after the government replaced traffic lights with interpretive dancers. Gridlock. Panic. Mime protests.',
+          'The council resigned. An election was called.',
+          'Now it\'s Candidate A, a sharp-talking reformer with big plans to modernize the state, vs Candidate B, a nostalgic hardliner promising to "bring Siminipolis back."',
+          'The streets are buzzing. The voters are fired up. And everything\'s on the line.',
+          'Let\'s see how the election goes...'
+        ]);
         setIsLoading(false);
       }
     };
@@ -75,14 +104,25 @@ const SimulationLore = () => {
     if (!isLoading && loreTitle) {
       const titleTimer = setTimeout(() => {
         setTitleAnimationComplete(true);
-        // Prepare audio for use after title animation
-        if (!typingAudioRef.current) {
-          typingAudioRef.current = new window.Audio('/sounds/keyboard_sound.mp3');
-          typingAudioRef.current.loop = true;
-          typingAudioRef.current.volume = 0.5;
-          // Preload audio
-          typingAudioRef.current.load();
-        }
+        
+        // After title animation, show candidates with delay for fade-in effect
+        setTimeout(() => {
+          setCandidatesVisible(true);
+          
+          // After candidates appear, show content box with delay
+          setTimeout(() => {
+            setContentBoxVisible(true);
+            
+            // Prepare audio for typing after content box appears
+            if (!typingAudioRef.current) {
+              typingAudioRef.current = new window.Audio('/sounds/typing_beep.mp3');
+              typingAudioRef.current.loop = true;
+              typingAudioRef.current.volume = 0.5;
+              // Preload audio
+              typingAudioRef.current.load();
+            }
+          }, 800);
+        }, 800);
       }, 4000); // Allow 4 seconds for the title animation
       
       return () => {
@@ -94,9 +134,9 @@ const SimulationLore = () => {
 
   // Handle audio playback separately for better control
   useEffect(() => {
-    // Start audio when title animation complete and lore content is being typed
-    if (titleAnimationComplete && currentLineIndex < loreContent.length && !isAnimationComplete) {
-      if (typingAudioRef.current) {
+    // Start audio when content box is visible and lore content is being typed
+    if (contentBoxVisible && currentLineIndex < loreContent.length && !isAnimationComplete) {
+      if (typingAudioRef.current && isTypingLore) {
         // Make sure we restart from the beginning
         typingAudioRef.current.currentTime = 0;
         
@@ -115,24 +155,27 @@ const SimulationLore = () => {
             document.addEventListener('keydown', resumeAudio, { once: true });
           });
         }
+      } else if (typingAudioRef.current && !isTypingLore) {
+        // Pause audio when typing is paused
+        typingAudioRef.current.pause();
       }
     }
     
     // Stop audio when typing is complete or component unmounts
     return () => {
-      if (isAnimationComplete && typingAudioRef.current) {
+      if ((isAnimationComplete || !isTypingLore) && typingAudioRef.current) {
         typingAudioRef.current.pause();
         typingAudioRef.current.currentTime = 0;
       }
     };
-  }, [titleAnimationComplete, currentLineIndex, loreContent.length, isAnimationComplete]);
+  }, [contentBoxVisible, currentLineIndex, loreContent.length, isAnimationComplete, isTypingLore]);
 
   // Handle word-by-word animation with adaptive speed and auto-scrolling
   useEffect(() => {
     let wordInterval: NodeJS.Timeout | null = null;
     let paragraphTimer: NodeJS.Timeout | null = null;
 
-    if (!isLoading && titleAnimationComplete && loreContent.length > 0 && currentLineIndex < loreContent.length) {
+    if (!isLoading && contentBoxVisible && loreContent.length > 0 && currentLineIndex < loreContent.length) {
       setIsTypingLore(true);
       
       const words = loreContent[currentLineIndex].split(' ');
@@ -152,12 +195,15 @@ const SimulationLore = () => {
           if (wordInterval) clearInterval(wordInterval);
           // Pause after paragraph
           const pauseDuration = Math.min(2000, Math.max(1000, words.length * 50));
+          
+          // Pause typing sound during the paragraph pause
+          setIsTypingLore(false);
+          
           paragraphTimer = setTimeout(() => {
             const nextIndex = currentLineIndex + 1;
             if (nextIndex >= loreContent.length) {
               setIsAnimationComplete(true);
               setIsFinalTyping(true);
-              setIsTypingLore(false);
               
               // Stop the typing sound when all lore content is typed
               if (typingAudioRef.current) {
@@ -175,6 +221,8 @@ const SimulationLore = () => {
               }, 500);
             } else {
               setCurrentLineIndex(nextIndex);
+              // Resume typing sound for the next paragraph
+              setIsTypingLore(true);
             }
           }, pauseDuration);
         }
@@ -186,19 +234,24 @@ const SimulationLore = () => {
       if (paragraphTimer) clearTimeout(paragraphTimer);
       setIsTypingLore(false);
     };
-  }, [isLoading, titleAnimationComplete, loreContent, currentLineIndex]);
+  }, [isLoading, contentBoxVisible, loreContent, currentLineIndex]);
 
   // Final text typing effect
   useEffect(() => {
     if (isFinalTyping) {
       setFinalTextTyped('');
       let charIndex = 0;
+      
+      // Start typing sound for final text
+      setIsTypingLore(true);
+      
       const typeInterval = setInterval(() => {
         setFinalTextTyped(finalText.slice(0, charIndex + 1));
         charIndex++;
         if (charIndex >= finalText.length) {
           clearInterval(typeInterval);
           setIsFinalTyping(false);
+          setIsTypingLore(false);
         }
       }, 60);
       return () => clearInterval(typeInterval);
@@ -211,25 +264,85 @@ const SimulationLore = () => {
     navigate(`/simulation/${simId}`); // simulation result page.
   };
 
+  // Get candidate names and parties
+  const getCandidateInfo = () => {
+    if (candidates && candidates.length >= 2) {
+      return [
+        { name: candidates[0].name || 'RAHUL SINGH', party: 'BLUE PARTY' },
+        { name: candidates[1].name || 'ARMAN PATEL', party: 'ORANGE PARTY' }
+      ];
+    }
+    return [
+      { name: 'RAHUL SINGH', party: 'BLUE PARTY' },
+      { name: 'ARMAN PATEL', party: 'ORANGE PARTY' }
+    ];
+  };
+
+  const candidateInfo = getCandidateInfo();
+
+  // Toolbar actions - continue button at the top
+  const toolbarActions = (
+    <Button 
+      onClick={handleContinue}
+      disabled={!isAnimationComplete}
+      variant="primary"
+    >
+      Launch Simulation
+    </Button>
+  );
+
+  // Add useEffect to control page scrolling
+  useEffect(() => {
+    // Disable scrolling on the body when this component mounts
+    document.body.style.overflow = 'hidden';
+    
+    // Re-enable scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen w-full relative bg-black overflow-hidden">
-      {/* Stars background */}
-      <div className="fixed inset-0 bg-black opacity-100">
-        {/* Creating a starfield using pseudo-elements via CSS */}
+    <PageLayout>
+      {/* Custom Toolbar without back button - only title and continue button */}
+      <div className="sticky top-0 z-50 bg-transparent pt-6 pb-4 px-8">
+        <div className="max-w-[1728px] mx-auto flex justify-between items-center">
+          <div>
+            <h1 
+              className="text-white" 
+              style={{ 
+                fontFamily: "Roboto Mono",
+                fontWeight: 500,
+                fontSize: "48px",
+                lineHeight: "100%",
+                letterSpacing: "0%"
+              }}
+            >
+              The Lore
+            </h1>
+          </div>
+          
+          <div className="flex items-center">
+            {toolbarActions}
+          </div>
+        </div>
       </div>
-      
-      {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
+
+      {/* Main Content Container - No overflow, fixed height */}
+      <div 
+        className="w-full px-4 flex flex-col items-center justify-center overflow-hidden mt-12"
+        style={{ height: 'calc(100vh - 140px)' }}
+      >
         {isLoading ? (
           <div className="flex flex-col items-center py-8">
-            <div className="w-20 h-20 border-t-4 border-yellow-500 border-solid rounded-full animate-spin mb-4"></div>
+            <div className="w-20 h-20 border-t-4 border-pink-500 border-solid rounded-full animate-spin mb-4"></div>
             <p className="text-white text-lg" style={{ fontFamily: "Roboto Mono" }}>Loading the story of your world...</p>
           </div>
         ) : error ? (
           <div className="text-center bg-black/50 p-8 rounded-lg">
             <p className="text-red-500 mb-4" style={{ fontFamily: "Roboto Mono" }}>{error}</p>
             <button 
-              className="px-6 py-2 bg-white text-black font-medium rounded-md"
+              className="px-6 py-2 bg-white text-black font-medium"
               onClick={() => navigate('/candidate-settings')}
               style={{ fontFamily: "Roboto Mono" }}
             >
@@ -237,128 +350,153 @@ const SimulationLore = () => {
             </button>
           </div>
         ) : (
-          <div className="max-w-6xl w-full mx-auto text-center perspective">
-            {/* Title crawl animation */}
-            <div className={`title-crawl ${titleAnimationComplete ? 'fade-out' : ''}`}>
-              <div className="crawl-content">
-                <h1 
-                  className="text-yellow-400 text-7xl md:text-8xl tracking-widest font-bold title-3d"
-                  style={{ fontFamily: "Roboto Mono" }}
-                >
-                  {loreTitle}
-                </h1>
-              </div>
-            </div>
-            
-            {/* Main content appears after title animation */}
-            {titleAnimationComplete && (
-              <>
-                {/* Cinematic overlay effects */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent"></div>
+          <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden">
+            {/* Star Wars style title animation */}
+            {!titleAnimationComplete && (
+              <div className="absolute inset-0 star-wars-container perspective overflow-hidden">
+                <div className="title-crawl">
+                  <div className="crawl-content">
+                    <h1 
+                      className="text-yellow-400 text-6xl md:text-8xl tracking-wider font-bold title-3d"
+                      style={{ fontFamily: "Roboto Mono" }}
+                    >
+                      {loreTitle}
+                    </h1>
+                  </div>
                 </div>
-                
-                {/* Word-by-word lore content */}
-                <div 
-                  ref={contentRef}
-                  className="max-h-[60vh] overflow-y-auto pb-8 scrollbar-hide relative mt-20"
-                  style={{ scrollBehavior: 'smooth' }}
-                >
-                  <div className="space-y-12 py-4">
-                    {/* Previously displayed paragraphs */}
-                    {loreContent.slice(0, currentLineIndex).map((line, index) => (
-                      <p 
-                        key={index} 
-                        className="text-white text-xl md:text-2xl leading-relaxed"
-                        style={{ 
-                          fontFamily: "Roboto Mono",
-                          textShadow: '0 0 10px rgba(255,255,255,0.3)'
-                        }}
-                      >
-                        {line}
+              </div>
+            )}
+
+            {/* Content after title animation - Candidate Headers and Content Box */}
+            {titleAnimationComplete && (
+              <div className="w-full h-full flex flex-col items-center justify-center space-y-6 overflow-hidden">
+                {/* Candidate Headers - Fade in animation */}
+                <div className={`flex justify-between w-full max-w-[1728px] transition-all duration-1000 ease-in-out ${candidatesVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
+                  <div className="flex items-center bg-[#0F1322] py-2 px-4 rounded-sm w-[45%]">
+                    <img src="/images/candidate_default.png" alt="Candidate" className="w-12 h-12 mr-3" />
+                    <div className="text-left">
+                      <p className="text-white/70 text-xs" style={{ fontFamily: "Roboto Mono" }}>
+                        CANDIDATE|{candidateInfo[0].party}
                       </p>
-                    ))}
-                    
-                    {/* Current paragraph with word-by-word animation */}
-                    {currentLineIndex < loreContent.length && (
-                      <p 
-                        className="text-white text-xl md:text-2xl leading-relaxed"
-                        style={{ 
-                          fontFamily: "Roboto Mono",
-                          textShadow: '0 0 10px rgba(255,255,255,0.3)'
-                        }}
-                      >
-                        {displayedWords.join(' ')}
-                        {isTypingLore && <span className="cursor-animation"></span>}
+                      <p className="text-white text-xl" style={{ fontFamily: "Roboto Mono" }}>
+                        {candidateInfo[0].name}
                       </p>
-                    )}
-                    
-                    {/* Final line with typing effect and improved spacing - Star Wars style */}
-                    {isAnimationComplete && (
-                      <div className="mt-20 mb-8 overflow-visible">
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-end bg-[#0F1322] py-2 px-4 rounded-sm w-[45%]">
+                    <div className="text-right">
+                      <p className="text-white/70 text-xs" style={{ fontFamily: "Roboto Mono" }}>
+                        CANDIDATE|{candidateInfo[1].party}
+                      </p>
+                      <p className="text-white text-xl" style={{ fontFamily: "Roboto Mono" }}>
+                        {candidateInfo[1].name}
+                      </p>
+                    </div>
+                    <img src="/images/candidate_default.png" alt="Candidate" className="w-12 h-12 ml-3" />
+                  </div>
+                </div>
+
+                {/* Content Box - Appears with animation after candidates */}
+                <div className={`w-full max-w-[1728px] flex-grow flex flex-col bg-[#0F1322]/80 border border-white/10 rounded-sm p-8 transition-all duration-1000 ease-in-out overflow-hidden ${contentBoxVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-12'}`}>
+                  {/* First line is a heading */}
+                  {loreContent.length > 0 && contentBoxVisible && (
+                    <h2 
+                      className="text-white text-3xl mb-6 font-bold"
+                      style={{ fontFamily: "Roboto Mono" }}
+                    >
+                      {currentLineIndex > 0 ? loreContent[0] : displayedWords.join(' ')}
+                      {currentLineIndex === 0 && isTypingLore && <span className="cursor-animation"></span>}
+                    </h2>
+                  )}
+
+                  {/* Main content area with hidden scrollbar */}
+                  <div 
+                    ref={contentRef}
+                    className="flex-grow overflow-y-auto scrollbar-hide"
+                    style={{ scrollBehavior: 'smooth' }}
+                  >
+                    <div className="space-y-6 pr-4">
+                      {/* Previously displayed paragraphs (skipping the first one which is the heading) */}
+                      {loreContent.slice(1, currentLineIndex).map((line, index) => (
                         <p 
-                          className="text-yellow-400 text-2xl md:text-3xl leading-relaxed font-bold final-line tracking-wider"
+                          key={index} 
+                          className="text-white text-xl leading-relaxed"
                           style={{ 
                             fontFamily: "Roboto Mono",
-                            textShadow: '0 0 25px rgba(255,215,0,0.7)', 
-                            letterSpacing: '0.08em',
-                            transform: 'perspective(500px) rotateX(15deg)',
-                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {line}
+                        </p>
+                      ))}
+                      
+                      {/* Current paragraph with word-by-word animation (if not the first line) */}
+                      {currentLineIndex > 0 && currentLineIndex < loreContent.length && (
+                        <p 
+                          className="text-white text-xl leading-relaxed"
+                          style={{ 
+                            fontFamily: "Roboto Mono",
+                          }}
+                        >
+                          {displayedWords.join(' ')}
+                          {isTypingLore && <span className="cursor-animation"></span>}
+                        </p>
+                      )}
+                      
+                      {/* Final text */}
+                      {isAnimationComplete && (
+                        <p 
+                          className="text-white text-xl leading-relaxed mt-6"
+                          style={{ 
+                            fontFamily: "Roboto Mono",
                           }}
                         >
                           {finalTextTyped}
-                          {!isTypingLore && <span className="cursor-animation" />}
+                          {isFinalTyping && <span className="cursor-animation"></span>}
                         </p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
-                
-                {/* Controls with matching style to other pages */}
-                <div className="mt-16 flex justify-center gap-6 relative z-20">                  
-                  {isAnimationComplete && (
-                    <button 
-                      className="px-[88px] py-5 bg-white hover:bg-white/90 transition-colors text-black rounded-md shadow-lg hover:shadow-xl"
-                      onClick={handleContinue}
-                      style={{ 
-                        fontFamily: "Roboto Mono",
-                        boxShadow: '0 0 20px rgba(255, 255, 255, 0.4)'
-                      }}
-                    >
-                      <span className="text-[28px] leading-[37px]" style={{ fontFamily: "Roboto Mono" }}>
-                        Launch Simulation
-                      </span>
-                    </button>
-                  )}
-                </div>
-              </>
+              </div>
             )}
           </div>
         )}
       </div>
-      
+
       {/* CSS Animations */}
       <style>{`
-        /* Star field animation */
-        @keyframes twinkle {
-          0% { opacity: 0.2; }
-          50% { opacity: 0.8; }
-          100% { opacity: 0.2; }
+        /* PageLayout override to prevent scrolling */
+        .scrollbar-hide {
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* Internet Explorer 10+ */
         }
         
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none; /* WebKit */
+          width: 0 !important;
+          height: 0 !important;
+        }
+        
+        /* Star Wars style animations */
         .perspective {
           perspective: 800px;
         }
         
-        .title-crawl {
-          position: absolute;
-          top: 50%;
-          left: 0;
+        .star-wars-container {
+          height: 100%;
           width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+        }
+        
+        .title-crawl {
+          position: relative;
+          top: 0;
           transform-origin: 50% 100%;
-          transform: translateY(-50%) rotateX(30deg);
-          transition: opacity 2s ease;
+          animation: crawlUp 4s ease-out forwards;
         }
         
         .crawl-content {
@@ -366,41 +504,22 @@ const SimulationLore = () => {
           padding: 20px;
         }
         
-        .star-wars-intro {
-          animation: fadeInBlue 2s ease-out 0.5s forwards;
-          opacity: 0;
-        }
-        
-        .star-wars-subtitle {
-          animation: fadeInYellow 2s ease-out 1s forwards;
-          opacity: 0;
-        }
-        
-        .fade-out {
-          opacity: 0;
-        }
-        
         .title-3d {
-          animation: crawlUp 4s ease-out 1.5s forwards;
           opacity: 0;
-          text-shadow: 0 0 25px rgba(255,215,0,0.6);
-        }
-        
-        @keyframes fadeInBlue {
-          0% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-        
-        @keyframes fadeInYellow {
-          0% { opacity: 0; }
-          100% { opacity: 1; }
+          animation: fadeInAndScale 3.5s ease-out 0.5s forwards;
+          text-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
         }
         
         @keyframes crawlUp {
-          0% { transform: translateZ(0) scale(1); opacity: 0; }
-          10% { opacity: 1; }
-          85% { opacity: 1; transform: translateZ(-150px) scale(0.85); }
-          100% { transform: translateZ(-300px) scale(0.6); opacity: 0; }
+          0% { transform: rotateX(20deg) translateY(100vh); }
+          100% { transform: rotateX(20deg) translateY(-10vh); }
+        }
+        
+        @keyframes fadeInAndScale {
+          0% { opacity: 0; transform: scale(0.8); }
+          20% { opacity: 1; }
+          80% { opacity: 1; transform: scale(1); }
+          100% { opacity: 0; transform: scale(1.2); }
         }
         
         /* Cursor animation for typing effect */
@@ -417,48 +536,9 @@ const SimulationLore = () => {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
-        
-        /* Final line animation */
-        .final-line {
-          perspective: 400px;
-        }
-        
-        /* Starfield effect */
-        .bg-black::before,
-        .bg-black::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-image: 
-            radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-            radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-            radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
-          background-size: 550px 550px, 350px 350px, 250px 250px;
-          background-position: 0 0, 40px 60px, 130px 270px;
-          animation: twinkle 8s ease-in-out infinite alternate;
-        }
-        
-        .bg-black::after {
-          background-size: 450px 450px, 250px 250px, 150px 150px;
-          background-position: 50px 30px, 120px 100px, 10px 120px;
-          animation-duration: 10s;
-          animation-delay: 1s;
-        }
-        
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
       `}</style>
-    </div>
+    </PageLayout>
   );
 };
 
-export default SimulationLore; 
+export default SimulationLore;

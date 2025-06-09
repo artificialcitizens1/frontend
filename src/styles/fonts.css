@@ -3,6 +3,9 @@
 /* Import Roboto Mono from Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap");
 
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+
 /* Import Arcade Interlaced font */
 @font-face {
   font-family: "Arcade Interlaced";
@@ -28,4 +31,8 @@ body {
 
 .roboto-mono {
   font-family: 'Roboto Mono', monospace;
+}
+
+.inter {
+  font-family: 'Inter', sans-serif;
 }
